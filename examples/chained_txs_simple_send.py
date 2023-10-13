@@ -69,6 +69,6 @@ for x in range(consecutive_transactions):
     tx_1_outbox = appkit.get_outputs_to_spend(tx_1, 0)
     outBox_list.append(tx_1_outbox)
     time.sleep(sleep_time)
-    print(ergo.txId(tx_1)) # submits tx to node
+    print(ergo.txId(tx_1))  # submits tx to node
     time.sleep(sleep_time)
 helper_functions.exit()
