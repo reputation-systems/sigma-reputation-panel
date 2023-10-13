@@ -19,6 +19,8 @@ import time
 
 from ergpy import helper_functions, appkit
 
+# TODO   -   Don't work.
+
 # Logging utility
 LOGGING_FORMAT = '[%(asctime)s] - [%(levelname)-8s] -  %(message)s'
 logging.basicConfig(format=LOGGING_FORMAT)
@@ -45,7 +47,7 @@ consecutive_transactions = 3
 sleep_time = 0.5  # the amount of time in seconds the program will pause in between submitting txs
 # here we calculate the amount of ergs required for the genesis outbox
 genesis_amount = [consecutive_transactions * (0.22 + 0.33 + 0.11) + (consecutive_transactions + 1) * 0.001]
-genesis_receiver = [""]  # wallet of sender
+genesis_receiver = ["3WwdXmYP39DLmDWJ6grH9ArXbWuCt2uGAh46VTfeGPrHKJJY6cSJ"]  # wallet of sender
 
 # This creates an outbox for the chained transaction but will not submit it automatically to the node
 genesis_tx = helper_functions.simple_send(ergo=ergo, amount=genesis_amount, wallet_mnemonic=wallet_mnemonic,
