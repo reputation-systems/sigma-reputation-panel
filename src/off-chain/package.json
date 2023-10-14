@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@fleet-sdk/core": "^0.2.3"
+  }
+}

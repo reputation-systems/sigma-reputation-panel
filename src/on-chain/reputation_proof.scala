@@ -5,6 +5,8 @@
 *
 */
 
+// TODO: Definir AssignedReputation
+
 ! SELF.R5[AssignedReputation].isDefined &&  // An optional object where the proof assign it's reputation (it could be different types of data, like other Reputation systems, urls, git repositories, etc).
 {
     val owner = SELF.R4[SigmaProp].get  // Owner's public key. 
