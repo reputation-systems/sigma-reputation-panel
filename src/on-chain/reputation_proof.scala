@@ -5,7 +5,8 @@
 *
 */
 
-// TODO: Definir AssignedReputation
+//  TODO: Define AssignedReputation
+//  TODO: Limit the number of possible tokens to one
 
 ! SELF.R5[AssignedReputation].isDefined &&  // An optional object where the proof assign it's reputation (it could be different types of data, like other Reputation systems, urls, git repositories, etc).
 {
