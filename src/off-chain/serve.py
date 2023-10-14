@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return open("../front-end/index.html", "r").read()
+    return open("src/front-end/index.html", "r").read()
 
 
 @app.route('/get_unexpended_reputation_proofs/<owner_pk>')

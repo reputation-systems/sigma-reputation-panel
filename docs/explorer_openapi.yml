@@ -1,0 +1,3159 @@
+openapi: 3.0.3
+info:
+  title: Ergo Explorer API v1
+  version: '1.0'
+tags:
+- name: transactions
+  description: Transactions methods
+- name: boxes
+  description: Boxes methods
+- name: assets
+  description: Assets methods
+- name: epochs
+  description: Epochs methods
+- name: addresses
+  description: Addresses methods
+- name: blocks
+  description: Blocks methods
+paths:
+  /api/v1/transactions/{p1}:
+    get:
+      operationId: getApiV1TransactionsP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/transactions/byInputsScriptTemplateHash/{p1}:
+    get:
+      operationId: getApiV1TransactionsByinputsscripttemplatehashP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/transactions/byGlobalIndex/stream:
+    get:
+      description: Get a stream of transactions ordered by global index
+      operationId: getApiV1TransactionsByglobalindexStream
+      parameters:
+      - name: minGix
+        in: query
+        description: Min global index (in blockchain) of the TX
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_TransactionInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byLastEpochs/stream:
+    get:
+      operationId: getApiV1BoxesUnspentBylastepochsStream
+      parameters:
+      - name: lastEpochs
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 1536
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byGlobalIndex/stream:
+    get:
+      description: Get a stream of unspent outputs ordered by global index
+      operationId: getApiV1BoxesUnspentByglobalindexStream
+      parameters:
+      - name: minGix
+        in: query
+        description: Min global index (in blockchain) of an on-chain entity
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/stream:
+    get:
+      operationId: getApiV1BoxesUnspentStream
+      parameters:
+      - name: minHeight
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+      - name: maxHeight
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/byErgoTreeTemplateHash/{p1}/stream:
+    get:
+      description: Get a stream of unspent outputs by a hash of the given ErgoTreeTemplate
+      operationId: getApiV1BoxesByergotreetemplatehashP1Stream
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: minHeight
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+      - name: maxHeight
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byErgoTreeTemplateHash/{p1}/stream:
+    get:
+      operationId: getApiV1BoxesUnspentByergotreetemplatehashP1Stream
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: minHeight
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 0
+      - name: maxHeight
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byTokenId/{p1}:
+    get:
+      operationId: getApiV1BoxesUnspentBytokenidP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/byTokenId/{p1}:
+    get:
+      operationId: getApiV1BoxesBytokenidP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/{p1}:
+    get:
+      operationId: getApiV1BoxesP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/byErgoTree/{p1}:
+    get:
+      operationId: getApiV1BoxesByergotreeP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/byErgoTreeTemplateHash/{p1}:
+    get:
+      operationId: getApiV1BoxesByergotreetemplatehashP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byErgoTree/{p1}:
+    get:
+      operationId: getApiV1BoxesUnspentByergotreeP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byErgoTreeTemplateHash/{p1}:
+    get:
+      operationId: getApiV1BoxesUnspentByergotreetemplatehashP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/byAddress/{p1}:
+    get:
+      operationId: getApiV1BoxesByaddressP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/unconfirmed/byAddress/{p1}:
+    get:
+      operationId: getApiV1BoxesUnspentUnconfirmedByaddressP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MOutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/byAddress/{p1}:
+    get:
+      operationId: getApiV1BoxesUnspentByaddressP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/byGlobalIndex/stream:
+    get:
+      description: Get a stream of outputs ordered by global index
+      operationId: getApiV1BoxesByglobalindexStream
+      parameters:
+      - name: minGix
+        in: query
+        description: Min global index (in blockchain) of an on-chain entity
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/search/union:
+    post:
+      description: Search among UTXO set by ergoTreeTemplateHash and tokens. The resulted
+        UTXOs will contain at lest one of the given tokens.
+      operationId: postApiV1BoxesUnspentSearchUnion
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoxAssetsQuery'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/unspent/search:
+    post:
+      description: Detailed search among UTXO set
+      operationId: postApiV1BoxesUnspentSearch
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoxQuery'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/boxes/search:
+    post:
+      description: Detailed search among all boxes in the chain
+      operationId: postApiV1BoxesSearch
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoxQuery'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/tokens:
+    get:
+      operationId: getApiV1Tokens
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: hideNfts
+        in: query
+        description: Exclude NFTs from result set
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/tokens/search:
+    get:
+      description: Search by ID or Symbol of an asset. Note that symbols aren't unique.
+      operationId: getApiV1TokensSearch
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 3
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/tokens/bySymbol/{p1}:
+    get:
+      description: Get all assets with a given Symbol. Note that symbols aren't unique.
+      operationId: getApiV1TokensBysymbolP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TokenInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/tokens/{p1}:
+    get:
+      operationId: getApiV1TokensP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/assets:
+    get:
+      description: Use '/tokens' instead
+      operationId: getApiV1Assets
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: hideNfts
+        in: query
+        description: Exclude NFTs from result set
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+      deprecated: true
+  /api/v1/assets/search/byTokenId:
+    get:
+      operationId: getApiV1AssetsSearchBytokenid
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 5
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/epochs/params:
+    get:
+      operationId: getApiV1EpochsParams
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpochInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/addresses/{p1}/transactions:
+    get:
+      operationId: getApiV1AddressesP1Transactions
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: concise
+        in: query
+        description: Display only address inputs/outputs in transaction
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: fromHeight
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: toHeight
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/addresses/{p1}/balance/confirmed:
+    get:
+      operationId: getApiV1AddressesP1BalanceConfirmed
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: minConfirmations
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Balance'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/addresses/{p1}/balance/total:
+    get:
+      operationId: getApiV1AddressesP1BalanceTotal
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalBalance'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/blocks:
+    get:
+      operationId: getApiV1Blocks
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/blocks/{p1}:
+    get:
+      operationId: getApiV1BlocksP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockSummary'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/blocks/headers:
+    get:
+      operationId: getApiV1BlocksHeaders
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/blocks/byGlobalIndex/stream:
+    get:
+      description: Get a stream of blocks ordered by global index (height)
+      operationId: getApiV1BlocksByglobalindexStream
+      parameters:
+      - name: minGix
+        in: query
+        description: Min global index (in blockchain) of an on-chain entity
+        required: true
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+      - name: limit
+        in: query
+        required: true
+        schema:
+          type: integer
+          maximum: 500
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_BlockInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/blocks/stream/summary:
+    get:
+      description: Get a stream of block summaries ordered by global index (height)
+      operationId: getApiV1BlocksStreamSummary
+      parameters:
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1536
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_BlockSummaryV1'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/mempool/transactions/submit:
+    post:
+      operationId: postApiV1MempoolTransactionsSubmit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxIdResponse'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/mempool/transactions/byAddress/{p1}:
+    get:
+      operationId: getApiV1MempoolTransactionsByaddressP1
+      parameters:
+      - name: p1
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: offset
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 2147483647
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Items_A'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/mempool/boxes/unspent:
+    get:
+      description: Get a stream of unspent outputs
+      operationId: getApiV1MempoolBoxesUnspent
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List_OutputInfo'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/info:
+    get:
+      operationId: getApiV1Info
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkState'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+      deprecated: true
+  /api/v1/networkState:
+    get:
+      operationId: getApiV1Networkstate
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkState'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/networkStats:
+    get:
+      operationId: getApiV1Networkstats
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkStats'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+  /api/v1/ergotree/convert:
+    post:
+      operationId: postApiV1ErgotreeConvert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErgoTreeConversionRequest'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErgoTreeHuman'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        default:
+          description: Unknown error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnknownErr'
+components:
+  schemas:
+    AssetInfo:
+      required:
+      - headerId
+      - boxId
+      - tokenId
+      - index
+      - amount
+      type: object
+      properties:
+        headerId:
+          type: string
+          description: Header ID this asset belongs to
+        boxId:
+          type: string
+          description: Box ID this asset belongs to
+        tokenId:
+          type: string
+          description: Token ID
+        index:
+          type: integer
+          description: Index of the asset in an output
+        amount:
+          type: integer
+          description: Amount of tokens
+          format: int64
+        name:
+          type: string
+          description: Name of the asset
+        decimals:
+          type: integer
+          description: Number of decimal places
+        type:
+          type: string
+          description: Type of the asset (token standard)
+    AssetInstanceInfo:
+      required:
+      - tokenId
+      - index
+      - amount
+      type: object
+      properties:
+        tokenId:
+          type: string
+          description: Token ID
+        index:
+          type: integer
+          description: Index of the asset in an output
+        amount:
+          type: integer
+          description: Amount of tokens
+          format: int64
+        name:
+          type: string
+          description: Name of a token
+        decimals:
+          type: integer
+          description: Number of decimal places
+        type:
+          type: string
+          description: Type of a token (token standard)
+    BadRequest:
+      required:
+      - status
+      - reason
+      type: object
+      properties:
+        status:
+          type: integer
+        reason:
+          type: string
+    Balance:
+      required:
+      - nanoErgs
+      type: object
+      properties:
+        nanoErgs:
+          type: integer
+          description: Ergo balance
+          format: int64
+        tokens:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenAmount'
+          description: Tokens balances
+    BlockExtensionInfo:
+      required:
+      - headerId
+      - digest
+      - fields
+      type: object
+      properties:
+        headerId:
+          type: string
+          description: ID of the corresponding header
+        digest:
+          type: string
+          description: Hex-encoded extension digest
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+    BlockHeader:
+      required:
+      - id
+      - parentId
+      - version
+      - timestamp
+      - height
+      - nBits
+      - votes
+      - stateRoot
+      - adProofsRoot
+      - transactionsRoot
+      - extensionHash
+      - powSolutions
+      type: object
+      properties:
+        id:
+          type: string
+          description: Modifier ID
+        parentId:
+          type: string
+          description: Modifier ID
+        version:
+          type: integer
+        timestamp:
+          type: integer
+          format: int64
+        height:
+          type: integer
+        nBits:
+          type: integer
+          format: int64
+        votes:
+          type: string
+        stateRoot:
+          type: string
+          description: Hex-encoded string
+        adProofsRoot:
+          type: string
+          description: Hex-encoded string
+        transactionsRoot:
+          type: string
+          description: Hex-encoded string
+        extensionHash:
+          type: string
+          description: Hex-encoded string
+        powSolutions:
+          $ref: '#/components/schemas/BlockPowSolutions'
+    BlockInfo:
+      required:
+      - id
+      - height
+      - epoch
+      - version
+      - timestamp
+      - transactionsCount
+      - miner
+      - size
+      - difficulty
+      - minerReward
+      type: object
+      properties:
+        id:
+          type: string
+          description: Block ID
+        height:
+          type: integer
+          description: Block height
+        epoch:
+          type: integer
+          description: Block epoch (Epochs are enumerated from 0)
+        version:
+          type: integer
+          description: Block version
+        timestamp:
+          type: integer
+          description: Timestamp the block was created (UNIX timestamp in millis)
+          format: int64
+        transactionsCount:
+          type: integer
+          description: Number of transactions included in the block
+        miner:
+          $ref: '#/components/schemas/MinerInfo'
+        size:
+          type: integer
+          description: Overall size of the block in bytes
+        difficulty:
+          type: string
+          description: Block difficulty
+        minerReward:
+          type: integer
+          description: The amount of nanoErgs miner received as a reward for block
+          format: int64
+    BlockPowSolutions:
+      required:
+      - pk
+      - w
+      - n
+      - d
+      type: object
+      properties:
+        pk:
+          type: string
+          description: Hex-encoded string
+        w:
+          type: string
+          description: Hex-encoded string
+        n:
+          type: string
+          description: Hex-encoded string
+        d:
+          type: string
+    BlockReferencesInfo:
+      required:
+      - previousId
+      type: object
+      properties:
+        previousId:
+          type: string
+          description: ID of the previous block
+        nextId:
+          type: string
+          description: ID of the next block (if one exists)
+      description: References to previous and next (if exists) blocks
+    BlockSummary:
+      required:
+      - block
+      - references
+      type: object
+      properties:
+        block:
+          $ref: '#/components/schemas/FullBlockInfo'
+        references:
+          $ref: '#/components/schemas/BlockReferencesInfo'
+    BlockSummaryV1:
+      required:
+      - header
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/HeaderInfo'
+        blockTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionInfo1'
+    BoxAssetsQuery:
+      required:
+      - ergoTreeTemplateHash
+      type: object
+      properties:
+        ergoTreeTemplateHash:
+          type: string
+          description: SHA-256 hash of ErgoTree template this box script should have
+        assets:
+          type: array
+          items:
+            type: string
+            description: Token ID
+          description: IDs of tokens returned boxes should contain
+    BoxQuery:
+      required:
+      - ergoTreeTemplateHash
+      type: object
+      properties:
+        ergoTreeTemplateHash:
+          type: string
+          description: SHA-256 hash of ErgoTree template this box script should have
+        registers:
+          type: object
+          description: Pairs of (register ID, register value) this box should contain
+          additionalProperties:
+            type: string
+        constants:
+          type: object
+          description: Pairs of (constant index, constant value) this box should contain
+          additionalProperties:
+            type: string
+        assets:
+          type: array
+          items:
+            type: string
+            description: Token ID
+          description: IDs of tokens returned boxes should contain
+    DataInputInfo:
+      required:
+      - boxId
+      - value
+      - index
+      - outputBlockId
+      - outputTransactionId
+      - outputIndex
+      - ergoTree
+      - address
+      - additionalRegisters
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: ID of the corresponding box
+        value:
+          type: integer
+          description: Number of nanoErgs in the corresponding box
+          format: int64
+        index:
+          type: integer
+          description: Index of the input in a transaction
+        outputBlockId:
+          type: string
+          description: Modifier ID
+        outputTransactionId:
+          type: string
+          description: ID of the transaction outputting corresponding box
+        outputIndex:
+          type: integer
+          description: Index of the output corresponding this input
+        ergoTree:
+          type: string
+          description: Hex-encoded string
+        address:
+          type: string
+          description: Decoded address of the corresponding box holder
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+    DataInputInfo1:
+      required:
+      - id
+      - index
+      - transactionId
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the corresponding box
+        value:
+          type: integer
+          description: Number of nanoErgs in the corresponding box
+          format: int64
+        index:
+          type: integer
+        transactionId:
+          type: string
+          description: ID of the transaction this data input was used in
+        outputTransactionId:
+          type: string
+          description: ID of the transaction outputting corresponding box
+        outputIndex:
+          type: integer
+        address:
+          type: string
+          description: Decoded address of the corresponding box holder
+    EpochInfo:
+      required:
+      - height
+      - storageFeeFactor
+      - minValuePerByte
+      - maxBlockSize
+      - maxBlockCost
+      - blockVersion
+      - tokenAccessCost
+      - inputCost
+      - dataInputCost
+      - outputCost
+      type: object
+      properties:
+        height:
+          type: integer
+        storageFeeFactor:
+          type: integer
+        minValuePerByte:
+          type: integer
+        maxBlockSize:
+          type: integer
+        maxBlockCost:
+          type: integer
+        blockVersion:
+          type: integer
+        tokenAccessCost:
+          type: integer
+        inputCost:
+          type: integer
+        dataInputCost:
+          type: integer
+        outputCost:
+          type: integer
+    ErgoTreeConversionRequest:
+      required:
+      - hashed
+      type: object
+      properties:
+        hashed:
+          type: string
+          description: Hashed value of ergo script
+    ErgoTreeHuman:
+      required:
+      - constants
+      - script
+      type: object
+      properties:
+        constants:
+          type: string
+          description: Constants use in ergo script
+        script:
+          type: string
+          description: Human readable ergo script
+    FullBlockInfo:
+      required:
+      - header
+      - extension
+      type: object
+      properties:
+        header:
+          $ref: '#/components/schemas/HeaderInfo'
+        blockTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionInfo1'
+        extension:
+          $ref: '#/components/schemas/BlockExtensionInfo'
+        adProofs:
+          type: string
+          description: Serialized hex-encoded AD Proofs
+      description: Full block info
+    HeaderInfo:
+      required:
+      - id
+      - parentId
+      - version
+      - height
+      - epoch
+      - difficulty
+      - adProofsRoot
+      - stateRoot
+      - transactionsRoot
+      - timestamp
+      - nBits
+      - size
+      - extensionHash
+      - powSolutions
+      - votes
+      type: object
+      properties:
+        id:
+          type: string
+          description: Block/header ID
+        parentId:
+          type: string
+          description: ID of the parental block/header
+        version:
+          type: integer
+          description: Version of the header
+        height:
+          type: integer
+          description: Block/header height
+        epoch:
+          type: integer
+          description: Block/header epoch (Epochs are enumerated from 0)
+        difficulty:
+          type: string
+          description: Block/header difficulty
+        adProofsRoot:
+          type: string
+          description: Hex-encoded root of the corresponding AD proofs
+        stateRoot:
+          type: string
+          description: Hex-encoded root of the corresponding state
+        transactionsRoot:
+          type: string
+          description: Hex-encoded root of the corresponding transactions
+        timestamp:
+          type: integer
+          description: Timestamp the block/header was created
+          format: int64
+        nBits:
+          type: integer
+          description: Encoded required difficulty
+          format: int64
+        size:
+          type: integer
+          description: Size of the header in bytes
+        extensionHash:
+          type: string
+          description: Hex-encoded hash of the corresponding extension
+        powSolutions:
+          $ref: '#/components/schemas/PowSolutionInfo'
+        votes:
+          $ref: '#/components/schemas/Tuple3_Byte_Byte_Byte'
+    InputInfo:
+      required:
+      - boxId
+      - value
+      - index
+      - outputBlockId
+      - outputTransactionId
+      - outputIndex
+      - outputGlobalIndex
+      - outputCreatedAt
+      - outputSettledAt
+      - ergoTree
+      - ergoTreeConstants
+      - ergoTreeScript
+      - address
+      - additionalRegisters
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: ID of the corresponding box
+        value:
+          type: integer
+          description: Number of nanoErgs in the corresponding box
+          format: int64
+        index:
+          type: integer
+          description: Index of the input in a transaction
+        spendingProof:
+          type: string
+          description: Hex-encoded serialized sigma proof
+        outputBlockId:
+          type: string
+          description: Modifier ID
+        outputTransactionId:
+          type: string
+          description: ID of the transaction outputting corresponding box
+        outputIndex:
+          type: integer
+          description: Index of the output corresponding this input
+        outputGlobalIndex:
+          type: integer
+          description: Global index of the output corresponding this input
+          format: int64
+        outputCreatedAt:
+          type: integer
+          description: Height the output corresponding this input was created at
+        outputSettledAt:
+          type: integer
+          description: Height the output corresponding this input was settled at
+        ergoTree:
+          type: string
+          description: Hex-encoded string
+        ergoTreeConstants:
+          type: string
+        ergoTreeScript:
+          type: string
+        address:
+          type: string
+          description: Decoded address of the corresponding box holder
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+    InputInfo1:
+      required:
+      - id
+      - index
+      - transactionId
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the corresponding box
+        value:
+          type: integer
+          description: Number of nanoErgs in the corresponding box
+          format: int64
+        index:
+          type: integer
+          description: Index of the input in a transaction
+        spendingProof:
+          type: string
+          description: Hex-encoded serialized sigma proof
+        transactionId:
+          type: string
+          description: ID of the transaction this input was used in
+        outputTransactionId:
+          type: string
+          description: ID of the transaction outputting corresponding box
+        outputIndex:
+          type: integer
+          description: Index of the output corresponding this input
+        address:
+          type: string
+          description: Decoded address of the corresponding box holder
+    Items_A:
+      required:
+      - total
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionInfo'
+          description: Items in selection
+        total:
+          type: integer
+          description: Total qty of items
+    List_BlockInfo:
+      oneOf:
+      - $ref: '#/components/schemas/Nil'
+      - type: array
+        items:
+          $ref: '#/components/schemas/BlockInfo'
+    List_BlockSummaryV1:
+      oneOf:
+      - $ref: '#/components/schemas/Nil'
+      - type: array
+        items:
+          $ref: '#/components/schemas/BlockSummaryV1'
+    List_OutputInfo:
+      oneOf:
+      - $ref: '#/components/schemas/Nil'
+      - type: array
+        items:
+          $ref: '#/components/schemas/OutputInfo'
+    List_TransactionInfo:
+      oneOf:
+      - $ref: '#/components/schemas/Nil'
+      - type: array
+        items:
+          $ref: '#/components/schemas/TransactionInfo'
+    MOutputInfo:
+      required:
+      - boxId
+      - transactionId
+      - value
+      - index
+      - creationHeight
+      - ergoTree
+      - address
+      - additionalRegisters
+      - mainChain
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: Id of the box
+        transactionId:
+          type: string
+          description: Id of the transaction that created the box
+        blockId:
+          type: string
+          description: Id of the block a box included in
+        value:
+          type: integer
+          description: Value of the box in nanoERG
+          format: int64
+        index:
+          type: integer
+          description: Index of the output in a transaction
+        globalIndex:
+          type: integer
+          description: Global index of the output in the blockchain
+          format: int64
+        creationHeight:
+          type: integer
+          description: Height at which the box was created
+        settlementHeight:
+          type: integer
+          description: Height at which the box got fixed in blockchain
+        ergoTree:
+          type: string
+          description: Serialized ergo tree
+        address:
+          type: string
+          description: An address derived from ergo tree
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+        spentTransactionId:
+          type: string
+          description: Id of the transaction this output was spent by
+        mainChain:
+          type: boolean
+    MinerInfo:
+      required:
+      - address
+      - name
+      type: object
+      properties:
+        address:
+          type: string
+          description: Miner reward address
+        name:
+          type: string
+          description: Miner name
+    NetworkState:
+      required:
+      - lastBlockId
+      - height
+      - maxBoxGix
+      - maxTxGix
+      - params
+      type: object
+      properties:
+        lastBlockId:
+          type: string
+          description: Modifier ID
+        height:
+          type: integer
+        maxBoxGix:
+          type: integer
+          format: int64
+        maxTxGix:
+          type: integer
+          format: int64
+        params:
+          $ref: '#/components/schemas/EpochInfo'
+    NetworkStats:
+      required:
+      - uniqueAddressesNum
+      type: object
+      properties:
+        uniqueAddressesNum:
+          type: integer
+          format: int64
+    Nil:
+      type: object
+    NotFound:
+      required:
+      - status
+      - reason
+      type: object
+      properties:
+        status:
+          type: integer
+        reason:
+          type: string
+    OutputInfo:
+      required:
+      - boxId
+      - transactionId
+      - blockId
+      - value
+      - index
+      - globalIndex
+      - creationHeight
+      - settlementHeight
+      - ergoTree
+      - ergoTreeConstants
+      - ergoTreeScript
+      - address
+      - additionalRegisters
+      - mainChain
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: Id of the box
+        transactionId:
+          type: string
+          description: Id of the transaction that created the box
+        blockId:
+          type: string
+          description: Id of the block a box included in
+        value:
+          type: integer
+          description: Value of the box in nanoERG
+          format: int64
+        index:
+          type: integer
+          description: Index of the output in a transaction
+        globalIndex:
+          type: integer
+          description: Global index of the output in the blockchain
+          format: int64
+        creationHeight:
+          type: integer
+          description: Height at which the box was created
+        settlementHeight:
+          type: integer
+          description: Height at which the box got fixed in blockchain
+        ergoTree:
+          type: string
+          description: Serialized ergo tree
+        ergoTreeConstants:
+          type: string
+        ergoTreeScript:
+          type: string
+        address:
+          type: string
+          description: An address derived from ergo tree
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+        spentTransactionId:
+          type: string
+          description: Id of the transaction this output was spent by
+        mainChain:
+          type: boolean
+    OutputInfo1:
+      required:
+      - id
+      - txId
+      - value
+      - index
+      - creationHeight
+      - ergoTree
+      - address
+      - additionalRegisters
+      - mainChain
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of the box
+        txId:
+          type: string
+          description: Id of the transaction that created the box
+        value:
+          type: integer
+          description: Value of the box in nanoERG
+          format: int64
+        index:
+          type: integer
+          description: Index of the output in a transaction
+        creationHeight:
+          type: integer
+          description: Height at which the box was created
+        ergoTree:
+          type: string
+          description: Serialized ergo tree
+        address:
+          type: string
+          description: An address derived from ergo tree
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+        spentTransactionId:
+          type: string
+          description: Transaction ID
+        mainChain:
+          type: boolean
+    PowSolutionInfo:
+      required:
+      - pk
+      - w
+      - n
+      - d
+      type: object
+      properties:
+        pk:
+          type: string
+          description: Miner public key
+        w:
+          type: string
+          description: Hex-encoded string
+        n:
+          type: string
+          description: Hex-encoded string
+        d:
+          type: string
+          description: Autolykos.d
+    TokenAmount:
+      required:
+      - tokenId
+      - amount
+      - decimals
+      type: object
+      properties:
+        tokenId:
+          type: string
+          description: Token ID
+        amount:
+          type: integer
+          description: Token amount
+          format: int64
+        decimals:
+          type: integer
+          description: Number of decimals
+        name:
+          type: string
+          description: Token name
+        tokenType:
+          type: string
+          description: Asset type (token standard)
+    TokenInfo:
+      required:
+      - id
+      - boxId
+      - emissionAmount
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the asset
+        boxId:
+          type: string
+          description: Box ID this asset was issued by
+        emissionAmount:
+          type: integer
+          description: Number of decimal places
+          format: int64
+        name:
+          type: string
+          description: Name of the asset
+        description:
+          type: string
+          description: Description of the asset
+        type:
+          type: string
+          description: Asset type (token standard)
+        decimals:
+          type: integer
+          description: Number of decimal places
+    TotalBalance:
+      required:
+      - confirmed
+      - unconfirmed
+      type: object
+      properties:
+        confirmed:
+          $ref: '#/components/schemas/Balance'
+        unconfirmed:
+          $ref: '#/components/schemas/Balance'
+    TransactionInfo:
+      required:
+      - id
+      - blockId
+      - inclusionHeight
+      - timestamp
+      - index
+      - globalIndex
+      - numConfirmations
+      - size
+      type: object
+      properties:
+        id:
+          type: string
+          description: Transaction ID
+        blockId:
+          type: string
+          description: ID of the corresponding header
+        inclusionHeight:
+          type: integer
+          description: Height of the block the transaction was included in
+        timestamp:
+          type: integer
+          description: Timestamp the transaction got into the network
+          format: int64
+        index:
+          type: integer
+          description: Index of a transaction inside a block
+        globalIndex:
+          type: integer
+          description: global index of a transaction in the blockchain
+          format: int64
+        numConfirmations:
+          type: integer
+          description: Number of transaction confirmations
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputInfo'
+        dataInputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataInputInfo'
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutputInfo'
+        size:
+          type: integer
+          description: Transaction size in bytes
+    TransactionInfo1:
+      required:
+      - id
+      - headerId
+      - inclusionHeight
+      - timestamp
+      - index
+      - confirmationsCount
+      type: object
+      properties:
+        id:
+          type: string
+          description: Transaction ID
+        headerId:
+          type: string
+          description: ID of the corresponding header
+        inclusionHeight:
+          type: integer
+          description: Height of the block the transaction was included in
+        timestamp:
+          type: integer
+          description: Timestamp the transaction got into the network
+          format: int64
+        index:
+          type: integer
+          description: Index of a transaction inside a block
+        confirmationsCount:
+          type: integer
+          description: Number of transaction confirmations
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/InputInfo1'
+        dataInputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataInputInfo1'
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/OutputInfo1'
+    Tuple3_Byte_Byte_Byte:
+      required:
+      - _1
+      - _2
+      - _3
+      type: object
+      properties:
+        _1:
+          type: integer
+        _2:
+          type: integer
+        _3:
+          type: integer
+      description: Block votes (3 bytes)
+    TxIdResponse:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id of submitted transaction
+    UDataInputInfo:
+      required:
+      - boxId
+      - value
+      - index
+      - outputTransactionId
+      - outputIndex
+      - ergoTree
+      - address
+      - additionalRegisters
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: ID of the corresponding box
+        value:
+          type: integer
+          description: Number of nanoErgs in the corresponding box
+          format: int64
+        index:
+          type: integer
+          description: Index of the input in a transaction
+        outputBlockId:
+          type: string
+          description: Modifier ID
+        outputTransactionId:
+          type: string
+          description: ID of the transaction outputting corresponding box
+        outputIndex:
+          type: integer
+          description: Index of the output corresponding this input
+        ergoTree:
+          type: string
+          description: ErgoTree Template
+        address:
+          type: string
+          description: Decoded address of the corresponding box holder
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+    UInputInfo:
+      required:
+      - boxId
+      - value
+      - index
+      - outputTransactionId
+      - outputIndex
+      - ergoTree
+      - address
+      - additionalRegisters
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: ID of the corresponding box
+        value:
+          type: integer
+          description: Number of nanoErgs in the corresponding box
+          format: int64
+        index:
+          type: integer
+          description: Index of the input in a transaction
+        spendingProof:
+          type: string
+          description: Hex-encoded serialized sigma proof
+        outputBlockId:
+          type: string
+          description: Modifier ID
+        outputTransactionId:
+          type: string
+          description: ID of the transaction outputting corresponding box
+        outputIndex:
+          type: integer
+          description: Index of the output corresponding this input
+        ergoTree:
+          type: string
+          description: ErgoTree Template
+        address:
+          type: string
+          description: Decoded address of the corresponding box holder
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+    UOutputInfo:
+      required:
+      - boxId
+      - transactionId
+      - value
+      - index
+      - creationHeight
+      - ergoTree
+      - address
+      - additionalRegisters
+      type: object
+      properties:
+        boxId:
+          type: string
+          description: Id of the box
+        transactionId:
+          type: string
+          description: Id of the transaction that created the box
+        value:
+          type: integer
+          description: Value of the box in nanoERG
+          format: int64
+        index:
+          type: integer
+          description: Index of the output in a transaction
+        creationHeight:
+          type: integer
+          description: Height at which the box was created
+        ergoTree:
+          type: string
+          description: Serialized ergo tree
+        address:
+          type: string
+          description: An address derived from ergo tree
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetInstanceInfo'
+        additionalRegisters:
+          type: object
+          additionalProperties:
+            type: string
+        spentTransactionId:
+          type: string
+          description: Id of the transaction this output was spent by
+    UTransactionInfo:
+      required:
+      - id
+      - creationTimestamp
+      - size
+      type: object
+      properties:
+        id:
+          type: string
+          description: Transaction ID
+        creationTimestamp:
+          type: integer
+          description: Timestamp the transaction got into the network
+          format: int64
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UInputInfo'
+        dataInputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UDataInputInfo'
+        outputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UOutputInfo'
+        size:
+          type: integer
+          description: Transaction size in bytes
+    UnknownErr:
+      required:
+      - status
+      - reason
+      type: object
+      properties:
+        status:
+          type: integer
+        reason:
+          type: string

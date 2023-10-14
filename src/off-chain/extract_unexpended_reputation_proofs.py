@@ -2,6 +2,7 @@
 from typing import List
 
 DEMO_DATA = True
+CONTRACT_HASH = "2Ud2Ryh6MkC8Lstg1BiSE86Vbs7FTBdChEMo2c3ZK3pyGaQoY2Ck9QQiz2n4vWP6"
 
 
 class ReputationProofs:
@@ -44,6 +45,24 @@ def extract_unexpended_reputation_proofs(owner_pk: bytes) -> List[ReputationProo
                 expended_amount=randrange(0, 50)
             ) for _i in range(10)
         ]
+
     else:
-        from ergpy import appkit, helper_functions
-        pass
+        import requests
+        api_url = "https://api.ergoplatform.com/api/v1/boxes/unspent/search"
+        payload = {
+          "ergoTreeTemplateHash": CONTRACT_HASH,
+          "registers": {
+            "property4": owner_pk.decode("utf-8")
+          }
+        }
+
+        response = requests.post(api_url, data=payload)
+        # Check if the request was successful (HTTP status code 200)
+        if response.status_code == 200:
+            # Parse and work with the response data (JSON in this case)
+            data = response.json()
+            print(data)
+            #   TODO filter only the contracts that don't have the R5 and R6 registries.
+            return data  # TODO convert to a List[ReputationProofs]
+        else:
+            print(f"Request failed with status code {response.status_code}")
