@@ -27,7 +27,7 @@ Los árboles de reputación son conjuntos de UTXOs, donde:
 
 
 En principio no hay dos tipos de contrato (rama o hoja del árbol):
-  - Son la misma plantilla de contrato (reputation_proof.es)
+  - Son la misma plantilla de contrato (reputation_proof.scala)
   - Adoptan su función dentro del contexto de todo el árbol (segun sus registros, entradas y salidas).
 
 
