@@ -1,8 +1,7 @@
 #  Extract the reputation proofs of an owner that can be expended.
 from typing import List
-from random import randrange
-from hashlib import sha512
-from ergpy import appkit, helper_functions
+
+DEMO_DATA = True
 
 
 class ReputationProofs:
@@ -26,21 +25,25 @@ class ReputationProofs:
 
 def extract_unexpended_reputation_proofs(owner_pk: bytes) -> List[ReputationProofs]:
     #
-    # Return all the ReputationProofs that satisfies that:
+    # Return all the reputation proof that satisfies that:
     #    - R4 is the owner_pk
     #    - propositionBytes is the on-chain/reputation_proof.scala contract
     #    - Can be spent, that is:
     #          1. it has a token not fully expended, and
-    #          2. it doesn't have a R5 registry (AssignedReputation object)
+    #          2. it doesn't have a R5 and R6 registries (AssignedReputation object)
     #
 
-    return [
-        ReputationProofs(
-            # box_id=sha512(randrange(0, 10)).digest(), TODO
-            # token_id=sha512(randrange(0, 10)).digest(),
-            box_id=b"dfkjdaljd",
-            token_id=b"ff9d7f8ad8979",
-            total_amount=randrange(50, 100),
-            expended_amount=randrange(0, 50)
-        ) for _i in range(10)
-    ]
+    if DEMO_DATA:
+        from random import randrange, randbytes
+        from hashlib import sha512
+        return [
+            ReputationProofs(
+                box_id=sha512(randbytes(10)).hexdigest().encode('utf-8'),
+                token_id=sha512(randbytes(10)).hexdigest().encode('utf-8'),
+                total_amount=randrange(50, 100),
+                expended_amount=randrange(0, 50)
+            ) for _i in range(10)
+        ]
+    else:
+        from ergpy import appkit, helper_functions
+        pass

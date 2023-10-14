@@ -19,13 +19,13 @@
                       <div class="modal-dialog">
                         <div class="modal-content">
                           <div class="modal-header">
-                            <h5 class="modal-title" id="generateReputationLabel">¿Qué ponemos aquí?</h5>
+                            <h5 class="modal-title" id="generateReputationLabel">Generate new reputation proof</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
                               <form>
                                   <div class="mb-3">
-                                    <label for="reputationOption" class="form-label">Choose an option for a new reputation prove</label>
+                                    <label for="reputationOption" class="form-label">Choose an option</label>
                                     <select class="form-select" id="reputationOption">
                                       <option></option>
                                       <option value="new">A new one</option>
@@ -80,8 +80,8 @@
 
                                 values.forEach(function (value) {
                                     htmlData += '<option value="' + value['box_id'] + '" data-amount-free="' +
-                                        value['free_amount'] + '">' + value['box_id'] + ' (Free percentage: ' +
-                                        value['free_percentage'] + ')</option>';
+                                        value['free_amount'] + '">' + value['box_id'].substring(0, 12) +
+                                        ' (Free percentage: ' + value['free_percentage'] + ')</option>';
                                 });
 
                                 htmlData += '</select></div><div id="tokenRegister"></div>';
