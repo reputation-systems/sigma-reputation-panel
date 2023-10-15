@@ -7,7 +7,7 @@ $(document).ready(function() {
                     '<input type="number" class="form-control" id="reputationToken"/>' +
                 '</div>' +
                 '<div class="mb-3">' +
-                    '<label for="reputationRegister" class="form-label">Register</label>' +
+                    '<label for="reputationRegister" class="form-label">Object to assign reputation</label>' +
                     '<select class="form-select" id="reputationRegister">' +
                         '<option></option>' +
                     '</select>' +
@@ -40,7 +40,7 @@ $(document).ready(function() {
                                 '"/>' +
                             '</div>' +
                             '<div class="mb-3">' +
-                                '<label for="reputationRegister" class="form-label">Register</label>' +
+                                '<label for="reputationRegister" class="form-label">Object to assign reputation</label>' +
                                 '<select class="form-select" id="reputationRegister">' +
                                     '<option></option>' +
                                 '</select>' +

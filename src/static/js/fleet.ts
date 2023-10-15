@@ -47,10 +47,10 @@ const ergo = await ergo;
 const wallet_pk = ergo.get_change_address();
 
 // TODO get the params from the UI.
-const new_one = true;
+const new_on: boolean = document.getElementById("").value;
 const token_label: string = calculateSHA256(wallet_pk + ergo.get_current_height().toString());  // TODO set by user optionally.
-const token_id = "";
-const token_amount = "100";
+const token_id: string = document.getElementById("").value;
+const token_amount: string = document.getElementById("").value;
 
 const builder = new OutputBuilder(
   1000000n,
