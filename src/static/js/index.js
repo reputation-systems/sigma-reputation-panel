@@ -50,4 +50,13 @@ $(document).ready(function() {
             })
         }
     })
+
+    $('#saveChanges').on('click', function() {
+        Swal.fire({
+            icon: 'success',
+            title: 'Reputation proof has been successfully added!'
+        }).then(() => {
+             window.location = '/';
+        });
+    })
 })

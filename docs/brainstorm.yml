@@ -8,11 +8,11 @@ Borrador de sistema de reputación en Ergo.
 
 
 
-Para asignar reputación a:
+Para asignar reputación a -> R5:
 
-- UTXOs (dentro de ergo)
+- Boxes (dentro de ergo)
 
-y a objetos externos:
+y a objetos externos -> R6:
 - direcciones
 - urls
 - repositiorios de Git
