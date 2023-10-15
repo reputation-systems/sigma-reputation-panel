@@ -28,7 +28,7 @@ def extract_unexpended_reputation_proofs(owner_pk: bytes) -> List[ReputationProo
     #
     # Return all the reputation proof that satisfies that:
     #    - R4 is the owner_pk
-    #    - propositionBytes is the on-chain/reputation_proof.scala contract
+    #    - propositionBytes is the on_chain/reputation_proof.scala contract
     #    - Can be spent, that is:
     #          1. it has a token not fully expended, and
     #          2. it doesn't have a R5 and R6 registries (AssignedReputation object)
@@ -43,7 +43,7 @@ def extract_unexpended_reputation_proofs(owner_pk: bytes) -> List[ReputationProo
                 token_id=sha512(randbytes(10)).hexdigest().encode('utf-8'),
                 total_amount=randrange(50, 100),
                 expended_amount=randrange(0, 50)
-            ) for _i in range(10)
+            ) for _i in range(randrange(1, 100))
         ]
 
     else:
@@ -65,4 +65,9 @@ def extract_unexpended_reputation_proofs(owner_pk: bytes) -> List[ReputationProo
             #   TODO filter only the contracts that don't have the R5 and R6 registries.
             return data  # TODO convert to a List[ReputationProofs]
         else:
-            print(f"Request failed with status code {response.status_code}")
+            print(f"Request failed with status code {response.status_code} {response.reason}")
+
+
+if __name__ == "__main__":
+    DEMO_DATA = False
+    extract_unexpended_reputation_proofs(owner_pk="9ejNy2qoifmzfCiDtEiyugthuXMriNNPhNKzzwjPtHnrK3esvbD".encode("utf-8"))

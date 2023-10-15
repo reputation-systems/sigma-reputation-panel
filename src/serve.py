@@ -1,12 +1,15 @@
-from flask import Flask, jsonify
-from extract_unexpended_reputation_proofs import extract_unexpended_reputation_proofs
+from flask import Flask, jsonify, render_template
+from off_chain.extract_unexpended_reputation_proofs import extract_unexpended_reputation_proofs
+
 
 app = Flask(__name__)
+
+app.static_folder = 'static'
 
 
 @app.route('/')
 def hello():
-    return open("src/front-end/index.html", "r").read()
+    return render_template('index.html')
 
 
 @app.route('/get_unexpended_reputation_proofs/<owner_pk>')

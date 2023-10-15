@@ -10,7 +10,7 @@
   <component name="PyNamespacePackagesService">
     <option name="namespacePackageFolders">
       <list>
-        <option value="$MODULE_DIR$/src/off-chain" />
+        <option value="$MODULE_DIR$/src" />
       </list>
     </option>
   </component>

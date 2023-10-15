@@ -188,7 +188,7 @@ paths:
       parameters:
       - name: minGix
         in: query
-        description: Min global index (in blockchain) of an on-chain entity
+        description: Min global index (in blockchain) of an on_chain entity
         required: true
         schema:
           type: integer
@@ -832,7 +832,7 @@ paths:
       parameters:
       - name: minGix
         in: query
-        description: Min global index (in blockchain) of an on-chain entity
+        description: Min global index (in blockchain) of an on_chain entity
         required: true
         schema:
           type: integer
@@ -1607,7 +1607,7 @@ paths:
       parameters:
       - name: minGix
         in: query
-        description: Min global index (in blockchain) of an on-chain entity
+        description: Min global index (in blockchain) of an on_chain entity
         required: true
         schema:
           type: integer

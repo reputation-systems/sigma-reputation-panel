@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "@fleet-sdk/core": "^0.2.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
   }
 }

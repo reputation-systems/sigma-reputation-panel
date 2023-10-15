@@ -57,8 +57,8 @@ Propiedades:
 
 
 Tipos de prueba de reputación:
-- A un objeto off-chain (repositorio de git, url web, ...)
-- A un objeto on-chain, es decir, un UTXO (a otra prueba de reputación,  otro contrato ...) utilizandolo como INPUT (como metadatos o no no lo se).
+- A un objeto off_chain (repositorio de git, url web, ...)
+- A un objeto on_chain, es decir, un UTXO (a otra prueba de reputación,  otro contrato ...) utilizandolo como INPUT (como metadatos o no no lo se).
 
 [
   Cuando una rama del árbol de reputación asigna reputación a otra rama o hoja (prueba) lo hace mediante sus OUTPUTS, ya que los UTXOs a los que asigna reputación serán creados despues de ella.
@@ -67,7 +67,7 @@ Tipos de prueba de reputación:
 
 
 Si un usuario quiere obtener la reputación de un objeto A buscará a traves de su árbol de reputación el objeto y 
-  computará la reputación total de ese objeto (en función de los parámetros de su motor de reputación [off-chain]).
+  computará la reputación total de ese objeto (en función de los parámetros de su motor de reputación [off_chain]).
 
 {
   De esta forma no es necesario crear consenso, cada usuario asigna reputación a los agentes que cree convenientes.
