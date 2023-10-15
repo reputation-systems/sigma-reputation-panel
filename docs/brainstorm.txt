@@ -36,7 +36,7 @@ Esquema de prueba de reputación:
 
 
 Interfaz de usuario:
-  - Boton de agregar prueba de reputación
+  - Boton de generar prueba de reputación
       1. Cantidad de reputación inicial.
           O parte de la reputación de otras pruebas.
       2. Objeto al que asignarle reputación.
