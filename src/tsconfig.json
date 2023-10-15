@@ -1,10 +1,31 @@
 {
   "compilerOptions": {
+    // "incremental": true,
     "target": "ESNext",
-    "module": "CommonJS",
-    "outDir": "./dist",
-    "strict": true
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    "declaration": true,
+    "inlineSourceMap": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "traceResolution": false,
+    "listEmittedFiles": false,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "listFiles": false,
+    "pretty": true,
+    "lib": ["ESNext", "DOM"],
+    "typeRoots": ["node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "_test-vectors": ["./packages/_test-vectors/"]
+    },
+    "outDir": "./static/js"
   },
+  "compileOnSave": false,
   "include": ["static/**/*.ts"],
   "exclude": ["node_modules"]
 }

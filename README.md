@@ -1,0 +1,3 @@
+- To run this project, it is necessary to execute the command python3 ./src/serve.py
+- The project is developed in a demo environment.
+- The project presentation is located in the 'docs'.

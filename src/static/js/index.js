@@ -8,9 +8,7 @@ $(document).ready(function() {
                 '</div>' +
                 '<div class="mb-3">' +
                     '<label for="reputationRegister" class="form-label">Object to assign reputation</label>' +
-                    '<select class="form-select" id="reputationRegister">' +
-                        '<option></option>' +
-                    '</select>' +
+                    '<input type="text" class="form-control" id="reputationRegister"/>' +
                 '</div>'
             );
         } else if($(this).val() == "another") {
@@ -25,7 +23,7 @@ $(document).ready(function() {
 
                     values.forEach(function (value) {
                         htmlData += '<option value="' + value['box_id'] + '" data-amount-free="' +
-                            value['free_amount'] + '">' + value['box_id'].substring(0, 12) +
+                            value['free_amount'] + '" data-token-id="' + value['token_id'] + '">' + value['box_id'].substring(0, 12) +
                             ' (Free percentage: ' + value['free_percentage'] + ')</option>';
                     });
 
@@ -41,9 +39,7 @@ $(document).ready(function() {
                             '</div>' +
                             '<div class="mb-3">' +
                                 '<label for="reputationRegister" class="form-label">Object to assign reputation</label>' +
-                                '<select class="form-select" id="reputationRegister">' +
-                                    '<option></option>' +
-                                '</select>' +
+                                '<input type="text" class="form-control" id="reputationRegister"/>' +
                             '</div>');
                     });
                 }
@@ -52,6 +48,18 @@ $(document).ready(function() {
     })
 
     $('#saveChanges').on('click', function() {
+        /*
+            When the "Save changes" button is clicked, the reputation proof information is sent to the wallet.
+                let new_one = false;
+                let token_id = null;
+                let amount = $('#reputationToken').val();
+                if($('#reputationOption').val()) {
+                    new_one = true;
+                } else {
+                    token_id = $('#reputationProof :selected').attr('data-token-id');
+                }
+                generate_reputation_proof(new_one, token_id, amount);
+        */
         Swal.fire({
             icon: 'success',
             title: 'Reputation proof has been successfully added!'
