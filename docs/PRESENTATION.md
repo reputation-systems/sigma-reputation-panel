@@ -9,7 +9,7 @@ Trust is the foundation of any functional ecosystem, including the digital world
 **Reputation Trees:**
 At the core of our system are Reputation Trees. These trees serve as hierarchical repositories of trust, with each tree containing a root Box representing 100% reputation. Within these trees, there are branches and leaves. Branches point to other reputation proofs, creating a hierarchy of trust, while leaves represent reputation proofs assigned to external objects in the form of metadata. This structure provides a systematic and scalable approach to reputation management.
 
-![reputation_system-example.svg](PRESENTATION%20e9b688a04a8448f2b53c13badbce5ad4/reputation_system-example.svg)
+![reputation_system-example.svg](resources/reputation_system-example.svg)
 
 **User-Generated Reputation:**
 A feature of this system is the ability for any user to submit reputation proofs. It's a truly democratic approach to trust, empowering users to assign and transfer reputation. Moreover, the system **does** not require consensus for reputation assignments, allowing individual users to express their trust independently.
