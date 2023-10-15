@@ -46,6 +46,7 @@ const ergo = await ergo;
 
 const wallet_pk = ergo.get_change_address();
 
+// TODO get the params from the UI.
 const new_one = true;
 const token_label: string = calculateSHA256(wallet_pk + ergo.get_current_height().toString());  // TODO set by user optionally.
 const token_id = "";
@@ -72,7 +73,7 @@ if (new_one) {
   }, {sum: false})
 }
 
-
+// TODO assign the contract.
 const unsignedTransaction = new TransactionBuilder(await ergo.get_current_height())
   .from(ergo.get_utxos()) // add inputs
   .to(builder)
