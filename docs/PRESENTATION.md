@@ -12,6 +12,29 @@ Users must have confidence in the entities they interact with,
 whether it's smart contracts, addresses, URLs, or other off-chain entities.
 This reputation system aims to establish and maintain this trust.
 
+**Why is it necessary?** 
+
+A reputation system can provide interesting approaches in a blockchain ecosystem. 
+
+On one hand, certain applications require it: 
+peer-to-peer versions of Airbnb, Uber, or similar platforms, as the central function of the company is to provide that 
+reputation network among interacting agents (hosts or tenants, drivers and passengers, etc.)
+
+On the other hand, current applications (DeFi protocols, bridges, etc.) may not directly require a reputation system, but nonetheless, it is highly necessary.
+It is necessary because blockchain is based on trustlessness. 
+If we consider that an ecosystem (of a peer-to-peer network like Ergo) is enriched by the number of tools it possesses 
+(among other variables, of course), what value do these tools have if users cannot trust them? 
+How does a user know which ones are reliable and which are not? 
+How does a user know which contracts, URLs, or whatever else they can use without taking too much risk? 
+
+The answer is: based on what others say, meaning the community plays a crucial role. 
+For this, two important parts are needed:
+1. The tools should be open and auditable. 
+2. A platform for sharing reviews, feedback, or opinions about these tools. 
+This is where this project aims to help. 
+Because currently, a user decides whether to trust a web3 page based on what its users say on Twitter (now X) 
+or how they discuss it on YouTube. We believe that this is a problem that no part of the entire ecosystem is currently addressing.
+
 **Basic explanation**
 
 The main characteristic of this system is that it doesn’t require consensus.
@@ -45,20 +68,7 @@ Well, in accordance with Ergo's principles, the system:
     - This remains cost-competitive because it allows agents to consider a wider range of options. The lower the quality of reputation systems, the higher the cost of switching between services (e.g., switching from one dentist to another is more expensive if I have no reviews for either; if people share their experiences, there will be more competition).
     
 - It Has a ****Long-term Focus****, as the development team has not based its approach on short-term vision.
-
-## Applications
-
-Some peer-to-peer networks need to have reputation system.
-The simplest way to do that on a blockchain network is to create a brand, a token or maybe a DAO for governing.
-This is not fully decentralized because the user will get the reputation based on a consensus with the rest of the token holders, this doesn't mean that in all cases we can do without tokens or DAOs; they are interesting solutions that aid in decentralization, but in some cases, they are just an attempt to cling to corporatism.
-
-For that, reputation system like this can help. The users don’t need to make a consensus with the others.
-
-In this way, an Airbnb peer-to-peer system could allow
-assigning reputation to users or locations only based on the sources where the user trusts.
-
-- Same for apps like Uber, JustEat …
-- Some actors could have the incentive to improve their reputation proofs with more followers, and ensure that, the Airbnb’s locations where they assign reputation are correct.
+- 
 
 ## System design
 
