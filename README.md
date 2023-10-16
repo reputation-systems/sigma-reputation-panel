@@ -2,6 +2,8 @@
 
 To run this project, it is necessary to execute the command:
 > python3 ./src/serve.py
+And install the requirements file:
+> pip3 install -r src/requirements.txt
 
 <br><br>
 The project is developed in a demo environment.
