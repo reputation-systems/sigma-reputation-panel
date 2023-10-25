@@ -2,3 +2,6 @@ venv
 .idea
 node_modules
 __pycache__
+.metals
+.scala-build
+.vscode
