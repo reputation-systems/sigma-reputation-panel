@@ -4,13 +4,6 @@ from off_chain.extract_unexpended_reputation_proofs import extract_unexpended_re
 
 app = Flask(__name__)
 
-app.static_folder = 'static'
-
-
-@app.route('/')
-def hello():
-    return render_template('index.html')
-
 
 @app.route('/get_unexpended_reputation_proofs/<owner_pk>')
 def get_unexpended_reputation_proofs(owner_pk: str):

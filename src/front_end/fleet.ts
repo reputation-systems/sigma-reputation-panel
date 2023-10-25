@@ -1,10 +1,12 @@
-import { TransactionBuilder, OutputBuilder, Box } from "@fleet-sdk/core";
-import * as crypto from 'crypto';
+import { TransactionBuilder, OutputBuilder, Box } from "./node_modules/@fleet-sdk/core";
+// import * as crypto from 'crypto';
 
 function calculateSHA256(input: string): string {
+  /*
   const hash = crypto.createHash('sha256');
   hash.update(input);
-  return hash.digest('hex');
+  return hash.digest('hex'); */
+  return ""
 }
 
 interface ErgoConnector {

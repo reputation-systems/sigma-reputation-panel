@@ -130,7 +130,7 @@ This structure provides a systematic and scalable approach to reputation managem
 A feature of this system is the ability for any user to submit reputation proofs.
 It's a truly democratic approach to trust, empowering users to assign and transfer reputation.
 Moreover, the system **does not require consensus** for reputation assignments,
-allowing individual users to express their trust independently.
+allowing individual users to app their trust independently.
 
 **User Interface:**
 We've designed an intuitive user interface that simplifies the process of submitting reputation proofs. 
