@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@fleet-sdk/compiler": "^0.2.3",
     "@fleet-sdk/core": "^0.2.3"
   },
   "devDependencies": {
