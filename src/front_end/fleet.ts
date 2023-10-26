@@ -1,4 +1,4 @@
-import { TransactionBuilder, OutputBuilder, Box } from "./node_modules/@fleet-sdk/core";
+import { TransactionBuilder, OutputBuilder, Box } from "@fleet-sdk/core";
 // import * as crypto from 'crypto';
 
 function calculateSHA256(input: string): string {
