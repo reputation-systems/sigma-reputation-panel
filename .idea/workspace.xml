@@ -5,29 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="50f5321f-d2dc-42ed-b6ca-5d6d0ee4a813" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/front_end/bun.lockb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/front_end/fleet.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/front_end/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/front_end/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/front_end/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/front_end/run.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/front_end/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/on_chain/compile.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/on_chain/reputation_proof.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/.npmrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/app.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/app.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/lib/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/routes/+layout.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/routes/+page.svelte" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/static/favicon.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/svelte.config.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/tsconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/svelte-test/vite.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +79,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "/home/jse/Projects/ergohack-vii/src/front_end/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/jse/Projects/ergohack-vii/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -139,7 +117,7 @@
       <workItem from="1698216737038" duration="1120000" />
       <workItem from="1698300624508" duration="6057000" />
       <workItem from="1698340940075" duration="4499000" />
-      <workItem from="1698583521374" duration="5998000" />
+      <workItem from="1698583521374" duration="6475000" />
     </task>
     <task id="LOCAL-00001" summary="updated example chained_txs_simple_send.py">
       <option name="closed" value="true" />
@@ -322,13 +300,6 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-    <option name="exactExcludedFiles">
-      <list>
-        <option value="$PROJECT_DIR$/src/front_end/fleet.js.map" />
-        <option value="$PROJECT_DIR$/src/front_end/fleet.js" />
-        <option value="$PROJECT_DIR$/src/front_end/fleet.d.ts" />
-      </list>
-    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
