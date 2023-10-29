@@ -20,6 +20,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@fleet-sdk/core": "^0.2.3"
+		"@fleet-sdk/core": "^0.2.3",
+		"@sveltejs/adapter-static": "^2.0.3"
 	}
 }
