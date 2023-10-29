@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="50f5321f-d2dc-42ed-b6ca-5d6d0ee4a813" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/front_end/bun.lockb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/front_end/fleet.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/front_end/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/front_end/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/front_end/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/front_end/run.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/front_end/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/on_chain/compile.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/on_chain/reputation_proof.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/.npmrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/app.d.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/app.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/lib/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/routes/+layout.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/src/routes/+page.svelte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/static/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/svelte.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/svelte-test/vite.config.ts" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="JavaScript File" />
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;jossemii&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="6b17b102-53d3-4556-b903-2c1f4ddd7c6d" />
+        <option name="url" value="https://github.com/jossemii/ergohack-vii.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2Wg62vWsbBxe6jddl26PJUIFLnW" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "javascript.nodejs.core.library.configured.version": "12.22.9",
+    "javascript.nodejs.core.library.typings.version": "12.20.55",
+    "last_opened_file_path": "/home/jse/Projects/ergohack-vii",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "ts.external.directory.path": "/home/jse/Projects/ergohack-vii/src/front_end/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/front_end" />
+      <recent name="$PROJECT_DIR$/src/off_chain" />
+      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$/src/static" />
+      <recent name="$PROJECT_DIR$/docs/resources" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="50f5321f-d2dc-42ed-b6ca-5d6d0ee4a813" name="Changes" comment="" />
+      <created>1697141672040</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1697141672040</updated>
+      <workItem from="1697141673054" duration="10091000" />
+      <workItem from="1697271096084" duration="1929000" />
+      <workItem from="1697273035384" duration="7801000" />
+      <workItem from="1697299286332" duration="30486000" />
+      <workItem from="1697374372269" duration="16368000" />
+      <workItem from="1697464295031" duration="5990000" />
+      <workItem from="1697479999861" duration="653000" />
+      <workItem from="1697709691737" duration="241000" />
+      <workItem from="1697894412409" duration="47000" />
+      <workItem from="1698078826247" duration="11167000" />
+      <workItem from="1698152998021" duration="9223000" />
+      <workItem from="1698216737038" duration="1120000" />
+      <workItem from="1698300624508" duration="6057000" />
+      <workItem from="1698340940075" duration="4499000" />
+      <workItem from="1698583521374" duration="5998000" />
+    </task>
+    <task id="LOCAL-00001" summary="updated example chained_txs_simple_send.py">
+      <option name="closed" value="true" />
+      <created>1697209684456</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1697209684456</updated>
+    </task>
+    <task id="LOCAL-00002" summary="reorg all the repo">
+      <option name="closed" value="true" />
+      <created>1697215225832</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1697215225832</updated>
+    </task>
+    <task id="LOCAL-00003" summary="brainstorm.yml with UI">
+      <option name="closed" value="true" />
+      <created>1697272969476</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1697272969476</updated>
+    </task>
+    <task id="LOCAL-00004" summary="improved of reputation_proof.es">
+      <option name="closed" value="true" />
+      <created>1697278945588</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1697278945588</updated>
+    </task>
+    <task id="LOCAL-00005" summary="improve of the contract.">
+      <option name="closed" value="true" />
+      <created>1697297357700</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1697297357700</updated>
+    </task>
+    <task id="LOCAL-00006" summary="extract_unexpended_reputation_proofs.py with demo data">
+      <option name="closed" value="true" />
+      <created>1697305364147</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1697305364147</updated>
+    </task>
+    <task id="LOCAL-00007" summary="extract_unexpended_reputation_proofs.py demo only">
+      <option name="closed" value="true" />
+      <created>1697306991124</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1697306991124</updated>
+    </task>
+    <task id="LOCAL-00008" summary="some improvements on the contract and Demo data control for the extract_unexpended_reputation_proofs.py">
+      <option name="closed" value="true" />
+      <created>1697315717227</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1697315717227</updated>
+    </task>
+    <task id="LOCAL-00009" summary="extract_unexpended_reputation_proofs.py with ergo explorer.">
+      <option name="closed" value="true" />
+      <created>1697318824620</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1697318824620</updated>
+    </task>
+    <task id="LOCAL-00010" summary="improve of fleet.ts to build the transaction">
+      <option name="closed" value="true" />
+      <created>1697371309597</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1697371309597</updated>
+    </task>
+    <task id="LOCAL-00011" summary="added TODOs">
+      <option name="closed" value="true" />
+      <created>1697371349197</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1697371349197</updated>
+    </task>
+    <task id="LOCAL-00012" summary="small changes on js.">
+      <option name="closed" value="true" />
+      <created>1697375995666</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1697375995666</updated>
+    </task>
+    <task id="LOCAL-00013" summary="brainstorm small change.">
+      <option name="closed" value="true" />
+      <created>1697376159098</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1697376159098</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Ergo Manifiesto added to the PRESENTATION.md">
+      <option name="closed" value="true" />
+      <created>1697404324360</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1697404324360</updated>
+    </task>
+    <task id="LOCAL-00015" summary="some files deleted and another revision of the PRESENTATION.md">
+      <option name="closed" value="true" />
+      <created>1697466993844</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1697466993844</updated>
+    </task>
+    <task id="LOCAL-00016" summary="final improvement of the PRESENTATION.md">
+      <option name="closed" value="true" />
+      <created>1697469941614</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1697469941614</updated>
+    </task>
+    <task id="LOCAL-00017" summary="README.md updated.">
+      <option name="closed" value="true" />
+      <created>1697470273792</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1697470273792</updated>
+    </task>
+    <task id="LOCAL-00018" summary="docs updates">
+      <option name="closed" value="true" />
+      <created>1697709925929</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1697709925929</updated>
+    </task>
+    <task id="LOCAL-00019" summary="video">
+      <option name="closed" value="true" />
+      <created>1698079951837</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1698079951837</updated>
+    </task>
+    <task id="LOCAL-00020" summary="update the front_end directory, still don't working">
+      <option name="closed" value="true" />
+      <created>1698215044619</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1698215044619</updated>
+    </task>
+    <task id="LOCAL-00021" summary="off_chain code is moved to another repository (compute-reputation-graph)">
+      <option name="closed" value="true" />
+      <created>1698304630323</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1698304630323</updated>
+    </task>
+    <task id="LOCAL-00022" summary="using bun. But with similar JS problems.">
+      <option name="closed" value="true" />
+      <created>1698346517648</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1698346517649</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/src/front_end/fleet.js.map" />
+        <option value="$PROJECT_DIR$/src/front_end/fleet.js" />
+        <option value="$PROJECT_DIR$/src/front_end/fleet.d.ts" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="improve of the contract." />
+    <MESSAGE value="index.html with basic modal" />
+    <MESSAGE value="index.html with basic modal ..." />
+    <MESSAGE value="extract_unexpended_reputation_proofs.py with demo data" />
+    <MESSAGE value="extract_unexpended_reputation_proofs.py demo only" />
+    <MESSAGE value="some improvements on the contract and Demo data control for the extract_unexpended_reputation_proofs.py" />
+    <MESSAGE value="extract_unexpended_reputation_proofs.py with ergo explorer." />
+    <MESSAGE value="Changes by Elena" />
+    <MESSAGE value="Refactor of all directories and changes of some files." />
+    <MESSAGE value="Refactor of all directories and changes of some files ...." />
+    <MESSAGE value="Nautilus connection -&gt; Ok" />
+    <MESSAGE value="improve of fleet.ts to build the transaction" />
+    <MESSAGE value="added TODOs" />
+    <MESSAGE value="small changes on js." />
+    <MESSAGE value="brainstorm small change." />
+    <MESSAGE value="Final changes and PRESENTATION.md" />
+    <MESSAGE value="Ergo Manifiesto added to the PRESENTATION.md" />
+    <MESSAGE value="some files deleted and another revision of the PRESENTATION.md" />
+    <MESSAGE value="final improvement of the PRESENTATION.md" />
+    <MESSAGE value="README.md updated." />
+    <MESSAGE value="docs updates" />
+    <MESSAGE value="video" />
+    <MESSAGE value="update the front_end directory, still don't working" />
+    <MESSAGE value="off_chain code is moved to another repository (compute-reputation-graph)" />
+    <MESSAGE value="using bun. But with similar JS problems." />
+    <option name="LAST_COMMIT_MESSAGE" value="using bun. But with similar JS problems." />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ergohack_vii$serve.coverage" NAME="serve Coverage Results" MODIFIED="1697214027303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/off-chain" />
+  </component>
+</project>
