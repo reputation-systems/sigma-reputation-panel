@@ -1,5 +1,10 @@
 <script lang="ts">
-	import {OutputBuilder, TransactionBuilder} from "@fleet-sdk/core";
+	 import {
+        OutputBuilder,
+        SAFE_MIN_BOX_VALUE,
+        RECOMMENDED_MIN_FEE_VALUE,
+        TransactionBuilder
+    } from '@fleet-sdk/core';
 
     async function generate_reputation_proof(new_one: boolean, token_id: string, token_amount: string) {
         /*
@@ -8,11 +13,11 @@
          */
         console.log("new one ", new_one, "   token id ", token_id, "   token_amount", token_amount)
 
-        const wallet_pk = ergo.get_change_address();
+        const wallet_pk = await ergo.get_change_address();
 
         const token_label: string = wallet_pk + ergo.get_current_height().toString();
         const builder = new OutputBuilder(
-          1000n,
+          SAFE_MIN_BOX_VALUE,
           wallet_pk
         );
 
@@ -20,7 +25,7 @@
           // https://fleet-sdk.github.io/docs/transaction-building#step-4-2-mint-a-token
           builder.mintToken({
             amount: token_amount, // the amount of tokens being minted without decimals
-            name: "reputation-token-" + token_label, // the name of the token
+            name: "rt-" + token_label, // the name of the token
             decimals: 0, // the number of decimals
             description: "Reputation token "  + token_label + " of the wallet " + wallet_pk
           })
@@ -33,13 +38,15 @@
         }
 
         // TODO assign the contract.
-        const unsignedTransaction = new TransactionBuilder(await ergo.get_current_height())
-          .from(ergo.get_utxos()) // add inputs
+        const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
+          .from(await ergo.get_utxos()) // add inputs
           .to(builder)
           .sendChangeTo(wallet_pk) // set change address
-          .payMinFee() // set fee
+          .payFee(RECOMMENDED_MIN_FEE_VALUE)
           .build() // build!
-          .toPlainObject();
+          .toEIP12Object();
+
+		console.log(unsignedTransaction)
 
         const signedTransaction = await ergo.sign_tx(unsignedTransaction);
         const transactionId = await ergo.submit_tx(signedTransaction);
@@ -95,7 +102,7 @@
 				  <div class="mb-3">
 					  <label class="form-label">Reputation proof</label>
 					  <select class="form-select" bind:value={reputationProof}>' +
-						  <option></option>
+						  <option></option>  <!-- TODO add an explorer query to get reputation proofs. -->
 					  </select>
 				  </div>
 				  <div class="mb-3">
