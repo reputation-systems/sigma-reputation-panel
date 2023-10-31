@@ -40,8 +40,13 @@ Interfaz de usuario:
       1. Cantidad de reputación inicial.
           O parte de la reputación de otras pruebas.
       2. Objeto al que asignarle reputación.
-    * En caso de que se asigne reputación a un objeto externo, la UI no permitirá outputs de la reputación en su política.
+
+    * En caso de que se asigne reputación a un objeto, la UI no permitirá outputs de la reputación en su política.
        (Aunque esto si podría darse externamenete, posiblemente reduciría la calidad de la prueba de reputación).
+
+    ** Otra opción es permitir que, aun asignando reputación a un objeto, la UI permita outputs en su política.
+       De esta forma, se permite que representar que un objeto A depende x de un objeto B.    (A -> B)
+
 
 
 Propiedades:
@@ -63,8 +68,11 @@ Tipos de prueba de reputación:
 no puede gastarse, es decir, no puede delegarse su reputación (representada mediante un token) a otra prueba de reputación.
 
 [
-  Cuando una rama del árbol de reputación asigna reputación a otra rama o hoja (prueba) lo hace mediante sus OUTPUTS, ya que los Boxes a los que asigna reputación serán creados despues de ella.
-  Cuando una prueba de reputación (una hoja del árbol de reputación) asigna su reputación asignada, lo hace mediante sus INPUTS, ya que asigna a objetos ya creados antes que ella.
+  Cuando una rama del árbol de reputación asigna reputación a otra rama o hoja (prueba) lo hace mediante sus OUTPUTS,
+  ya que los Boxes a los que asigna reputación serán creados despues de ella.
+
+  Cuando una prueba de reputación (una hoja del árbol de reputación) asigna su reputación asignada, lo hace mediante sus INPUTS,
+  ya que asigna a objetos ya creados antes que ella.
 ]
 
 
@@ -91,6 +99,11 @@ Si un usuario quiere obtener la reputación de un objeto A buscará a traves de 
 
 Las pruebas de reputación (hojas del árbol de reputación) deberán indicar, a parte del objeto al que se estan refiriendo, 
   que dicen sobre él. Esto es ya mas un tema de como expresar el lenguaje dentro del Box.
+
+  * Una posibilidad es que un registro sea un booleano, indicando la 'polaridad' de la prueba (si es positiva o negativa,
+    si habla bien o mal del puntero).
+    - ¿como se lleva la contabilidad a partir de alli? -> Bueno, el gasto del token siempre es el mismo. Pero el algoritmo
+      computará las sumas y las restas.
 
 
 
@@ -122,3 +135,14 @@ A la hora de asignar reputación a software (de menos a mas fiable):
 - A un repositorio de Git (determinista [al menos en el código, no en la máquina o arquitectura donde se ejecuta], pero compleja usabilidad).
 - A un commit concreto de un repositorio de Git (mas determinista que el anterior pero con los mismos defectos)
 - A un servicio de CELAUT (totalmente determinista y facil de usar |  como incomveniente, es necesario ejecutarlo mediante un nodo de CELAUT).
+
+
+
+// --------------------------------------------------------------
+
+ALGORITMO
+
+El algoritmo se encarga de computar la reputación de un puntero concreto desde una prueba de reputación concreta (posiblemente desde una raiz)
+- La raiz no tiene porque estar on-chain.
+- Posibles parametrizaciones:
+  - ....

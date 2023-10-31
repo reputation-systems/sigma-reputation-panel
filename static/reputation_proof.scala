@@ -13,9 +13,13 @@
 */
     // An optional object where the proof assign it's reputation 
     // (it could be different types of data, like other Reputation systems, urls, git repositories, etc).
-SELF.R5[Box].isDefined != true &&
-SELF.R6[(Coll[Byte], Coll[Byte])].isDefined != true &&
+    //
+    //
+// ENVIROMENT_VARIABLE_THAT_ALLOWS_SPEND_OR_NOT &&
+// SELF.R5[Box].isDefined != true &&
+// SELF.R6[(Coll[Byte], Coll[Byte])].isDefined != true &&
     // 
+    //
     // The proof's creator (or, at least, the one chosen by the box's creator) can spend the tokens
     // Owner's public key.  Without it, the box can't be expended. 
 proveDlog(decodePoint(SELF.R4[Coll[Byte]].get)) &&
