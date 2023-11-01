@@ -6,7 +6,12 @@
         TransactionBuilder
     } from '@fleet-sdk/core';
 
+	 const explorer_uri = "https://api.ergoplatform.com";
+	 const ergo_tree_template_hash = "EC591AEB578B53D7CE8BB2A0BEAB3795D187A4030D9D4C25E062AC26236F0D16"
+
     async function generate_reputation_proof(new_one: boolean, token_id: string, token_amount: string) {
+		 // TODO add reputationRegister (it's the pointer, if exists).
+
         /*
               Once the connection request is accepted by the user, this API will be injected in the same
               way as the Connection API, and you can interact with it through the ergo object.
@@ -53,7 +58,6 @@
         console.log("transaction id -> ", transactionId)
     }
 
-
 	export let showModal; // boolean
 
 	let dialog; // HTMLDialogElement
@@ -70,6 +74,90 @@
 	let reputationRegister;
 	let reputationProof;
 	let data_amount_free;
+
+
+	//  Unspent valid reputation proofs
+
+	 let unspent_proofs = []; //  TODO upload some proofs to the testnet to learn how to use the explorer api.
+	 // updateReputationProofList()
+	 // Demo data
+	 unspent_proofs = [
+		 {
+			 "id": "4kl1n34l13k4n4kn13k4ln1",
+			 "blockId": "4kl1n34l13k4n4kn13k4ln1",
+			 "inclusionHeight": 12,
+			 "timestamp": 123123123123,
+			 "index": 0,
+			 "globalIndex": 0,
+			 "numConfirmations": 5,
+			 "inputs": [],
+			 "dataInputs": [],
+			 "outputs": [],
+			 "size": 12334
+		 },
+		 {
+			 "id": "AAAAAAAAADFDAFADFDAFDA",
+			 "blockId": "AAAAAAAAADFDAFADFDAFDA",
+			 "inclusionHeight": 12,
+			 "timestamp": 123123123123,
+			 "index": 0,
+			 "globalIndex": 0,
+			 "numConfirmations": 5,
+			 "inputs": [],
+			 "dataInputs": [],
+			 "outputs": [],
+			 "size": 12334
+		 },
+		 {
+			 "id": "BBCFFDFBDFFDFBDFBDFBDFB",
+			 "blockId": "BBCFFDFBDFFDFBDFBDFBDFB",
+			 "inclusionHeight": 12,
+			 "timestamp": 123123123123,
+			 "index": 0,
+			 "globalIndex": 0,
+			 "numConfirmations": 5,
+			 "inputs": [],
+			 "dataInputs": [],
+			 "outputs": [],
+			 "size": 12334
+		 },
+	 ]
+
+	async function updateReputationProofList() {
+    try {
+      const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+			  "ergoTreeTemplateHash": ergo_tree_template_hash,
+			  "registers": {
+				"R4": await ergo.get_change_address(),
+			  },
+			/*  "constants": {
+				"property1": "string",
+				"property2": "string"
+			  },
+			  "assets": [
+				"string"
+			  ]
+
+			 */
+			}),
+      });
+
+      if (response.ok) {
+        const data = await response.json(); // Suponiendo que la respuesta es un objeto JSON
+		  console.log(data)
+		  unspent_proofs = data.items; // Actualiza las opciones con los datos recibidos
+      } else {
+        console.error('Error al realizar la solicitud POST');
+      }
+    } catch (error) {
+      console.error('Error al procesar la solicitud POST:', error);
+    }
+  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -102,7 +190,9 @@
 				  <div class="mb-3">
 					  <label class="form-label">Reputation proof</label>
 					  <select class="form-select" bind:value={reputationProof}>' +
-						  <option></option>  <!-- TODO add an explorer query to get reputation proofs. -->
+						  {#each unspent_proofs as option (option.id)}
+							  <option value={option.id}>{option.id}</option>
+						  {/each}
 					  </select>
 				  </div>
 				  <div class="mb-3">
