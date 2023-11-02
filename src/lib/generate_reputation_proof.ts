@@ -15,7 +15,7 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     let token_id =  input_proof ? input_proof.token_id : "--";
     let inputs = input_proof ? [input_proof.box] : await ergo.get_utxos();
 
-    console.log("new one ", input_proof, " \n  token id ", token_id, "   token_amount", token_amount)
+    console.log("new one ", input_proof, " \n  token id ", token_id, "   token_amount", token_amount, " \n inputs ", inputs)
 
     const wallet_pk = await ergo.get_change_address();
 
