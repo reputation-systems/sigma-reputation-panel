@@ -12,8 +12,8 @@ export async function generate_reputation_proof(token_amount: string, input_proo
           Once the connection request is accepted by the user, this API will be injected in the same
           way as the Connection API, and you can interact with it through the ergo object.
      */
-    let token_id =  input_proof ? input_proof.token_id : "--";
-    let inputs = input_proof ? [input_proof.box] : await ergo.get_utxos();
+    let token_id =  input_proof?.token_id ?? "--";
+    let inputs = (input_proof !== undefined) ? [input_proof.box] : await ergo.get_utxos();
 
     console.log("new one ", input_proof, " \n  token id ", token_id, "   token_amount", token_amount, " \n inputs ", inputs)
 
@@ -25,7 +25,7 @@ export async function generate_reputation_proof(token_amount: string, input_proo
       wallet_pk
     );
 
-    if (input_proof) {
+    if (input_proof === undefined) {
       // https://fleet-sdk.github.io/docs/transaction-building#step-4-2-mint-a-token
       builder.mintToken({
         amount: token_amount, // the amount of tokens being minted without decimals
