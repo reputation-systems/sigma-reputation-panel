@@ -1,9 +1,9 @@
 /**
 *
-* Reputation Proof  -   2Ud2Ryh6MkC8Lstg1BiSE86Vbs7FTBdChEMo2c3ZK3pyGaQoY2Ck9QQiz2n4vWP6
+* Reputation Proof  -  
     
 
-    R4     -> owner public key
+    ¿   R4     -> owner public key   ?
     R5     -> Pointer to the object to assign reputation: (ex: (Box, fjdfklj4314j3lk...) (git_repo, github.com/ergoplatform/ergodocs), (url, https://api.ergoplatform.com/api/v1/docs/))
 
     ** Where Box is an Ergo box.
