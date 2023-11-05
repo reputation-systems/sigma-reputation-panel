@@ -2,10 +2,8 @@
 	import { updateReputationProofList } from '$lib/unspent_proofs';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
     import { onMount } from 'svelte';
+	import { explorer_uri, ergo_tree_template_hash } from '$lib/envs';
     import type { ReputationProof } from '$lib/ReputationProof';
-
-	const explorer_uri = "https://api.ergoplatform.com";
-	const ergo_tree_template_hash = "EC591AEB578B53D7CE8BB2A0BEAB3795D187A4030D9D4C25E062AC26236F0D16"
 
 	export let showModal: any; // boolean
 
@@ -92,7 +90,8 @@
 			<!-- <button autofocus on:click={() => dialog.close()}>x</button> -->
 			<button on:click={() => generate_reputation_proof(
 					reputationTokenAmount,
-					input_proof
+					input_proof,
+					object_to_assign
 			)}>Generate proof</button>
 		</div>
 	</div>

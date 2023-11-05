@@ -3,11 +3,17 @@ import {
     SAFE_MIN_BOX_VALUE,
     RECOMMENDED_MIN_FEE_VALUE,
     TransactionBuilder,
+    SConstant,
+    SColl,
+    SByte,
 } from '@fleet-sdk/core';
+import { stringToBytes } from '@scure/base';
+
+// import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
 import type { ReputationProof } from '$lib/ReputationProof';
 
-export async function generate_reputation_proof(token_amount: string, input_proof?: ReputationProof) {
+export async function generate_reputation_proof(token_amount: string, input_proof?: ReputationProof, object_to_assign?: string): Promise<string> {
     /*
           Once the connection request is accepted by the user, this API will be injected in the same
           way as the Connection API, and you can interact with it through the ergo object.
@@ -15,11 +21,13 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     let token_id =  input_proof?.token_id ?? "--";
     let inputs = (input_proof !== undefined) ? [input_proof.box] : await ergo.get_utxos();
 
-    console.log("new one ", input_proof, " \n  token id ", token_id, "   token_amount", token_amount, " \n inputs ", inputs)
-
     const wallet_pk = await ergo.get_change_address();
-
     const token_label: string = wallet_pk + ergo.get_current_height().toString();
+
+    console.log("new one ", input_proof, " \n  token id ", token_id, "   token_amount", token_amount, " \n inputs ", inputs, " \n object to assign ", object_to_assign,
+    "\n wallet public key -> ", wallet_pk, "\n token label -> ", token_label)
+
+
     const builder = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
       wallet_pk
@@ -41,6 +49,14 @@ export async function generate_reputation_proof(token_amount: string, input_proo
       }, {sum: false})
     }
 
+    // Set owner public key and the object to assign reputation if exsists
+    builder.setAdditionalRegisters((object_to_assign === undefined) ? {
+      R4: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)))
+    } : {
+      R4: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk))),
+      R5: SConstant(SColl(SByte, stringToBytes('utf8', object_to_assign)))  // TODO add the type.
+    })
+
     // TODO assign the contract.
     const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
       .from(inputs) // add inputs
@@ -50,9 +66,8 @@ export async function generate_reputation_proof(token_amount: string, input_proo
       .build() // build!
       .toEIP12Object();
 
-    console.log(unsignedTransaction)
-
     const signedTransaction = await ergo.sign_tx(unsignedTransaction);
     const transactionId = await ergo.submit_tx(signedTransaction);
     console.log("transaction id -> ", transactionId)
+    return transactionId;
 }
