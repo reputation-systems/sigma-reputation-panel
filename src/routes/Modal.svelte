@@ -2,7 +2,7 @@
 	import { updateReputationProofList } from '$lib/unspent_proofs';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
     import { onMount } from 'svelte';
-	import { explorer_uri, ergo_tree_template_hash } from '$lib/envs';
+	import { explorer_uri, ergo_tree_hash } from '$lib/envs';
     import type { ReputationProof } from '$lib/ReputationProof';
 
 	export let showModal: any; // boolean
@@ -26,7 +26,7 @@
 
 	onMount(async () => {
 		try {
-			const data = await updateReputationProofList(explorer_uri, ergo_tree_template_hash, ergo);
+			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
 			unspend_reputation_proofs = data;
 		} catch (error) {
 			console.error(error);

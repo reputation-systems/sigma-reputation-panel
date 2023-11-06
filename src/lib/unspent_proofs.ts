@@ -1,5 +1,10 @@
 import type { ReputationProof } from "$lib/ReputationProof";
 
+
+/**
+    https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
+*/
+
 export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> {
     try {
         const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/search', {
@@ -10,17 +15,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         body: JSON.stringify({
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
-                "R4": await ergo.get_change_address(),
+                    "R4": await ergo.get_change_address(),  // TODO
                 },
-            /*  "constants": {
-                "property1": "string",
-                "property2": "string"
-                },
-                "assets": [
-                "string"
-                ]
-
-                */
             }),
         });
 

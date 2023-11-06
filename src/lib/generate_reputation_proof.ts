@@ -5,11 +5,10 @@ import {
     TransactionBuilder,
     SConstant,
     SColl,
-    SByte,
-    SGroupElement
+    SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from '@scure/base';
-import { ergo_tree_template_hash } from '$lib/envs';
+import { ergo_tree } from '$lib/envs';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
@@ -23,7 +22,6 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     let inputs = (input_proof !== undefined) ? [input_proof.box] : await ergo.get_utxos();
 
     const wallet_pk = await ergo.get_change_address();
-   // const token_label: string = wallet_pk + ergo.get_current_height().toString();
 
     // Output builder
     const builder = new OutputBuilder(
@@ -45,7 +43,7 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     }
 
     let registers = {
-      R1: SConstant(SColl(SByte, stringToBytes('utf8', ergo_tree_template_hash))),
+      R1: SConstant(SColl(SByte, ergo_tree)),
       R4: SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token"))),
       R5: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
       R6: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
