@@ -6,8 +6,10 @@ import {
     SConstant,
     SColl,
     SByte,
+    SGroupElement
 } from '@fleet-sdk/core';
 import { stringToBytes } from '@scure/base';
+import { ergo_tree_template_hash } from '$lib/envs';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
@@ -43,10 +45,11 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     }
 
     let registers = {
+      R1: SConstant(SColl(SByte, stringToBytes('utf8', ergo_tree_template_hash))),
       R4: SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token"))),
+      R5: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
+      R6: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
     }
-
-    // TODO How the contract knows the owner pk ??
 
     if (object_to_assign !== undefined)  
     { 
@@ -58,12 +61,12 @@ export async function generate_reputation_proof(token_amount: string, input_proo
        *
       */
       registers = {...registers, ...{
-        R5: SConstant(SColl(SByte, stringToBytes('utf8', object_to_assign))),   // Todo Object to assign reputation.
-        R6: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)))
+        R5: SConstant(SColl(SByte, stringToBytes('utf8', 'plain/txt-utf8'))),
+        R6: SConstant(SColl(SByte, stringToBytes('utf8', object_to_assign))),
       }}
     }
 
-    builder.setAdditionalRegisters(registers)
+    builder.setAdditionalRegisters({...registers, ...{R7: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)))}})
 
     // TODO assign the contract.
     const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
