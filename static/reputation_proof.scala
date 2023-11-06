@@ -3,8 +3,9 @@
 * Reputation Proof  -  
     
 
-    ¿   R4     -> owner public key   ?
     R5     -> Pointer to the object to assign reputation: (ex: (Box, fjdfklj4314j3lk...) (git_repo, github.com/ergoplatform/ergodocs), (url, https://api.ergoplatform.com/api/v1/docs/))
+    R6     -> owner public key
+
 
     ** Where Box is an Ergo box.
 
@@ -20,7 +21,7 @@
     //
     // The proof's creator (or, at least, the one chosen by the box's creator) can spend the tokens
     // Owner's public key.  Without it, the box can't be expended. 
-proveDlog(decodePoint(SELF.R4[Coll[Byte]].get)) &&
+proveDlog(decodePoint(SELF.R6[Coll[Byte]].get)) &&
     //
     // Assign them ONLY to other reputation proofs.
 OUTPUTS.forall({(x: Box) => x.propositionBytes == SELF.propositionBytes})
