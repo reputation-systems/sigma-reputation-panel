@@ -64,4 +64,42 @@ I want to do two diferent things:
 
 Thanks.
 
+
+
+
+
+LiquidPhase
+ — 
+Yesterday at 9:05 PM
+Additional registers are for registers 4-9 iirc, R1 is a standard mandatory register so i think you're building the script/tx wrong
+LiquidPhase
+ — 
+Yesterday at 9:14 PM
+Here's how you would likely do what you want to do.
+
+import { compile } from '@fleet-sdk/compiler';
+   let script = "{proveDlog(CONTEXT.preHeader.minerPk)}";
+
+  async function compileScript(script: string): Promise<string> {
+    const compiledScript = compile(script, { version: 0, includeSize: false });
+    const ergotreeBytes = compiledScript.toHex();
+
+
+
+compile the script in its own compiler function by importing the compiler from fleet and then inject the value in the output builder:
+
+ scriptOutput = SColl(SByte, utf8.decode(compiledScript)).toHex();
+ const unsignedTx = new TransactionBuilder(height)
+          .from(await ergo.get_utxos())
+          .to(
+            new OutputBuilder('1000000', scriptOutput)
+          )
+          .sendChangeTo(await ergo.get_change_address())
+          .payMinFee()
+          .build()
+          .toEIP12Object();
+
+ 
+atleast i think that's how you'd accomplish it. i could be mistaken
+
  */
