@@ -1,5 +1,6 @@
 <script lang="ts">
   import Modal from './Modal.svelte';
+  import Navbar from './Navbar.svelte';
   let showModal = false;
   let connected = false;
 
@@ -22,6 +23,7 @@
   }
 </script>
 
+<Navbar/>
 <h1>Welcome to the Reputation System Panel</h1>
 
 <a class="github-button" href="https://github.com/jossemii/ergo-reputation-system" target="_blank">
