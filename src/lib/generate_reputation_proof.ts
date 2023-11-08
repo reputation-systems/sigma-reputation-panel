@@ -5,7 +5,8 @@ import {
     TransactionBuilder,
     SConstant,
     SColl,
-    SByte
+    SByte,
+    Network
 } from '@fleet-sdk/core';
 import { stringToBytes, utf8 } from '@scure/base';
 import { ergo_tree } from '$lib/envs';
@@ -14,7 +15,8 @@ import { ergo_tree } from '$lib/envs';
 
 import type { ReputationProof } from '$lib/ReputationProof';
 
-export async function generate_reputation_proof(token_amount: string, input_proof?: ReputationProof, object_to_assign?: string): Promise<string> {
+export async function generate_reputation_proof(token_amount: string, input_proof?: ReputationProof, object_to_assign?: string) {
+
     /*
           Once the connection request is accepted by the user, this API will be injected in the same
           way as the Connection API, and you can interact with it through the ergo object.
@@ -67,16 +69,19 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     builder.setAdditionalRegisters({...registers, ...{R7: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)))}})
 
     // TODO assign the contract.
-    const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
+    try {
+      const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
       .from(inputs) // add inputs
       .to(builder)
       .sendChangeTo(wallet_pk) // set change address
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .build() // build!
       .toEIP12Object();
-
-    const signedTransaction = await ergo.sign_tx(unsignedTransaction);
-    const transactionId = await ergo.submit_tx(signedTransaction);
-    console.log("transaction id -> ", transactionId)
-    return transactionId;
+  
+      const signedTransaction = await ergo.sign_tx(unsignedTransaction);
+      const transactionId = await ergo.submit_tx(signedTransaction);
+      console.log("transaction id -> ", transactionId)
+    } catch(error) {
+      alert("Transaction error: "+error)
+    }
 }
