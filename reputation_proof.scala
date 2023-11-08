@@ -1,10 +1,12 @@
 /**
 *
-* Reputation Proof  -   2Ud2Ryh6MkC8Lstg1BiSE86Vbs7FTBdChEMo2c3ZK3pyGaQoY2Ck9QQiz2n4vWP6
+* Reputation Proof  -  
     
 
-    R4     -> owner public key
-    R5     -> Pointer to the object to assign reputation: (ex: (Box, fjdfklj4314j3lk...) (git_repo, github.com/ergoplatform/ergodocs), (url, https://api.ergoplatform.com/api/v1/docs/))
+    R5     -> Pointer to the object type.                 ex: Box, git repo, url
+    R6     -> Pointer to the object to assign reputation: ex: fjdfklj4314j3lk... github.com/ergoplatform/ergodocs, https://api.ergoplatform.com/api/v1/docs/
+    R7     -> owner public key
+
 
     ** Where Box is an Ergo box.
 
@@ -15,12 +17,12 @@
     //
     //
 // ENVIROMENT_VARIABLE_THAT_ALLOWS_SPEND_OR_NOT &&
-// SELF.R5[(Coll[Byte], Coll[Byte])].isDefined != true &&
+// SELF.R6[Coll[Byte]].isDefined != true &&
     // 
     //
     // The proof's creator (or, at least, the one chosen by the box's creator) can spend the tokens
     // Owner's public key.  Without it, the box can't be expended. 
-proveDlog(decodePoint(SELF.R4[Coll[Byte]].get)) &&
+proveDlog(decodePoint(SELF.R7[Coll[Byte]].get)) &&
     //
     // Assign them ONLY to other reputation proofs.
 OUTPUTS.forall({(x: Box) => x.propositionBytes == SELF.propositionBytes})
