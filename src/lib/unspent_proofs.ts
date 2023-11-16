@@ -22,7 +22,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
 
         if (response.ok) {
             const data = await response.json(); // Suponiendo que la respuesta es un objeto JSON
-            console.log(data)
+            console.log('Unspent reputation proofs -> ', data)
             return data.items.map((e: any) => {
                 return {
                     box_id: e.id,

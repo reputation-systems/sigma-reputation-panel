@@ -4,6 +4,7 @@ import {
     RECOMMENDED_MIN_FEE_VALUE,
     TransactionBuilder,
     SConstant,
+    ErgoAddress,
     SColl,
     SByte,
     Network
@@ -18,18 +19,18 @@ import type { ReputationProof } from '$lib/ReputationProof';
 export async function generate_reputation_proof(token_amount: string, input_proof?: ReputationProof, object_to_assign?: string) {
 
     /*
-          Once the connection request is accepted by the user, this API will be injected in the same
+          Once the user accepts the connection request, this API will be injected in the same
           way as the Connection API, and you can interact with it through the ergo object.
      */
     let inputs = (input_proof !== undefined) ? [input_proof.box] : await ergo.get_utxos();
 
     const wallet_pk = await ergo.get_change_address();
-    const scriptOutput = SColl(SByte, utf8.decode(ergo_tree)).toHex();  // TODO Should be an address Address.fromErgoTree(ergoTree, Network.Testnet).toString()  ???
+    const scriptAddress = ErgoAddress.fromErgoTree(ergo_tree, Network.Testnet).toString();
 
     // Output builder
     const builder = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
-      wallet_pk // <- Recipient address
+      scriptAddress
     );
 
     if (input_proof === undefined) {
