@@ -15,7 +15,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         body: JSON.stringify({
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
-                    "R4": await ergo.get_change_address(),  // TODO
+                    // "R4": "reputation-proof-token",
+                    // "R7": await ergo.get_change_address()
                 },
             }),
         });

@@ -31,7 +31,9 @@
 </a>
 
 <div class="button-container">
-  <button on:click={connectNautilus}>Connect to Nautilus</button>
+  {#if !connected}
+    <button on:click={connectNautilus}>Connect to Nautilus</button>
+  {/if}
 
   {#if connected}
     <button on:click={() => (showModal = true)}>Generate reputation proof</button>

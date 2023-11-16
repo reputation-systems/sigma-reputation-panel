@@ -1,24 +1,15 @@
 <script lang="ts">
 	import { updateReputationProofList } from '$lib/unspent_proofs';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
-	import { onMount } from 'svelte';
 	import { explorer_uri, ergo_tree_hash } from '$lib/envs';
 	import type { ReputationProof } from '$lib/ReputationProof';
   
 	export let showModal: any; // boolean
 	let dialog: any; // HTMLDialogElement
   
-	onMount(async () => {
-	  try {
-		const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
-		unspend_reputation_proofs = data;
-	  } catch (error) {
-		console.error(error);
-	  }
-	});
-  
 	let selectedOption = "";
 	function handleSelectChange(event: any) {
+	  fetchReputationProofs();
 	  selectedOption = event.target.value;
 	}
   
@@ -35,6 +26,17 @@
 	  generate_reputation_proof(reputationTokenAmount, input_proof, object_to_assign);
 	  dialog.close();
 	}
+
+	async function fetchReputationProofs() {
+		try {
+			console.log('Searching for boxes....')
+			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
+			unspend_reputation_proofs = data;
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
   </script>
   
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->

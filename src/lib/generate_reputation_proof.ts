@@ -4,13 +4,11 @@ import {
     RECOMMENDED_MIN_FEE_VALUE,
     TransactionBuilder,
     SConstant,
-    ErgoAddress,
     SColl,
-    SByte,
-    Network
+    SByte
 } from '@fleet-sdk/core';
-import { stringToBytes, utf8 } from '@scure/base';
-import { ergo_tree } from '$lib/envs';
+import { stringToBytes } from '@scure/base';
+import { ergo_tree_address } from '$lib/envs';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
@@ -25,12 +23,11 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     let inputs = (input_proof !== undefined) ? [input_proof.box] : await ergo.get_utxos();
 
     const wallet_pk = await ergo.get_change_address();
-    const scriptAddress = ErgoAddress.fromErgoTree(ergo_tree, Network.Testnet).toString();
 
     // Output builder
     const builder = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
-      scriptAddress
+      ergo_tree_address
     );
 
     if (input_proof === undefined) {
