@@ -18,6 +18,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                     // "R4": "reputation-proof-token",
                     // "R7": await ergo.get_change_address()
                 },
+                "constants": {},
+                "assets": []
             }),
         });
 
