@@ -4,7 +4,7 @@
     
 
     R5     -> Pointer to the object type.                 ex: Box, git repo, url
-    R6     -> Pointer to the object to assign reputation: ex: fjdfklj4314j3lk... github.com/ergoplatform/ergodocs, https://api.ergoplatform.com/api/v1/docs/
+    R6     -> Pointer to the object to assign reputation: ex: fjdfklj4314j3lk, https...
     R7     -> owner public key
 
 
@@ -25,4 +25,4 @@
 proveDlog(decodePoint(SELF.R7[Coll[Byte]].get)) &&
     //
     // Assign them ONLY to other reputation proofs.
-OUTPUTS.forall({(x: Box) => x.propositionBytes == SELF.propositionBytes})
+sigmaProp(OUTPUTS.forall({(x: Box) => x.propositionBytes == SELF.propositionBytes}))
