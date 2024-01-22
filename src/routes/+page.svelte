@@ -26,8 +26,8 @@
 <Navbar/>
 <h1>Welcome to the Ergo Reputation System Panel</h1>
 
-<a class="github-button" href="https://github.com/jossemii/ergo-reputation-system" target="_blank">
-  <img src="./github-mark.svg" alt="GitHub" width="32" height="32">
+<a class="github-button" href="https://github.com/celaut-project/ergo-reputation-system" target="_blank">
+  <img src="https://cdn.icon-icons.com/icons2/844/PNG/512/Github_icon-icons.com_67091.png" alt="GitHub" width="50" height="50">
 </a>
 
 <div class="button-container">
