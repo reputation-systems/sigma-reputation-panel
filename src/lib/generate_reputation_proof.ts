@@ -79,7 +79,7 @@ export async function generate_reputation_proof(token_amount: string, input_proo
       const signedTransaction = await ergo.sign_tx(unsignedTransaction);
       const transactionId = await ergo.submit_tx(signedTransaction);
       console.log("Transaction id -> ", transactionId)
-      alert("Transaction id -> ", transactionId)
+      alert("Transaction id -> " + transactionId)
     } catch(error) {
       alert("Transaction error: "+error)
     }
