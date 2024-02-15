@@ -7,7 +7,7 @@ export const explorer_uri = "https://api-testnet.ergoplatform.com";
 let contract = "{proveDlog(decodePoint(SELF.R7[Coll[Byte]].get)) && sigmaProp(OUTPUTS.forall({(box1: Box) => box1.propositionBytes == SELF.propositionBytes }))}";
 let ergoTree = compile(contract, {version: 1})
 
-let ertoTreeAddress = ErgoAddress.fromErgoTree(ergoTree.toHex(), Network.Testnet).toString()
+let ertoTreeAddress = ErgoAddress.fromErgoTree(ergoTree.template.toHex(), Network.Testnet).toString()
 let ergoTreeHash = hex.encode(sha256(ergoTree.toBytes()))
 
 export const ergo_tree_hash = ergoTreeHash
