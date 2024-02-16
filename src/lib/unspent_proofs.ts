@@ -28,8 +28,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
             console.log('Unspent reputation proofs -> ', data)
             return data.items.map((e: any) => {
                 return {
-                    box_id: e.id,
-                    token_id: "",
+                    box_id: e.boxId,
+                    token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
                     metadata: e
                 }
             }); // Actualiza las opciones con los datos recibidos
