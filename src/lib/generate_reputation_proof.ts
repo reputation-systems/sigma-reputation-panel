@@ -20,8 +20,6 @@ export async function generate_reputation_proof(token_amount: string, input_proo
           Once the user accepts the connection request, this API will be injected in the same
           way as the Connection API, and you can interact with it through the ergo object.
      */
-    let inputs = (input_proof !== undefined) ? [input_proof.box] : await ergo.get_utxos();
-
     const wallet_pk = await ergo.get_change_address();
 
     // Output builder
@@ -69,7 +67,7 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     // TODO assign the contract.
     try {
       const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
-      .from(inputs) // add inputs
+      .from(await ergo.get_utxos()) // add inputs
       .to(builder)
       .sendChangeTo(wallet_pk) // set change address
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
