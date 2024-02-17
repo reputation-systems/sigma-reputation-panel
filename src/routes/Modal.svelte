@@ -29,10 +29,7 @@
 	$: if (dialog && showModal) dialog.showModal();
   
 	function generateReputationProof() {
-		if (input_proof) {
-			generate_reputation_proof(reputationTokenAmount, input_proof, object_to_assign);
-		}
-		dialog.close();
+		generate_reputation_proof(reputationTokenAmount, input_proof, object_to_assign);
 	}
 
 	async function fetchReputationProofs() {
@@ -97,7 +94,10 @@
 		<hr />
 		<!-- svelte-ignore a11y-autofocus -->
 		<div class="row">
-			<button on:click={generateReputationProof} disabled={!reputationTokenAmount}>Generate proof</button>
+			<button on:click={generateReputationProof} 
+			disabled={!reputationTokenAmount || selectedOption == "another" && !input_proof}>
+				Generate proof
+			</button>
 		</div>
 	</div>
   </dialog>

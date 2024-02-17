@@ -28,7 +28,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       ergo_tree_address
     );
 
-    if (input_proof === undefined) {
+    if (input_proof === undefined || input_proof === null) {
       // https://fleet-sdk.github.io/docs/transaction-building#step-4-2-mint-a-token
       builder.mintToken({
         amount: token_amount.toString(), // the amount of tokens being minted without decimals
