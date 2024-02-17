@@ -7,23 +7,32 @@
 	export let showModal: any; // boolean
 	let dialog: any; // HTMLDialogElement
   
-	let selectedOption = "";
-	function handleSelectChange(event: any) {
-	  fetchReputationProofs();
-	  selectedOption = event.target.value;
-	}
-  
-	let input_proof: ReputationProof;
-	let reputationTokenAmount: string;
+	let selectedOption = "";  
+	let input_proof: null|ReputationProof;
+	let reputationTokenAmount: number;
 	let object_to_assign: string;
   
 	let unspend_reputation_proofs: ReputationProof[] = [];
+
+	function handleSelectChange(event: any) {
+	  fetchReputationProofs();
+	  selectedOption = event.target.value;
+	  input_proof = null;
+	  handleInputProofChange(event);
+	}
+
+	function handleInputProofChange(event: any) {
+		reputationTokenAmount = 0;
+		object_to_assign = "";
+	}
   
 	$: if (dialog && showModal) dialog.showModal();
   
 	function generateReputationProof() {
-	  generate_reputation_proof(reputationTokenAmount, input_proof, object_to_assign);
-	  dialog.close();
+		if (input_proof) {
+			generate_reputation_proof(reputationTokenAmount, input_proof, object_to_assign);
+		}
+		dialog.close();
 	}
 
 	async function fetchReputationProofs() {
@@ -64,7 +73,7 @@
 			<div class="mb-3">
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="form-label">Reputation proof</label>
-				<select class="form-select" bind:value={input_proof} on:change|stopPropagation>
+				<select class="form-select" bind:value={input_proof} on:change={handleInputProofChange}>
 					{#each unspend_reputation_proofs as option (option.box_id)}
 						<option value={option}>{option.box_id.slice(0, 10)}</option>
 					{/each}
@@ -74,7 +83,7 @@
 				<div class="mb-3">
 					<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
 					<span style="align-self: flex-end;">Up to: {input_proof.token_amount}</span>
-					<input on:change|stopPropagation type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof.token_amount}" />
+					<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof.token_amount}" />
 				</div>
 			{/if}
 		{/if}

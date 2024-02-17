@@ -14,7 +14,7 @@ import { ergo_tree_address } from '$lib/envs';
 
 import type { ReputationProof } from '$lib/ReputationProof';
 
-export async function generate_reputation_proof(token_amount: string, input_proof?: ReputationProof, object_to_assign?: string) {
+export async function generate_reputation_proof(token_amount: number, input_proof?: ReputationProof, object_to_assign?: string) {
 
     /*
           Once the user accepts the connection request, this API will be injected in the same
@@ -31,13 +31,13 @@ export async function generate_reputation_proof(token_amount: string, input_proo
     if (input_proof === undefined) {
       // https://fleet-sdk.github.io/docs/transaction-building#step-4-2-mint-a-token
       builder.mintToken({
-        amount: token_amount, // the amount of tokens being minted without decimals
+        amount: token_amount.toString(), // the amount of tokens being minted without decimals
       });
     } else {
       // https://fleet-sdk.github.io/docs/transaction-building#step-4-1-add-tokens
       builder.addTokens({
         tokenId: input_proof.token_id,
-        amount: token_amount
+        amount: token_amount.toString()
       }, {sum: false})
     }
 
