@@ -16,7 +16,6 @@
 	let input_proof: ReputationProof;
 	let reputationTokenAmount: string;
 	let object_to_assign: string;
-	let data_amount_free: any;
   
 	let unspend_reputation_proofs: ReputationProof[] = [];
   
@@ -47,6 +46,7 @@
 	  <hr />
 	  <form id="reputationForm">
 		<div class="mb-3">
+		  <!-- svelte-ignore a11y-label-has-associated-control -->
 		  <label class="form-label">Choose an option</label>
 		  <select class="form-select" bind:value={selectedOption} on:change={handleSelectChange}>
 			<option></option>
@@ -55,38 +55,40 @@
 		  </select>
 		</div>
 		{#if selectedOption === "new"}
-		<div class="mb-3">
-		  <label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
-		  <input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
-		</div>
+			<div class="mb-3">
+			<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+			<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
+			</div>
 		{/if}
 		{#if selectedOption === "another"}
-		<div class="mb-3">
-		  <!-- svelte-ignore a11y-label-has-associated-control -->
-		  <label class="form-label">Reputation proof</label>
-		  <select class="form-select" bind:value={input_proof}>
-			{#each unspend_reputation_proofs as option (option.box_id)}
-				<option value={option}>{option.box_id.slice(0, 10)}</option>
-			{/each}
-		  </select>
-		</div>
-		<div class="mb-3">
-		  <label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
-		  <input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{data_amount_free}" />
-		</div>
+			<div class="mb-3">
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<label class="form-label">Reputation proof</label>
+				<select class="form-select" bind:value={input_proof} on:change|stopPropagation>
+					{#each unspend_reputation_proofs as option (option.box_id)}
+						<option value={option}>{option.box_id.slice(0, 10)}</option>
+					{/each}
+				</select>
+			</div>
+			{#if input_proof }
+				<div class="mb-3">
+					<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+					<input on:change|stopPropagation type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof.token_amount}" />
+				</div>
+			{/if}
 		{/if}
 		{#if selectedOption !== ""}
-		<div class="mb-3">
-		  <label for="object_to_assign" class="form-label">Object to assign reputation</label>
-		  <input type="text" class="form-control" bind:value={object_to_assign} />
-		</div>
+			<div class="mb-3">
+				<label for="object_to_assign" class="form-label">Object to assign reputation</label>
+				<input type="text" class="form-control" bind:value={object_to_assign} />
+			</div>
 		{/if}
-	  </form>
-	  <hr />
-	  <!-- svelte-ignore a11y-autofocus -->
-	  <div class="row">
-		<button on:click={generateReputationProof}>Generate proof</button>
-	  </div>
+		</form>
+		<hr />
+		<!-- svelte-ignore a11y-autofocus -->
+		<div class="row">
+			<button on:click={generateReputationProof} disabled={!reputationTokenAmount}>Generate proof</button>
+		</div>
 	</div>
   </dialog>
   

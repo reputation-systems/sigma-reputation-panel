@@ -17,7 +17,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
                     // "R4": "reputation-proof-token",
-                    // "R7": await ergo.get_change_address()
+                    // "R7": await ergo.get_change_address() // TODO
                 },
                 "constants": {},
                 "assets": []
@@ -25,14 +25,13 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         });
 
         if (response.ok) {
-            const data = await response.json(); // Suponiendo que la respuesta es un objeto JSON
-            console.log('Unspent reputation proofs -> ', data)
-            return data.items.map((e: any) => {
+            return (await response.json()).items.map((e: any) => {
+                console.log(e.assets[0])
                 return {
                     box: e,
                     box_id: e.boxId,
                     token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
-                    metadata: e
+                    token_amount: e.assets.length > 0 ? e.assets[0].amount : 0,
                 }
             }); // Actualiza las opciones con los datos recibidos
         } else {
