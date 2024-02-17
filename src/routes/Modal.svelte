@@ -73,6 +73,7 @@
 			{#if input_proof }
 				<div class="mb-3">
 					<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+					<span style="align-self: flex-end;">Up to: {input_proof.token_amount}</span>
 					<input on:change|stopPropagation type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof.token_amount}" />
 				</div>
 			{/if}
