@@ -40,5 +40,6 @@
   <ul>
     <li><a href="/">Main</a></li>
     <li><a target="_blank" href="https://raw.githubusercontent.com/celaut-project/ergo-reputation-system/main/docs/PRESENTATION.md">Paper</a></li>
+    <li><a href="/threlte">Animation</a></li>
   </ul>
 </nav>
