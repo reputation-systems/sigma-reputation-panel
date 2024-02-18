@@ -21,11 +21,12 @@ export async function generate_reputation_proof(token_amount: number, input_proo
           way as the Connection API, and you can interact with it through the ergo object.
      */
     const wallet_pk = await ergo.get_change_address();
+    const inputs = await ergo.get_utxos();
 
     // Output builder
     const builder = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
-      ergo_tree_address
+      wallet_pk
     );
 
     if (input_proof === undefined || input_proof === null) {
@@ -42,9 +43,9 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     }
 
     let registers = {
-      R4: SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token"))),
+      R4: SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))),
       R5: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
-      R6: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
+      R6: SConstant(SColl(SByte, stringToBytes('utf8', '0'))),
     }
 
     if (object_to_assign !== undefined)  
@@ -66,12 +67,16 @@ export async function generate_reputation_proof(token_amount: number, input_proo
 
     // TODO assign the contract.
     try {
+      console.log(inputs)
+      console.log(wallet_pk)
+      console.log(ergo_tree_address)
+
       const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
-      .from(await ergo.get_utxos()) // add inputs
+      .from(inputs)
       .to(builder)
-      .sendChangeTo(wallet_pk) // set change address
+      .sendChangeTo(wallet_pk)
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
-      .build() // build!
+      .build()
       .toEIP12Object();
   
       const signedTransaction = await ergo.sign_tx(unsignedTransaction);
