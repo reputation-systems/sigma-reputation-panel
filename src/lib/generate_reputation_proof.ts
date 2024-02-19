@@ -21,7 +21,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
           way as the Connection API, and you can interact with it through the ergo object.
      */
     const wallet_pk = await ergo.get_change_address();
-    const inputs = await ergo.get_utxos();
+    const inputs = [...(await ergo.get_utxos()), input_proof?.box];
 
     // Output builder
     const builder = new OutputBuilder(
@@ -66,7 +66,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     builder.setAdditionalRegisters({...registers, ...{R7: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)))}})
 
     // TODO assign the contract.
-    try {
+
       const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
       .from(inputs)
       .to(builder)
@@ -77,9 +77,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
   
       const signedTransaction = await ergo.sign_tx(unsignedTransaction);
       const transactionId = await ergo.submit_tx(signedTransaction);
+
       console.log("Transaction id -> ", transactionId)
       alert("Transaction id -> " + transactionId)
-    } catch(error) {
-      alert("Transaction error: "+error)
-    }
 }
