@@ -72,7 +72,7 @@
 				<label class="form-label">Reputation proof</label>
 				<select class="form-select" bind:value={input_proof} on:change={handleInputProofChange}>
 					{#each unspend_reputation_proofs as option (option.box_id)}
-						<option value={option}>{option.box_id.slice(0, 10)}</option>
+						<option value={option}>{option.box_id.slice(0, 10)} - {option.token_id.slice(0, 10)} - ({option.token_amount})</option>
 					{/each}
 				</select>
 			</div>

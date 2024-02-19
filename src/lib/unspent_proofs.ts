@@ -11,11 +11,6 @@ import { stringToBytes } from "@scure/base";
 */
 
 export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> {
-    console.log( stringToBytes('utf8', "RPT"))
-    console.log( stringToBytes('utf8', "RPT").toString())
-    console.log(SColl(SByte, stringToBytes('utf8', "RPT")).toHex())
-    console.log(SColl(SByte, stringToBytes('utf8', "RPT")).toBytes())
-    console.log(SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))))
     try {
         const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/search', {
         method: 'POST',

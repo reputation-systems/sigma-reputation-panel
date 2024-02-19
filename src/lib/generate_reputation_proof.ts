@@ -8,11 +8,11 @@ import {
     SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from '@scure/base';
-import { ergo_tree_address } from '$lib/envs';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
 import type { ReputationProof } from '$lib/ReputationProof';
+import { ergo_tree_address } from './envs';
 
 export async function generate_reputation_proof(token_amount: number, input_proof?: ReputationProof, object_to_assign?: string) {
 
@@ -26,7 +26,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     // Output builder
     const builder = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
-      wallet_pk
+      ergo_tree_address
     );
 
     if (input_proof === undefined || input_proof === null) {
@@ -43,7 +43,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     }
 
     let registers = {
-      R4: SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))),
+      R4: SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token"))),
       R5: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
       R6: SConstant(SColl(SByte, stringToBytes('utf8', '0'))),
     }
@@ -67,10 +67,6 @@ export async function generate_reputation_proof(token_amount: number, input_proo
 
     // TODO assign the contract.
     try {
-      console.log(inputs)
-      console.log(wallet_pk)
-      console.log(ergo_tree_address)
-
       const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
       .from(inputs)
       .to(builder)
