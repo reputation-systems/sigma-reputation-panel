@@ -2,11 +2,10 @@ import type { ReputationProof } from "$lib/ReputationProof";
 import {
     SConstant,
     SColl,
-    SByte,
-    ErgoAddress,
-    Network
+    SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from "@scure/base";
+import { serializedToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -35,12 +34,10 @@ type ApiBox = {
     transactionId: string;
 };
 
-export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> {
-
+export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> 
+{
     const wallet_pk = await ergo.get_change_address();
-    console.log(wallet_pk)
-    const r7 = SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)));  // It's the serializedValue, but renderedValue is needed.
-    console.log(r7)
+
     try {
         const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/search', {
         method: 'POST',
@@ -50,8 +47,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         body: JSON.stringify({
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
-                    "R4":  "72657075746174696f6e2d70726f6f662d746f6b656e",
-                    "R7": r7 // 3357795339456f4a4a347a684a6632456974356d383336463669594e7961355373734b4641594838637277776253534c48787269
+                    "R4":  serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token")))),
+                    "R7": serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk))))
                 },
                 "constants": {},
                 "assets": []
