@@ -21,7 +21,7 @@ export async function generate_reputation_proof(token_amount: number, input_proo
           way as the Connection API, and you can interact with it through the ergo object.
      */
     const wallet_pk = await ergo.get_change_address();
-    const inputs = [...(await ergo.get_utxos()), input_proof?.box];
+    const inputs = input_proof ?  [...(await ergo.get_utxos()), input_proof?.box] : await ergo.get_utxos();
 
     // Output builder
     const builder = new OutputBuilder(
