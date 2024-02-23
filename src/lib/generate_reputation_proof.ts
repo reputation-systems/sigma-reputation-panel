@@ -13,6 +13,7 @@ import { stringToBytes } from '@scure/base';
 
 import type { ReputationProof } from '$lib/ReputationProof';
 import { ergo_tree_address } from './envs';
+import { generate_pk_proposition } from './utils';
 
 export async function generate_reputation_proof(token_amount: number, input_proof?: ReputationProof, object_to_assign?: string) {
 
@@ -63,21 +64,19 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       }}
     }
 
-    builder.setAdditionalRegisters({...registers, ...{R7: SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk)))}})
+    builder.setAdditionalRegisters({...registers, ...{R7: generate_pk_proposition((await ergo.get_change_address()))}})
 
-    // TODO assign the contract.
+    const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
+    .from(inputs)
+    .to(builder)
+    .sendChangeTo(wallet_pk)
+    .payFee(RECOMMENDED_MIN_FEE_VALUE)
+    .build()
+    .toEIP12Object();
 
-      const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
-      .from(inputs)
-      .to(builder)
-      .sendChangeTo(wallet_pk)
-      .payFee(RECOMMENDED_MIN_FEE_VALUE)
-      .build()
-      .toEIP12Object();
-  
-      const signedTransaction = await ergo.sign_tx(unsignedTransaction);
-      const transactionId = await ergo.submit_tx(signedTransaction);
+    const signedTransaction = await ergo.sign_tx(unsignedTransaction);
+    const transactionId = await ergo.submit_tx(signedTransaction);
 
-      console.log("Transaction id -> ", transactionId)
-      alert("Transaction id -> " + transactionId)
+    console.log("Transaction id -> ", transactionId)
+    alert("Transaction id -> " + transactionId)
 }

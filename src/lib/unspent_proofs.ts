@@ -5,7 +5,7 @@ import {
     SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from "@scure/base";
-import { serializedToRendered } from "$lib/utils";
+import { generate_pk_proposition, serializedToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -48,7 +48,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
                     "R4":  serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token")))),
-                    "R7": serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', wallet_pk))))
+                    "R7": serializedToRendered(generate_pk_proposition((await ergo.get_change_address())))
                 },
                 "constants": {},
                 "assets": []
