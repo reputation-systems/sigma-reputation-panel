@@ -5,8 +5,9 @@ import { sha256, hex } from "@fleet-sdk/crypto";
 export const explorer_uri = "https://api-testnet.ergoplatform.com";
 
 let contract = `{
-    val z = decodePoint(SELF.R7[Coll[Byte]].get);
-    proveDlog(z)
+    val encoded = SELF.R7[Coll[Byte]].get
+    val z = decodePoint(encoded)
+    proveDlog(z);
 }`;
 let ergoTree = compile(contract, {version: 1})
 

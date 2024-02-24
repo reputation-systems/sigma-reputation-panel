@@ -64,7 +64,9 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       }}
     }
 
-    builder.setAdditionalRegisters({...registers, ...{R7: generate_pk_proposition((await ergo.get_change_address()))}})
+    builder.setAdditionalRegisters({...registers, ...{
+      R7: generate_pk_proposition((await ergo.get_change_address()))}
+    })
 
     const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
     .from(inputs)
