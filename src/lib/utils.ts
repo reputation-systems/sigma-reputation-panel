@@ -1,5 +1,4 @@
 import { ErgoAddress, SGroupElement, SSigmaProp } from "@fleet-sdk/core";
-import { base64 } from "@scure/base";
 
 export function serializedToRendered(serializedValue: string): string {
     // Assuming the serialized value always starts with a pattern to strip (e.g., '0e')

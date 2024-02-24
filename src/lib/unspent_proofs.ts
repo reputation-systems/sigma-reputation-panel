@@ -5,7 +5,7 @@ import {
     SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from "@scure/base";
-import { generate_pk_proposition, serializedToRendered } from "$lib/utils";
+import { serializedToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
