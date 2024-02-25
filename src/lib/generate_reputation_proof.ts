@@ -23,30 +23,46 @@ export async function generate_reputation_proof(token_amount: number, input_proo
      */
     const wallet_pk = await ergo.get_change_address();
     const inputs = input_proof ?  [...(await ergo.get_utxos()), input_proof?.box] : await ergo.get_utxos();
+    let outputs: OutputBuilder[] = [];
 
     // Output builder
-    const builder = new OutputBuilder(
+    const new_proof_output = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
       ergo_tree_address
     );
 
     if (input_proof === undefined || input_proof === null) {
       // https://fleet-sdk.github.io/docs/transaction-building#step-4-2-mint-a-token
-      builder.mintToken({
+      new_proof_output.mintToken({
         amount: token_amount.toString(), // the amount of tokens being minted without decimals
       });
     } else {
       // https://fleet-sdk.github.io/docs/transaction-building#step-4-1-add-tokens
-      builder.addTokens({
+      new_proof_output.addTokens({
         tokenId: input_proof.token_id,
         amount: token_amount.toString()
       }, {sum: false})
+
+      // Replicate the input to a new output. (If it's not added, the rest of the token amount will be send to the wallet address, that is, new output with wallet script)
+      if (input_proof.token_amount - token_amount > 0) {
+        outputs.push(
+                new OutputBuilder(
+                  SAFE_MIN_BOX_VALUE,
+                  ergo_tree_address
+                )
+                .addTokens({
+                  tokenId: input_proof.token_id,
+                  amount: (input_proof.token_amount - token_amount).toString()
+                }, {sum: false})
+                .setAdditionalRegisters(input_proof.box.additionalRegisters)
+              )
+      }
     }
 
     let registers = {
-      R4: SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token"))),
+      R4: SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))),
       R5: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
-      R6: SConstant(SColl(SByte, stringToBytes('utf8', '0'))),
+      R6: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
     }
 
     if (object_to_assign !== undefined)  
@@ -64,13 +80,15 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       }}
     }
 
-    builder.setAdditionalRegisters({...registers, ...{
+    new_proof_output.setAdditionalRegisters({...registers, ...{
       R7: generate_pk_proposition((await ergo.get_change_address()))}
     })
 
+    outputs.push(new_proof_output)
+
     const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
     .from(inputs)
-    .to(builder)
+    .to(outputs)
     .sendChangeTo(wallet_pk)
     .payFee(RECOMMENDED_MIN_FEE_VALUE)
     .build()

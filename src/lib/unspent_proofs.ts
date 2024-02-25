@@ -47,7 +47,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         body: JSON.stringify({
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
-                    "R4":  serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "reputation-proof-token")))),
+                    "R4":  serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "RPT")))),
                     "R7":  serializedToRendered(generate_pk_proposition((await ergo.get_change_address())))
                 },
                 "constants": {},
