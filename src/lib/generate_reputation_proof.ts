@@ -59,25 +59,25 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       }
     }
 
-    let registers = {
-      R4: SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))),
-      R5: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
-      R6: SConstant(SColl(SByte, stringToBytes('utf8', ''))),
-    }
-
-    if (object_to_assign !== undefined)  
-    { 
-      /**
+    /**
        * 
        * https://github.com/ergoplatform/eips/blob/master/eip-0004.md#ergo-asset-types
        *  If there is an object to assign the reputation, there are various ways to support it.
        *  Maybe should improve new ones
        *
       */
-      registers = {...registers, ...{
-        R5: SConstant(SColl(SByte, stringToBytes('utf8', 'plain/txt-utf8'))),
-        R6: SConstant(SColl(SByte, stringToBytes('utf8', object_to_assign))),
-      }}
+    let r5 = "";
+    let r6 = "";
+    if (object_to_assign !== undefined)  
+    { 
+      r5 = "plain/txt-utf8";
+      r6 = object_to_assign;
+    }
+
+    let registers = {
+      R4: SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))),
+      R5: SConstant(SColl(SByte, stringToBytes('utf8', r5))),
+      R6: SConstant(SColl(SByte, stringToBytes('utf8', r6))),
     }
 
     new_proof_output.setAdditionalRegisters({...registers, ...{
