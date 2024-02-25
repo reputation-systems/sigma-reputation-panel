@@ -49,7 +49,9 @@ import Modal from './Modal.svelte';
     <p class="alert-message">Attention! This is a test version. <br><br> Please, don't use on MainNet.</p>
   </div>
   <div class="graph-content">
-     <Graph />
+    {#if connected}
+      <Graph />
+    {/if}
   </div>
 </div>
 
@@ -75,8 +77,11 @@ import Modal from './Modal.svelte';
 
   .graph-content {
     position: absolute;
+    text-align: center;
     top: 50%;
-    left: 50%;
+    left: 30%;
+    width: 100%;
+    height: 100%;
   }
 
   .alert-message {
