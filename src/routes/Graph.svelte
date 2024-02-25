@@ -26,7 +26,7 @@
   
         const nodes = unspend_reputation_proofs.map(proof => ({
             id: proof.box_id,
-            name: proof.box_id.slice(0, 10) // + " - " +proof.token_id.slice(0, 10)
+            name: proof.box_id.slice(0, 10) + " - " +proof.token_id.slice(0, 10) + "  ("+proof.token_amount+")"
         }));
     
         /*const links = [
