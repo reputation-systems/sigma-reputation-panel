@@ -22,7 +22,7 @@
     //
     // The proof's creator (or, at least, the one chosen by the box's creator) can spend the tokens
     // Owner's public key.  Without it, the box can't be expended. 
-proveDlog(decodePoint(SELF.R7[Coll[Byte]].get)) &&
+proveDlog(SELF.R7[GroupElement].get) &&
     //
     // Assign them ONLY to other reputation proofs.
-sigmaProp(OUTPUTS.forall({(x: Box) => x.propositionBytes == SELF.propositionBytes}))
+sigmaProp(OUTPUTS.exists({(x: Box) => x.propositionBytes == SELF.propositionBytes}))
