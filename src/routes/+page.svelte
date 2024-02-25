@@ -1,5 +1,6 @@
 <script lang="ts">
-  import Modal from './Modal.svelte';
+  import Graph from './Graph.svelte';
+import Modal from './Modal.svelte';
   import Navbar from './Navbar.svelte';
   let showModal = false;
   let connected = false;
@@ -47,6 +48,9 @@
   <div class="modal-content">
     <p class="alert-message">Attention! This is a test version. <br><br> Please, don't use on MainNet.</p>
   </div>
+  <div class="graph-content">
+     <Graph />
+  </div>
 </div>
 
 
@@ -67,6 +71,12 @@
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .graph-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
   }
 
   .alert-message {
