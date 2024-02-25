@@ -27,7 +27,9 @@
 		"@sveltejs/adapter-static": "^2.0.3",
 		"@threlte/core": "^7.1.0",
 		"@threlte/extras": "^8.7.5",
+		"@types/d3": "^7.4.3",
 		"@types/three": "^0.161.2",
+		"d3": "^7.8.5",
 		"three": "^0.161.0",
 		"update": "^0.7.4"
 	}
