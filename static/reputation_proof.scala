@@ -12,6 +12,8 @@
 
     TODO: Limit the number of possible tokens to one
 */
+let INPUT_PROOF: Box = SELF.INPUTS.filter({(x: Box) => x.propositionBytes == SELF.propositionBytes})[0];
+let REST_OFF_NEW_PROOFS: Box[] = INPUT_PROOF.filter({(x: Box) => x.propositionBytes == SELF.propositionBytes});
     // An optional object where the proof assign it's reputation 
     // (it could be different types of data, like other Reputation systems, urls, git repositories, etc).
     //
@@ -25,4 +27,13 @@
 proveDlog(SELF.R7[GroupElement].get) &&
     //
     // Assign them ONLY to other reputation proofs.
-sigmaProp(OUTPUTS.exists({(x: Box) => x.propositionBytes == SELF.propositionBytes}))
+sigmaProp(SELF.tokens.length == 1) &&
+sigmaProp(OUTPUTS.forall({(x: Box) => {
+    x.tokens.length == 0 ||
+    x.tokens[0][0] !== SELF.tokens[0][0] ||
+    (
+        x.tokens[0][0] == SELF.tokens[0][0] &&
+        x.tokens[0][1] + REST_OFF_NEW_PROOFS.fold({(total: Int, x: Box) => total + x.tokens[0][1]}) = INPUT_PROOF.tokens[0][1]
+        x.propositionBytes == SELF.propositionBytes
+    )
+}}))

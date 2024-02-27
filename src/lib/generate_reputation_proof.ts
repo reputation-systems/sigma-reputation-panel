@@ -46,16 +46,16 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       // Replicate the input to a new output. (If it's not added, the rest of the token amount will be send to the wallet address, that is, new output with wallet script)
       if (input_proof.token_amount - token_amount > 0) {
         outputs.push(
-                new OutputBuilder(
-                  SAFE_MIN_BOX_VALUE,
-                  ergo_tree_address
-                )
-                .addTokens({
-                  tokenId: input_proof.token_id,
-                  amount: (input_proof.token_amount - token_amount).toString()
-                }, {sum: false})
-                .setAdditionalRegisters(input_proof.box.additionalRegisters)
-              )
+          new OutputBuilder(
+            SAFE_MIN_BOX_VALUE,
+            ergo_tree_address
+          )
+          .addTokens({
+            tokenId: input_proof.token_id,
+            amount: (input_proof.token_amount - token_amount).toString()
+          }, {sum: false})
+          .setAdditionalRegisters(input_proof.box.additionalRegisters)
+        )
       }
     }
 

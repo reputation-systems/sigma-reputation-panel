@@ -6,7 +6,15 @@ export const explorer_uri = "https://api-testnet.ergoplatform.com";
 
 let contract = `{
     proveDlog(SELF.R7[GroupElement].get) &&
-    sigmaProp(OUTPUTS.exists({(x: Box) => x.propositionBytes == SELF.propositionBytes}))
+    sigmaProp(SELF.tokens.size == 1) &&
+    sigmaProp(OUTPUTS.forall { (x: Box) =>
+      x.tokens.size == 0 ||
+      (x.tokens(0)._1 != SELF.tokens(0)._1) ||
+      (
+        x.tokens(0)._1 == SELF.tokens(0)._1 &&
+        x.propositionBytes == SELF.propositionBytes
+      )
+    })  
 }`;
 let ergoTree = compile(contract, {version: 1})
 
