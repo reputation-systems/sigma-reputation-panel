@@ -1,4 +1,4 @@
-import type { ReputationProof } from "$lib/ReputationProof";
+import type { RPBox, ReputationProof } from "$lib/ReputationProof";
 import {
     SConstant,
     SColl,
@@ -56,9 +56,10 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         });
 
         if (response.ok) {
-            return (await response.json()).items.map((e: ApiBox) => {
-                return {
-                    current_boxes: [{
+            let proofs = new Map<string, ReputationProof>();
+            (await response.json()).items.forEach((e: ApiBox) => {
+                let token_id = e.assets[0].tokenId;
+                let current_box: RPBox = {
                         box: {
                             boxId: e.boxId,
                             value: e.value,
@@ -76,11 +77,16 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         },
                         box_id: e.boxId,
                         token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
-                        token_amount: e.assets.length > 0 ? e.assets[0].amount : 0,
-                    }]
-                }
-            }); // Actualiza las opciones con los datos recibidos
-        } else {
+                        token_amount: e.assets.length > 0 ? Number(e.assets[0].amount) : 0,
+                    };
+
+                let _reputation_proof: ReputationProof = proofs.has(token_id) ? proofs.get(token_id)! : {current_boxes: [], token_id: token_id};
+                _reputation_proof.current_boxes.push(current_box);
+                proofs.set(token_id, _reputation_proof);
+            });
+            return Array.from(proofs.values());
+        } 
+        else {
             console.error('Error al realizar la solicitud POST');
             return [];
         }

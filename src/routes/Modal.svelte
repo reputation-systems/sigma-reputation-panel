@@ -8,16 +8,17 @@
 	let dialog: any; // HTMLDialogElement
   
 	let selectedOption = "";  
-	let input_proof: null|RPBox;
+	let input_proof: null|ReputationProof;
+	let input_proof_box: null|RPBox;
 	let reputationTokenAmount: number;
 	let object_to_assign: string;
   
-	let unspend_reputation_proofs: RPBox[] = [];
+	let unspend_reputation_proofs: ReputationProof[] = [];
 
 	function handleSelectChange(event: any) {
 	  fetchReputationProofs();
 	  selectedOption = event.target.value;
-	  input_proof = null;
+	  input_proof_box = null;
 	  handleInputProofChange(event);
 	}
 
@@ -29,14 +30,14 @@
 	$: if (dialog && showModal) dialog.showModal();
   
 	function generateReputationProof() {
-		generate_reputation_proof(reputationTokenAmount, input_proof, object_to_assign);
+		generate_reputation_proof(reputationTokenAmount, input_proof_box ?? undefined, object_to_assign);
 	}
 
 	async function fetchReputationProofs() {
 		try {
 			console.log('Searching for boxes....')
 			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
-			unspend_reputation_proofs = data.map((e: ReputationProof) => e.current_boxes[0]);
+			unspend_reputation_proofs = data;
 		} catch (error) {
 			console.error(error);
 		}
@@ -62,8 +63,8 @@
 		</div>
 		{#if selectedOption === "new"}
 			<div class="mb-3">
-			<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
-			<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
+				<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
 			</div>
 		{/if}
 		{#if selectedOption === "another"}
@@ -71,17 +72,28 @@
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="form-label">Reputation proof</label>
 				<select class="form-select" bind:value={input_proof} on:change={handleInputProofChange}>
-					{#each unspend_reputation_proofs as option (option.box_id)}
-						<option value={option}>{option.box_id.slice(0, 10)} - {option.token_id.slice(0, 10)} - ({option.token_amount})</option>
+					{#each unspend_reputation_proofs as option (option.token_id)}
+						<option value={option}>{option.token_id.slice(0, 10)}</option>
 					{/each}
 				</select>
 			</div>
-			{#if input_proof }
+			{#if input_proof}
 				<div class="mb-3">
-					<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
-					<span style="align-self: flex-end;">Up to: {input_proof.token_amount}</span>
-					<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof.token_amount}" />
+					<!-- svelte-ignore a11y-label-has-associated-control -->
+					<label class="form-label">Proof box</label>
+					<select class="form-select" bind:value={input_proof_box} on:change={handleInputProofChange}>
+						{#each input_proof.current_boxes as option (option.box_id)}
+							<option value={option}>{option.box_id.slice(0, 10)} - ({option.token_amount})</option>
+						{/each}
+					</select>
 				</div>
+				{#if input_proof_box }
+					<div class="mb-3">
+						<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+						<span style="align-self: flex-end;">Up to: {input_proof_box.token_amount}</span>
+						<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" />
+					</div>
+				{/if}
 			{/if}
 		{/if}
 		{#if selectedOption !== ""}
@@ -95,7 +107,7 @@
 		<!-- svelte-ignore a11y-autofocus -->
 		<div class="row">
 			<button on:click={generateReputationProof} 
-			disabled={!reputationTokenAmount || selectedOption == "another" && !input_proof}>
+				disabled={!reputationTokenAmount || selectedOption == "another" && !input_proof_box}>
 				Generate proof
 			</button>
 		</div>
