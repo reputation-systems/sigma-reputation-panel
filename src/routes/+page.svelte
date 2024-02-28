@@ -79,7 +79,7 @@ import Modal from './Modal.svelte';
     position: absolute;
     text-align: center;
     top: 50%;
-    left: 30%;
+    left: 15%;
     width: 100%;
     height: 100%;
   }
