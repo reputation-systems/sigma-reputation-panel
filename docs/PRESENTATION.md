@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Our purpose to the Ergohack-VII is reputation system. A reputation system addresses a fundamental need in the blockchain ecosystem - trust. Trust is essential in any ecosystem, and our system aims to bridge the trust gap by providing a decentralized, user-driven mechanism for assigning and transferring reputation.
+Our purpose ~~to the Ergohack-VII~~ is build reputation system. A reputation system addresses a fundamental need in the blockchain ecosystem - trust. Trust is essential in any ecosystem, and our system aims to bridge the trust gap by providing a decentralized, user-driven mechanism for assigning and transferring reputation.
 
 **Trust and Reputation:**
 
@@ -71,6 +71,8 @@ Well, in accordance with Ergo's principles, the system:
 - It Has a ****Long-term Focus****, as the development team has not based its approach on short-term vision.
 
 
+# ---- FROM THIS, NEEDS TO REWRITE ----
+
 ## System design
 
 Each reputation proof has a token used to reflect the amount of reputation that can be assigned. 
@@ -105,17 +107,7 @@ Reputation Proof  -   2Ud2Ryh6MkC8Lstg1BiSE86Vbs7FTBdChEMo2c3ZK3pyGaQoY2Ck9QQiz2
     R6 -> Reputation off-chain object
     
 */
-    // An optional object where the proof assign it's reputation 
-    // (it could be different types of data, like other Reputation systems, urls, git repositories, etc).
-SELF.R5[Box].isDefined != true &&
-SELF.R6[(Coll[Byte], Coll[Byte])].isDefined != true &&
-    // 
-    // The proof's creator (or, at least, the one chosen by the box's creator) can spend the tokens
-    // Owner's public key.  Without it, the box can't be expended. 
-proveDlog(decodePoint(SELF.R4[Coll[Byte]].get)) &&
-    //
-    // Assign them ONLY to other reputation proofs.
-OUTPUTS.forall({(x: Box) => x.propositionBytes == SELF.propositionBytes})
+....
 ```
 
 
@@ -181,10 +173,9 @@ There are certain things that we are not able to solve these two days, they are:
        `type AssignedReputation = Box || (Cell[Byte], Cell[Byte])` types. We don’t know if there is a better way to do it.
     - We would want to limit the number of possible tokens to one, for a more specific contract.
 - On the off-chain side:
-    - We need to develop the `compute_reputation.py` script. It will allow computing the reputation of an object based 
-      on the user’s reputation proofs (and from those external proofs to which the user has assigned reputation).
-    - The `extract_unexpended_reputation_proofs.py` script it’s only using random demo data for the user’s unexpended 
-      reputation proofs. It has the code to use the api explorer, but it didn't work.
+    - Using [Sigma reputation graph](https://github.com/reputation-dapps/sigma-reputation-graph) to compute the reputation of an object from some perspective.
+
+![Compute reputation algorithm](resources/compute_reputation_algorithm.excalidraw.svg)
 
 ## **Future aproaches**
 
@@ -202,4 +193,4 @@ Some possible branches to expand are:
 
 *Thanks for reading.*
 
-[GitHub repository](https://github.com/jossemii/ergohack-vii)
+[GitHub repository](https://https://github.com/reputation-dapps/ergo-reputation-system)
