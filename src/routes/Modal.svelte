@@ -170,7 +170,7 @@
 	button {
 	  padding: 0.5em 1em;
 	  font-size: 1rem;
-	  background-color: #007bff;
+	  background-color: rgb(17, 17, 17);
 	  color: #fff;
 	  border: none;
 	  cursor: pointer;
@@ -178,7 +178,7 @@
 	}
   
 	button:hover {
-	  background-color: #0056b3;
+	  background-color: rgb(17, 17, 17);
 	}
   </style>
   
