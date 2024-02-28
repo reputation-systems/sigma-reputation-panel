@@ -58,24 +58,26 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         if (response.ok) {
             return (await response.json()).items.map((e: ApiBox) => {
                 return {
-                    box: {
-                        boxId: e.boxId,
-                        value: e.value,
-                        assets: e.assets,
-                        ergoTree: e.ergoTree,
-                        creationHeight: e.creationHeight,
-                        additionalRegisters: Object.entries(e.additionalRegisters).reduce((acc, [key, value]) => {
-                            acc[key] = value.serializedValue;
-                            return acc;
-                        }, {} as {
-                            [key: string]: string;
-                        }),
-                        index: e.index,
-                        transactionId: e.transactionId
-                      },
-                    box_id: e.boxId,
-                    token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
-                    token_amount: e.assets.length > 0 ? e.assets[0].amount : 0,
+                    current_boxes: [{
+                        box: {
+                            boxId: e.boxId,
+                            value: e.value,
+                            assets: e.assets,
+                            ergoTree: e.ergoTree,
+                            creationHeight: e.creationHeight,
+                            additionalRegisters: Object.entries(e.additionalRegisters).reduce((acc, [key, value]) => {
+                                acc[key] = value.serializedValue;
+                                return acc;
+                            }, {} as {
+                                [key: string]: string;
+                            }),
+                            index: e.index,
+                            transactionId: e.transactionId
+                        },
+                        box_id: e.boxId,
+                        token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
+                        token_amount: e.assets.length > 0 ? e.assets[0].amount : 0,
+                    }]
                 }
             }); // Actualiza las opciones con los datos recibidos
         } else {

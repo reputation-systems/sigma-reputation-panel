@@ -3,16 +3,16 @@
     import * as d3 from 'd3';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import type { ReputationProof } from '$lib/ReputationProof';
+    import type { RPBox, ReputationProof } from '$lib/ReputationProof';
   
     let svgElement: SVGSVGElement;
-    let unspend_reputation_proofs: ReputationProof[] = [];
+    let unspend_reputation_proofs: RPBox[] = [];
 
     async function fetchReputationProofs() {
 		try {
 			console.log('Searching for boxes....')
 			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
-			unspend_reputation_proofs = data;
+			unspend_reputation_proofs = data.map((e: ReputationProof) => e.current_boxes[0]);;
             console.log(unspend_reputation_proofs)
             build_graph();
 		} catch (error) {

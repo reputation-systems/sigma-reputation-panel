@@ -2,17 +2,17 @@
 	import { updateReputationProofList } from '$lib/unspent_proofs';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
 	import { explorer_uri, ergo_tree_hash } from '$lib/envs';
-	import type { ReputationProof } from '$lib/ReputationProof';
+	import type { RPBox, ReputationProof } from '$lib/ReputationProof';
   
 	export let showModal: any; // boolean
 	let dialog: any; // HTMLDialogElement
   
 	let selectedOption = "";  
-	let input_proof: null|ReputationProof;
+	let input_proof: null|RPBox;
 	let reputationTokenAmount: number;
 	let object_to_assign: string;
   
-	let unspend_reputation_proofs: ReputationProof[] = [];
+	let unspend_reputation_proofs: RPBox[] = [];
 
 	function handleSelectChange(event: any) {
 	  fetchReputationProofs();
@@ -36,7 +36,7 @@
 		try {
 			console.log('Searching for boxes....')
 			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
-			unspend_reputation_proofs = data;
+			unspend_reputation_proofs = data.map((e: ReputationProof) => e.current_boxes[0]);
 		} catch (error) {
 			console.error(error);
 		}
@@ -48,7 +48,7 @@
   <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
-	  <h2 class="modal-title" id="generateReputationLabel">Generate new reputation proof</h2>
+	  <h2 class="modal-title" id="generateReputationLabel">Generate reputation proof</h2>
 	  <hr />
 	  <form id="reputationForm">
 		<div class="mb-3">
@@ -56,8 +56,8 @@
 		  <label class="form-label">Choose an option</label>
 		  <select class="form-select" bind:value={selectedOption} on:change={handleSelectChange}>
 			<option></option>
-			<option value="new">A new one</option>
-			<option value="another">From another reputation prove</option>
+			<option value="new">Generate a new one</option>
+			<option value="another">Update a current one</option>
 		  </select>
 		</div>
 		{#if selectedOption === "new"}

@@ -11,11 +11,11 @@ import { stringToBytes } from '@scure/base';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
-import type { ReputationProof } from '$lib/ReputationProof';
+import type { RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address } from './envs';
 import { generate_pk_proposition } from './utils';
 
-export async function generate_reputation_proof(token_amount: number, input_proof?: ReputationProof, object_to_assign?: string) {
+export async function generate_reputation_proof(token_amount: number, input_proof?: RPBox, object_to_assign?: string) {
 
     /*
           Once the user accepts the connection request, this API will be injected in the same
