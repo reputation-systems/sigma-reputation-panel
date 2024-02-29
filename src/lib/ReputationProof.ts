@@ -2,7 +2,9 @@ import type { Amount, Box } from "@fleet-sdk/core";
 
 export interface ReputationProof {
     token_id: string,
-    current_boxes: RPBox[]
+    current_boxes: RPBox[],
+    total_amount: number,
+    number_of_boxes: number
 }
 
 export interface RPBox {

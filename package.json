@@ -29,6 +29,7 @@
 		"@threlte/extras": "^8.7.5",
 		"@types/three": "^0.161.2",
 		"@xyflow/svelte": "^0.0.36",
+		"elkjs": "^0.9.2",
 		"three": "^0.161.0",
 		"update": "^0.7.4"
 	}

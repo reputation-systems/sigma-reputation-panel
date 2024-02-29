@@ -80,8 +80,17 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         token_amount: e.assets.length > 0 ? Number(e.assets[0].amount) : 0,
                     };
 
-                let _reputation_proof: ReputationProof = proofs.has(token_id) ? proofs.get(token_id)! : {current_boxes: [], token_id: token_id};
+                let _reputation_proof: ReputationProof = proofs.has(token_id) 
+                    ? proofs.get(token_id)! 
+                    : {
+                        current_boxes: [], 
+                        token_id: token_id,
+                        number_of_boxes: 0,
+                        total_amount: 0
+                    };
                 _reputation_proof.current_boxes.push(current_box);
+                _reputation_proof.total_amount += current_box.token_amount;
+                _reputation_proof.number_of_boxes += 1;
                 proofs.set(token_id, _reputation_proof);
             });
             return Array.from(proofs.values());
