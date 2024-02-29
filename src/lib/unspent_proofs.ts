@@ -83,11 +83,10 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 if (
                     e.additionalRegisters.R6 !== undefined && 
                     e.additionalRegisters.R5 !== undefined && 
-                   true//  e.additionalRegisters.R5.serializedValue === "token-proof"
+                    e.additionalRegisters.R5.renderedValue === serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "token-proof"))))
                 ) {
                     current_box.object_type = ObjectType.ProofByToken;
-                    current_box.object_value = e.additionalRegisters.R6.serializedValue;
-                    console.log(current_box.object_value)
+                    current_box.object_value = serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', e.additionalRegisters.R6.serializedValue))));
                 }
 
                 let _reputation_proof: ReputationProof = proofs.has(token_id) 

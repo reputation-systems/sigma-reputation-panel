@@ -6,11 +6,14 @@
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import type { ReputationProof } from '$lib/ReputationProof';
+    import { ObjectType, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
     import Menu from './Menu.svelte';
     import Header from './Header.svelte';
+    import { stringToBytes } from '@scure/base';
+    import { SByte, SColl, SConstant } from '@fleet-sdk/core';
+    import { serializedToRendered } from '$lib/utils';
     let connected = false;
 
     async function connectNautilus() {
@@ -96,7 +99,7 @@
       let _edges: Edge[] = [];
       proofs.map(p => {
         $nodes.push({
-            id: p.token_id,
+            id: serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', p.token_id)))),
             // type: "group",
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
@@ -105,11 +108,16 @@
           });
 
         p.current_boxes.map(b => {
-          _edges.push({
-            id: 'edge-'+b.box_id,
-            source: p.token_id,
-            target: b.object_value
-          });
+          if (
+            b.object_value && b.object_type &&
+            b.object_type == ObjectType.ProofByToken
+            ) {
+            _edges.push({
+              id: 'edge-'+b.box_id,
+              source: serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', p.token_id)))),
+              target: serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', b.token_id))))
+            });
+          }
         });
 
         /*p.current_boxes.map(b => {
