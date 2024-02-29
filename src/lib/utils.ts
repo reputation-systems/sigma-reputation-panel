@@ -12,6 +12,23 @@ export function serializedToRendered(serializedValue: string): string {
     }
 }
 
+export function hexToUtf8(hexString: string): string | null {
+    // Asegúrate de que la cadena hexadecimal tenga una longitud par para que se pueda convertir correctamente
+    if (hexString.length % 2 !== 0) {
+      console.error('La cadena hexadecimal tiene una longitud impar');
+      return null;
+    }
+  
+    // Convierte la cadena hexadecimal a un array de bytes
+    const byteArray = new Uint8Array(hexString.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+  
+    // Crea un nuevo TextDecoder para convertir el array de bytes a una cadena UTF-8
+    const decoder = new TextDecoder('utf-8');
+    const utf8String = decoder.decode(byteArray);
+  
+    return utf8String;
+  }
+
 export function generate_pk_proposition(wallet_pk: string): string {
     const pk = ErgoAddress.fromBase58(wallet_pk).getPublicKeys()[0];
     const encodedProp = SGroupElement(pk);

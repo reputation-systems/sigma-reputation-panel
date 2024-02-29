@@ -11,7 +11,7 @@ import { stringToBytes } from '@scure/base';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
-import type { RPBox } from '$lib/ReputationProof';
+import { ObjectType, type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address } from './envs';
 import { generate_pk_proposition } from './utils';
 
@@ -70,8 +70,10 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     let r6 = "";
     if (object_to_assign !== undefined)  
     { 
-      r5 = "plain/txt-utf8";
+      r5 = ObjectType.ProofByToken;
       r6 = object_to_assign;
+      console.log(r5)
+      console.log(r6)
     }
 
     let registers = {

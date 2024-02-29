@@ -38,7 +38,6 @@
         console.log('Searching for boxes....')
         const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
         const unspend_reputation_proofs = data;
-        console.log(unspend_reputation_proofs);
         build_graph(unspend_reputation_proofs);
       } catch (error) {
         console.error(error);
@@ -93,8 +92,8 @@
 
     function build_graph(proofs: ReputationProof[]) {
       $nodes = [];
-      $edges = [];
       let _x = 0; let _y = 0;
+      let _edges: Edge[] = [];
       proofs.map(p => {
         $nodes.push({
             id: p.token_id,
@@ -104,6 +103,15 @@
             data: { label: p.token_id.slice(0, 10) },
             position: { x: _x, y: _y },
           });
+
+        p.current_boxes.map(b => {
+          _edges.push({
+            id: 'edge-'+b.box_id,
+            source: p.token_id,
+            target: b.object_value
+          });
+        });
+
         /*p.current_boxes.map(b => {
           const percentage_of_tokens = parseFloat(Number(b.token_amount/p.total_amount * 100).toFixed(3));
           $nodes.push({
@@ -115,6 +123,7 @@
           });
         });*/
       });
+      $edges = _edges;
       onLayout(window.innerWidth > window.innerHeight ? 'TB' : 'LR', );
     }
   </script>

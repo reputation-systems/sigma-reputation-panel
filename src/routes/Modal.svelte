@@ -99,7 +99,14 @@
 		{#if selectedOption !== ""}
 			<div class="mb-3">
 				<label for="object_to_assign" class="form-label">Object to assign reputation</label>
-				<input type="text" class="form-control" bind:value={object_to_assign} />
+				<!-- <input type="text" class="form-control" bind:value={object_to_assign} /> -->
+				<select class="form-select" bind:value={object_to_assign}>
+					{#each unspend_reputation_proofs as option (option.token_id)}
+						{#if input_proof?.token_id !== option.token_id}
+							<option value={option.token_id}>{option.token_id.slice(0, 10)}</option>
+						{/if}
+					{/each}
+				</select>
 			</div>
 		{/if}
 		</form>

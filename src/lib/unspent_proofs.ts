@@ -1,11 +1,11 @@
-import type { RPBox, ReputationProof } from "$lib/ReputationProof";
+import { ObjectType, type RPBox, type ReputationProof } from "$lib/ReputationProof";
 import {
     SConstant,
     SColl,
     SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from "@scure/base";
-import { generate_pk_proposition, serializedToRendered } from "$lib/utils";
+import { generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -79,6 +79,16 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
                         token_amount: e.assets.length > 0 ? Number(e.assets[0].amount) : 0,
                     };
+                
+                if (
+                    e.additionalRegisters.R6 !== undefined && 
+                    e.additionalRegisters.R5 !== undefined && 
+                   true//  e.additionalRegisters.R5.serializedValue === "token-proof"
+                ) {
+                    current_box.object_type = ObjectType.ProofByToken;
+                    current_box.object_value = e.additionalRegisters.R6.serializedValue;
+                    console.log(current_box.object_value)
+                }
 
                 let _reputation_proof: ReputationProof = proofs.has(token_id) 
                     ? proofs.get(token_id)! 
