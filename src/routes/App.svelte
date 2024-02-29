@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { SvelteFlow, Background, type Node, Controls, MiniMap } from '@xyflow/svelte';
+    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position } from '@xyflow/svelte';
   
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
@@ -58,6 +58,8 @@
         p.current_boxes.map(b => {
           $nodes.push({
             id: b.box_id,
+            sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
+            targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
             data: { label: b.box_id.slice(0, 10)+" - "+b.token_id.slice(0, 4) }, 
             position: { x: _x, y: _y },
           });
