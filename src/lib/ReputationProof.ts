@@ -12,9 +12,20 @@ export function token_rendered(proof: ReputationProof): string {
     return stringToRendered(proof.token_id);
 };
 
+export const reputation_token_label = "RPT";
+
 export enum ObjectType {
     PlainText = "plain/txt-utf8",
     ProofByToken = "token-proof"
+}
+
+export function object_type_by_rendered_value(value: string): ObjectType {
+    for (const objectType of Object.values(ObjectType)) {
+        if (stringToRendered(objectType) === value) {
+            return objectType as ObjectType;
+        }
+    }
+    return ObjectType.PlainText;
 }
 
 export interface RPBox {

@@ -11,11 +11,13 @@ import { stringToBytes } from '@scure/base';
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
-import { ObjectType, type RPBox } from '$lib/ReputationProof';
+import { ObjectType, reputation_token_label, type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address } from './envs';
-import { generate_pk_proposition } from './utils';
+import { generate_pk_proposition, stringToRendered, stringToSerialized } from './utils';
 
-export async function generate_reputation_proof(token_amount: number, input_proof?: RPBox, object_to_assign?: string) {
+export async function generate_reputation_proof(token_amount: number, input_proof?: RPBox,
+                                                object_to_assign?: string, object_type_to_assign: ObjectType = ObjectType.PlainText
+                                              ) {
 
     /*
           Once the user accepts the connection request, this API will be injected in the same
@@ -68,18 +70,18 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       */
     let r5 = "";
     let r6 = "";
-    if (object_to_assign !== undefined)  
+    if (object_to_assign !== undefined)
     { 
-      r5 = ObjectType.ProofByToken;
+      r5 = object_type_to_assign;
       r6 = object_to_assign;
       console.log(r5)
       console.log(r6)
     }
 
     let registers = {
-      R4: SConstant(SColl(SByte, stringToBytes('utf8', "RPT"))),
-      R5: SConstant(SColl(SByte, stringToBytes('utf8', r5))),
-      R6: SConstant(SColl(SByte, stringToBytes('utf8', r6))),
+      R4: stringToSerialized(reputation_token_label),
+      R5: stringToSerialized(r5),
+      R6: stringToSerialized(r6)
     }
 
     new_proof_output.setAdditionalRegisters({...registers, ...{

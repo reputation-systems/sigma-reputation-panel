@@ -2,7 +2,7 @@
 	import { updateReputationProofList } from '$lib/unspent_proofs';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
 	import { explorer_uri, ergo_tree_hash } from '$lib/envs';
-	import type { RPBox, ReputationProof } from '$lib/ReputationProof';
+	import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   
 	export let showModal: any; // boolean
 	let dialog: any; // HTMLDialogElement
@@ -12,12 +12,14 @@
 	let input_proof_box: null|RPBox;
 	let reputationTokenAmount: number;
 	let object_to_assign: string;
+	let object_type_to_assign: ObjectType | undefined;
   
 	let unspend_reputation_proofs: ReputationProof[] = [];
 
 	function handleSelectChange(event: any) {
 	  fetchReputationProofs();
 	  selectedOption = event.target.value;
+	  input_proof = null;
 	  input_proof_box = null;
 	  handleInputProofChange(event);
 	}
@@ -25,12 +27,20 @@
 	function handleInputProofChange(event: any) {
 		reputationTokenAmount = 0;
 		object_to_assign = "";
+		handleObjectToAssignChange(event);
+	}
+
+	function handleObjectToAssignChange(event: any) {
+		object_to_assign = "";
 	}
   
 	$: if (dialog && showModal) dialog.showModal();
   
 	function generateReputationProof() {
-		generate_reputation_proof(reputationTokenAmount, input_proof_box ?? undefined, object_to_assign);
+		generate_reputation_proof(
+			reputationTokenAmount, input_proof_box ?? undefined, 
+			object_to_assign, object_type_to_assign
+		);
 	}
 
 	async function fetchReputationProofs() {
@@ -95,17 +105,25 @@
 				{/if}
 			{/if}
 		{/if}
-		{#if selectedOption !== ""}
+		{#if selectedOption !== "" && (selectedOption == "new" || selectedOption == "another" && input_proof_box)}
 			<div class="mb-3">
 				<label for="object_to_assign" class="form-label">Object to assign reputation</label>
-				<!-- <input type="text" class="form-control" bind:value={object_to_assign} /> -->
-				<select class="form-select" bind:value={object_to_assign}>
-					{#each unspend_reputation_proofs as option (option.token_id)}
-						{#if input_proof?.token_id !== option.token_id}
-							<option value={option.token_id}>{option.token_id.slice(0, 10)}</option>
-						{/if}
-					{/each}
+				<select class="form-select" bind:value={object_type_to_assign}  on:change={handleInputProofChange}>
+					<option value={ObjectType.PlainText}>Plain text</option>
+					<option value={ObjectType.ProofByToken}>Other reputation proof</option>
 				</select>
+				{#if object_type_to_assign == ObjectType.PlainText}
+					<input type="text" class="form-control" bind:value={object_to_assign} />
+				{/if}
+				{#if object_type_to_assign == ObjectType.ProofByToken}
+					<select class="form-select" bind:value={object_to_assign}>
+						{#each unspend_reputation_proofs as option (option.token_id)}
+							{#if input_proof?.token_id !== option.token_id}
+								<option value={option.token_id}>{option.token_id.slice(0, 10)}</option>
+							{/if}
+						{/each}
+					</select>
+				{/if}
 			</div>
 		{/if}
 		</form>

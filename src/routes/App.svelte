@@ -14,6 +14,7 @@
     import EdgeType from './EdgeType.svelte';
     import NodeCircleType from './NodeCircleType.svelte';
     import ContextMenu from './ContextMenu.svelte';
+    import { hexToUtf8 } from '$lib/utils';
         
     
     let connected = false;
@@ -125,6 +126,30 @@
                 source: token_rendered(p),
                 target: b.object_value,
                 animated: true,
+                data: {
+                  box: b.box_id,
+                  proportion: percentage_of_tokens,
+                  color: "#ffcc00"
+                },
+                type: 'edge_type'
+              });
+          }
+          else if (
+            b.object_value && b.object_type &&
+            b.object_type == ObjectType.PlainText
+          ) {
+            $nodes.push({
+              id: 'node-'+b.box_id,
+              data: {label: hexToUtf8(b.object_value)},
+              type: "circle_type",
+              sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
+              targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
+              position: { x: _x, y: _y },
+            });
+            _edges.push({
+                id: 'edge-'+b.box_id,
+                source: token_rendered(p),
+                target: 'node-'+b.box_id,
                 data: {
                   box: b.box_id,
                   proportion: percentage_of_tokens,

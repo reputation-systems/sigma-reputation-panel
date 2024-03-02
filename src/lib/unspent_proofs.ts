@@ -1,4 +1,4 @@
-import { ObjectType, type RPBox, type ReputationProof } from "$lib/ReputationProof";
+import { ObjectType, reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value } from "$lib/ReputationProof";
 import { generate_pk_proposition, serializedToRendered, stringToRendered } from "$lib/utils";
 
 /**
@@ -41,7 +41,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         body: JSON.stringify({
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
-                    "R4":  stringToRendered("RPT"),
+                    "R4":  stringToRendered(reputation_token_label),
                     "R7":  serializedToRendered(generate_pk_proposition((await ergo.get_change_address())))
                 },
                 "constants": {},
@@ -74,12 +74,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         }
                     };
                 
-                if (
-                    e.additionalRegisters.R6 !== undefined && 
-                    e.additionalRegisters.R5 !== undefined && 
-                    e.additionalRegisters.R5.renderedValue === stringToRendered("token-proof")
-                ) {
-                    current_box.object_type = ObjectType.ProofByToken;
+                if (e.additionalRegisters.R6 !== undefined && e.additionalRegisters.R5 !== undefined) {
+                    current_box.object_type = object_type_by_rendered_value(e.additionalRegisters.R5.renderedValue),
                     current_box.object_value = e.additionalRegisters.R6.renderedValue;
                 }
 
