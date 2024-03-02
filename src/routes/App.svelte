@@ -117,8 +117,8 @@
               const percentage_of_tokens = parseFloat(Number(b.token_amount/p.total_amount * 100).toFixed(3));
               _edges.push({
                 id: 'edge-'+b.box_id,
-                source: b.object_value,
-                target: token_rendered(p),
+                source: token_rendered(p),
+                target: b.object_value,
                 data: {
                   box: b.box_id,
                   proportion: percentage_of_tokens
