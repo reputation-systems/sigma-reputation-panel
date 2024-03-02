@@ -37,7 +37,6 @@
     
     async function fetchReputationProofs() {
       try {
-        console.log('Searching for boxes....')
         const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
         const unspend_reputation_proofs = data;
         build_graph(unspend_reputation_proofs);
