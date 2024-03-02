@@ -132,7 +132,7 @@
 		<!-- svelte-ignore a11y-autofocus -->
 		<div class="row">
 			<button on:click={generateReputationProof} 
-				disabled={!reputationTokenAmount || selectedOption == "another" && !input_proof_box}>
+				disabled={!reputationTokenAmount || selectedOption == "another" && !input_proof_box || selectedOption == "new_from_another"}>
 				Generate proof
 			</button>
 		</div>

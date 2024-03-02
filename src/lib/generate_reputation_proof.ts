@@ -69,8 +69,6 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     { 
       r5 = object_type_to_assign;
       r6 = object_to_assign;
-      console.log(r5)
-      console.log(r6)
     }
 
     let registers = {
