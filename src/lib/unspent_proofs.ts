@@ -1,4 +1,4 @@
-import { ObjectType, reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value } from "$lib/ReputationProof";
+import { reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value } from "$lib/ReputationProof";
 import { generate_pk_proposition, serializedToRendered, stringToRendered } from "$lib/utils";
 
 /**
