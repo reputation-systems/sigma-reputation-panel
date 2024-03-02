@@ -13,6 +13,7 @@
     import Header from './Header.svelte';
     import EdgeType from './EdgeType.svelte';
     import NodeCircleType from './NodeCircleType.svelte';
+    import ContextMenu from './ContextMenu.svelte';
         
     
     let connected = false;
@@ -171,4 +172,5 @@
       </Controls>
       <MiniMap />
     </SvelteFlow>
+    <ContextMenu />
   </div>
