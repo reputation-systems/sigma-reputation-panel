@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton } from '@xyflow/svelte';
+    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton, type EdgeTypes } from '@xyflow/svelte';
   
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
@@ -11,6 +11,7 @@
 
     import Menu from './Menu.svelte';
     import Header from './Header.svelte';
+    import EdgeType from './EdgeType.svelte';
         
     
     let connected = false;
@@ -83,6 +84,9 @@
 
     const nodes = writable<Node[]>([]);
     const edges = writable<Edge[]>([]);
+    const edgeTypes: EdgeTypes = {
+      edge_type: EdgeType
+    };
 
     function onLayout(direction: string) {
       const layoutedElements = getLayoutedElements($nodes, $edges, direction);
@@ -110,11 +114,17 @@
             b.object_value && b.object_type &&
             b.object_type == ObjectType.ProofByToken
             ) {
-            _edges.push({
-              id: 'edge-'+b.box_id,
-              source: b.object_value,
-              target: token_rendered(p)
-            });
+              const percentage_of_tokens = parseFloat(Number(b.token_amount/p.total_amount * 100).toFixed(3));
+              _edges.push({
+                id: 'edge-'+b.box_id,
+                source: b.object_value,
+                target: token_rendered(p),
+                data: {
+                  box: b.box_id,
+                  proportion: percentage_of_tokens
+                },
+                type: 'edge_type'
+              });
           }
         });
 
@@ -136,7 +146,7 @@
   
 
   <div style="height:100vh;">
-    <SvelteFlow {nodes} {edges} style="background: #1A192B" fitView>
+    <SvelteFlow {nodes} {edges} {edgeTypes} style="background: #1A192B" fitView>
       <Background />
       <Header />
       <Controls>
