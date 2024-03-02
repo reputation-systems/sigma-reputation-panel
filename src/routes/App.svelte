@@ -140,7 +140,7 @@
           ) {
             $nodes.push({
               id: 'node-'+b.box_id,
-              data: {label: hexToUtf8(b.object_value)},
+              data: {label: hexToUtf8(b.object_value), ellipsis: ".."},
               type: "circle_type",
               sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
               targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,

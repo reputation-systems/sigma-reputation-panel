@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Position, type NodeProps, Handle, useHandleConnections } from '@xyflow/svelte';
+  import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow } from '@xyflow/svelte';
   type $$Props = NodeProps;
 
   export let id: $$Props['id'];
@@ -18,10 +18,29 @@
   const connections = useHandleConnections({ nodeId: id, type: 'target' });
 
   $: isConnectable = $connections.length === 0;
+
+  const { viewport } = useSvelteFlow();
+
+  let showContent = false;
+  $: {
+    if ($viewport.zoom > 1.8) {
+      showContent = true;
+    } else {
+      showContent = false;
+    }
+  }
+
 </script>
 
 <div class="customNode">
   <Handle type="target" position={Position.Left} {isConnectable} />
+  <div style="font-size: smaller;">
+    {#if showContent}
+      {data.label}
+    {:else}
+      {data.label.slice(0, 2)} {data.ellipsis ?? ""}
+    {/if}
+  </div>
 </div>
 
 <style>
