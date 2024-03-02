@@ -58,7 +58,7 @@
   <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
-	  <h2 class="modal-title" id="generateReputationLabel">Generate reputation proof</h2>
+	  <h2 class="modal-title" id="generateReputationLabel">Generate or update Reputation Proof</h2>
 	  <hr />
 	  <form id="reputationForm">
 		<div class="mb-3">
@@ -67,6 +67,7 @@
 		  <select class="form-select" bind:value={selectedOption} on:change={handleSelectChange}>
 			<option></option>
 			<option value="new">Generate a new one</option>
+			<option value="new_from_another">Generate a new one from another</option>
 			<option value="another">Update a current one</option>
 		  </select>
 		</div>
@@ -76,7 +77,7 @@
 				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
 			</div>
 		{/if}
-		{#if selectedOption === "another"}
+		{#if selectedOption === "another" || selectedOption === "new_from_another"}
 			<div class="mb-3">
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="form-label">Reputation proof</label>
