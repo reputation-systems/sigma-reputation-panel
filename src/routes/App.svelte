@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton, type EdgeTypes } from '@xyflow/svelte';
+    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton, type EdgeTypes, type NodeTypes } from '@xyflow/svelte';
   
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
@@ -12,6 +12,7 @@
     import Menu from './Menu.svelte';
     import Header from './Header.svelte';
     import EdgeType from './EdgeType.svelte';
+    import NodeCircleType from './NodeCircleType.svelte';
         
     
     let connected = false;
@@ -84,6 +85,9 @@
 
     const nodes = writable<Node[]>([]);
     const edges = writable<Edge[]>([]);
+    const nodeTypes: NodeTypes = {
+      circle_type: NodeCircleType
+    };
     const edgeTypes: EdgeTypes = {
       edge_type: EdgeType
     };
@@ -110,34 +114,45 @@
           });
 
         p.current_boxes.map(b => {
+          const percentage_of_tokens = parseFloat(Number(b.token_amount/p.total_amount * 100).toFixed(3));
           if (
-            b.object_value && b.object_type &&
-            b.object_type == ObjectType.ProofByToken
+              b.object_value && b.object_type &&
+              b.object_type == ObjectType.ProofByToken
             ) {
-              const percentage_of_tokens = parseFloat(Number(b.token_amount/p.total_amount * 100).toFixed(3));
               _edges.push({
                 id: 'edge-'+b.box_id,
                 source: token_rendered(p),
                 target: b.object_value,
                 data: {
                   box: b.box_id,
-                  proportion: percentage_of_tokens
+                  proportion: percentage_of_tokens,
+                  color: "#ffcc00"
+                },
+                type: 'edge_type'
+              });
+          }
+          else {
+            $nodes.push({
+              id: 'node-'+b.box_id,
+              data: {label: ""},
+              type: "circle_type",
+              sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
+              targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
+              position: { x: _x, y: _y },
+            });
+            _edges.push({
+                id: 'edge-'+b.box_id,
+                source: token_rendered(p),
+                target: 'node-'+b.box_id,
+                data: {
+                  box: b.box_id,
+                  proportion: percentage_of_tokens,
+                  color: "#FDEAA1"
                 },
                 type: 'edge_type'
               });
           }
         });
-
-        /*p.current_boxes.map(b => {
-          const percentage_of_tokens = parseFloat(Number(b.token_amount/p.total_amount * 100).toFixed(3));
-          $nodes.push({
-            id: b.box_id,
-            parentNode: b.token_id,
-            expandParent: true,
-            data: { label: b.box_id.slice(0, 10)+" - "+percentage_of_tokens+ "%" }, 
-            position: { x: _x, y: _y },
-          });
-        });*/
       });
       $edges = _edges;
       onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );
@@ -146,7 +161,7 @@
   
 
   <div style="height:100vh;">
-    <SvelteFlow {nodes} {edges} {edgeTypes} style="background: #1A192B" fitView>
+    <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes} style="background: #1A192B" fitView>
       <Background />
       <Header />
       <Controls>

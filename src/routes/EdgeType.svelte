@@ -27,6 +27,7 @@
     <div
       style:transform="translate(-50%, -50%) translate({labelX}px,{labelY}px)"
       class="edge-label nodrag nopan"
+      style="background: {data.color}"
     >
         {data.proportion}%
         <EdgeLabel label={data.box.slice(0, 10)} />
@@ -37,7 +38,6 @@
     .edge-label {
       pointer-events: all;
       position: absolute;
-      background: #ffcc00;
       padding: 5px;
       border-radius: 5px;
       font-size: 8px;
