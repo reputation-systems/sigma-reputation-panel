@@ -1,6 +1,4 @@
-import { SByte, type Amount, type Box, SColl, SConstant } from "@fleet-sdk/core";
-import { serializedToRendered } from "./utils";
-import { stringToBytes } from "@scure/base";
+import { stringToRendered } from "./utils";
 
 export interface ReputationProof {
     token_id: string,
@@ -10,7 +8,7 @@ export interface ReputationProof {
 }
 
 export function token_rendered(proof: ReputationProof): string {
-    return serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', proof.token_id))));
+    return stringToRendered(proof.token_id);
 };
 
 export enum ObjectType {

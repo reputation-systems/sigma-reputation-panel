@@ -1,11 +1,5 @@
 import { ObjectType, type RPBox, type ReputationProof } from "$lib/ReputationProof";
-import {
-    SConstant,
-    SColl,
-    SByte
-} from '@fleet-sdk/core';
-import { stringToBytes } from "@scure/base";
-import { generate_pk_proposition, serializedToRendered } from "$lib/utils";
+import { generate_pk_proposition, serializedToRendered, stringToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -47,7 +41,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         body: JSON.stringify({
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
-                    "R4":  serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "RPT")))),
+                    "R4":  stringToRendered("RPT"),
                     "R7":  serializedToRendered(generate_pk_proposition((await ergo.get_change_address())))
                 },
                 "constants": {},
@@ -60,30 +54,14 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
             (await response.json()).items.forEach((e: ApiBox) => {
                 let token_id = e.assets[0].tokenId;
                 let current_box: RPBox = {
-                        box: {
-                            boxId: e.boxId,
-                            value: e.value,
-                            assets: e.assets,
-                            ergoTree: e.ergoTree,
-                            creationHeight: e.creationHeight,
-                            additionalRegisters: Object.entries(e.additionalRegisters).reduce((acc, [key, value]) => {
-                                acc[key] = value.serializedValue;
-                                return acc;
-                            }, {} as {
-                                [key: string]: string;
-                            }),
-                            index: e.index,
-                            transactionId: e.transactionId
-                        },
                         box_id: e.boxId,
-                        token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
                         token_amount: e.assets.length > 0 ? Number(e.assets[0].amount) : 0,
                     };
                 
                 if (
                     e.additionalRegisters.R6 !== undefined && 
                     e.additionalRegisters.R5 !== undefined && 
-                    e.additionalRegisters.R5.renderedValue === serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "token-proof"))))
+                    e.additionalRegisters.R5.renderedValue === stringToRendered("token-proof")
                 ) {
                     current_box.object_type = ObjectType.ProofByToken;
                     current_box.object_value = e.additionalRegisters.R6.renderedValue;

@@ -1,4 +1,5 @@
-import { ErgoAddress, SGroupElement, SSigmaProp } from "@fleet-sdk/core";
+import { ErgoAddress, SByte, SColl, SConstant, SGroupElement } from "@fleet-sdk/core";
+import { stringToBytes } from "@scure/base";
 
 export function serializedToRendered(serializedValue: string): string {
     // Assuming the serialized value always starts with a pattern to strip (e.g., '0e')
@@ -33,4 +34,12 @@ export function generate_pk_proposition(wallet_pk: string): string {
     const pk = ErgoAddress.fromBase58(wallet_pk).getPublicKeys()[0];
     const encodedProp = SGroupElement(pk);
     return encodedProp.toHex();
+}
+
+export function stringToSerialized(value: string): string {
+    return SConstant(SColl(SByte, stringToBytes('utf8', value)));
+}
+
+export function stringToRendered(value: string): string {
+    return serializedToRendered(stringToSerialized(value));
 }
