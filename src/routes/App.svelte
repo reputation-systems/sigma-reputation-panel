@@ -124,6 +124,7 @@
                 id: 'edge-'+b.box_id,
                 source: token_rendered(p),
                 target: b.object_value,
+                animated: true,
                 data: {
                   box: b.box_id,
                   proportion: percentage_of_tokens,
