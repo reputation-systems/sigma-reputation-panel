@@ -1,3 +1,4 @@
+import type { Amount, Box } from "@fleet-sdk/core";
 import { stringToRendered } from "./utils";
 
 export interface ReputationProof {
@@ -17,6 +18,8 @@ export enum ObjectType {
 }
 
 export interface RPBox {
+    box: Box<Amount>,
+    token_id: string,
     box_id: string,
     token_amount: number,
     object_type?: ObjectType,
