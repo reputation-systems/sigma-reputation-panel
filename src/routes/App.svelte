@@ -130,7 +130,7 @@
         });*/
       });
       $edges = _edges;
-      onLayout(window.innerWidth > window.innerHeight ? 'TB' : 'LR', );
+      onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );
     }
   </script>
   
