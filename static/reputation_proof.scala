@@ -15,5 +15,5 @@
         x.tokens.size == 1 &&
         x.propositionBytes == SELF.propositionBytes
       )
-    })  
+    })
 }

@@ -26,9 +26,9 @@
   <EdgeLabelRenderer>
     <div
       style:transform="translate(-50%, -50%) translate({labelX}px,{labelY}px)"
-      class="edge-label nodrag nopan"
+      class="edge-label"
       style="background: {data.color}"
-    >
+    > <!-- class="edge-label nodrag nopan"     For no drag over it. -->
         {data.proportion}%
         <EdgeLabel label={data.box.slice(0, 10)} />
     </div>
