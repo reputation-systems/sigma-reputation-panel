@@ -78,14 +78,8 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         {
             'name': 'addItem',
             'onClick': addItem,
-            'displayText': "Add Item",
+            'displayText': "Add Proof",
             'class': 'fa-solid fa-plus'
-        },
-        {
-            'name': 'emptyicons',
-            'onClick': addItem,
-            'displayText': "Empty Icon",
-            'class': 'fa-solid fa-square'
         },
         {
             'name': 'zoom',
