@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type EdgeProps, getBezierPath, BaseEdge, EdgeLabelRenderer } from '@xyflow/svelte';
+    import { type EdgeProps, getBezierPath, BaseEdge, EdgeLabelRenderer, useSvelteFlow } from '@xyflow/svelte';
     import EdgeLabel from './EdgeLabel.svelte';
   
     type $$Props = EdgeProps;
@@ -11,6 +11,17 @@
     export let targetY: $$Props['targetY'];
     export let targetPosition: $$Props['targetPosition'];
     export let data: $$Props['data'] = undefined;
+
+    const { viewport } = useSvelteFlow();
+
+    let showContent = false;
+    $: {
+      if ($viewport.zoom > 1.8) {
+        showContent = true;
+      } else {
+        showContent = false;
+      }
+    }
   
     $: [edgePath, labelX, labelY] = getBezierPath({
       sourceX,
@@ -30,7 +41,9 @@
       style="background: {data.color}"
     > <!-- class="edge-label nodrag nopan"     For no drag over it. -->
         {data.proportion}%
-        <EdgeLabel label={data.box.slice(0, 10)} />
+        {#if showContent}
+          <EdgeLabel label={data.box.slice(0, 10)} />
+        {/if}
     </div>
   </EdgeLabelRenderer>
   
