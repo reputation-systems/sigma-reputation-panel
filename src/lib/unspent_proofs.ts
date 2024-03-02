@@ -5,7 +5,7 @@ import {
     SByte
 } from '@fleet-sdk/core';
 import { stringToBytes } from "@scure/base";
-import { generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
+import { generate_pk_proposition, serializedToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -86,7 +86,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                     e.additionalRegisters.R5.renderedValue === serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', "token-proof"))))
                 ) {
                     current_box.object_type = ObjectType.ProofByToken;
-                    current_box.object_value = serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', e.additionalRegisters.R6.serializedValue))));
+                    current_box.object_value = e.additionalRegisters.R6.renderedValue;
                 }
 
                 let _reputation_proof: ReputationProof = proofs.has(token_id) 

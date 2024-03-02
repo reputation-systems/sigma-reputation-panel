@@ -1,19 +1,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, Panel, ControlButton } from '@xyflow/svelte';
+    import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton } from '@xyflow/svelte';
   
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { ObjectType, type ReputationProof } from '$lib/ReputationProof';
+    import { ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
     import Menu from './Menu.svelte';
     import Header from './Header.svelte';
-    import { stringToBytes } from '@scure/base';
-    import { SByte, SColl, SConstant } from '@fleet-sdk/core';
-    import { serializedToRendered } from '$lib/utils';
+        
+    
     let connected = false;
 
     async function connectNautilus() {
@@ -99,7 +98,7 @@
       let _edges: Edge[] = [];
       proofs.map(p => {
         $nodes.push({
-            id: serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', p.token_id)))),
+            id: token_rendered(p),
             // type: "group",
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
@@ -114,8 +113,8 @@
             ) {
             _edges.push({
               id: 'edge-'+b.box_id,
-              source: serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', p.token_id)))),
-              target: serializedToRendered(SConstant(SColl(SByte, stringToBytes('utf8', b.token_id))))
+              source: b.object_value,
+              target: token_rendered(p)
             });
           }
         });
