@@ -51,6 +51,8 @@
     
     $: if (connected) { fetchReputationProofs(); }
 
+    // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
+
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
 
@@ -108,7 +110,6 @@
       proofs.map(p => {
         $nodes.push({
             id: token_rendered(p),
-            // type: "group",
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
             data: { label: p.token_id.slice(0, 10) },
