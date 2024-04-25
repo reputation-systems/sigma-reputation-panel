@@ -14,18 +14,16 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 <script>
 
     import Modal from "./Modal.svelte";
-
+    import Search from "./Search.svelte";
+    
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
     // menu is dimension (height and width) of context menu
     let menu = { h: 0, y: 0 }
     // browser/window dimension (height and width)
     let browser = { h: 0, y: 0 }
-    // showMenu is state of context-menu visibility
     let showMenu = false;
-    // to display some text
-    let content;
-
+    let showSearch = false;
     let showModal = false;
 
 
@@ -69,13 +67,11 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         showModal = true
     }
     function search(){
-        content.textContent = "Search..."
+        showSearch = true;
     }
     function setting(){
-        content.textContent = "Settings..."
     }
     function remove() {
-        content.textContent = "Remove ..."
     }
     let menuItems = [
         {
@@ -175,8 +171,6 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     }
 </style>
 
-<div class="content" bind:this={content}>Right click somewhere!</div>
-
 {#if showMenu}
 <nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
     <div class="navbar" id="navbar">
@@ -195,6 +189,5 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 
 <svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
 
-
-
 <Modal bind:showModal />
+<Search bind:showSearch />
