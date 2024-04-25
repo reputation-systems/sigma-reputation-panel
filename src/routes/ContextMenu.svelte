@@ -12,6 +12,9 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 -->
 
 <script>
+
+    import Modal from "./Modal.svelte";
+
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
     // menu is dimension (height and width) of context menu
@@ -22,6 +25,9 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     let showMenu = false;
     // to display some text
     let content;
+
+    let showModal = false;
+
 
     function rightClickContextMenu(e){
         showMenu = true
@@ -60,7 +66,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
         }
     }
     function addItem(){
-        content.textContent = "Add and item..."
+        showModal = true
     }
     function print(){
         content.textContent = "Printed..."
@@ -199,3 +205,6 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 <svelte:window on:contextmenu|preventDefault={rightClickContextMenu} 
 on:click={onPageClick} />
 
+
+
+<Modal bind:showModal />
