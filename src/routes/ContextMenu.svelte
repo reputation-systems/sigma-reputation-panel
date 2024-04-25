@@ -68,17 +68,14 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
     function addItem(){
         showModal = true
     }
-    function print(){
-        content.textContent = "Printed..."
-    }
-    function zoom(){
-        content.textContent = "Zooom..."
-    }
-    function remove(){
-        content.textContent = "Removed..."
+    function search(){
+        content.textContent = "Search..."
     }
     function setting(){
         content.textContent = "Settings..."
+    }
+    function remove() {
+        content.textContent = "Remove ..."
     }
     let menuItems = [
         {
@@ -88,16 +85,10 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
             'class': 'fa-solid fa-plus'
         },
         {
-            'name': 'zoom',
-            'onClick': zoom,
-            'displayText': "Zoom",
+            'name': 'search',
+            'onClick': search,
+            'displayText': "Search",
             'class': 'fa-solid fa-magnifying-glass'
-        },
-        {
-            'name': 'printMenu',
-            'onClick': print,
-            'displayText': "Print",
-            'class': 'fa-solid fa-print'
         },
         {
             'name': 'hr',
@@ -202,8 +193,7 @@ Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dad
 </nav>
 {/if}
 
-<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} 
-on:click={onPageClick} />
+<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
 
 
 
