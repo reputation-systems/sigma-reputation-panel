@@ -1,16 +1,3 @@
-<!-- 
-Github @dukenmarga, July 2022
-Context Menu is small menu that displayed when user right-click the mouse on browser.
-Think of it as a way to show Refresh option on Microsoft Windows when right-click on desktop.
-Known bug:
-    - If the browser loads the content for the first time, showMenu set to false.
-    Hence, we cannot get menu.h and menu.y dimension, since context menu has not been available at DOM.
-    The first right click will not shown properly when right-click occurs around the edge (bottom part
-    and right part) of the browser.
-
-Inspired from: Context Menu https://svelte.dev/repl/3a33725c3adb4f57b46b597f9dade0c1?version=3.25.0
--->
-
 <script>
 
     import Modal from "./Modal.svelte";

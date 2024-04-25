@@ -13,11 +13,36 @@
     import Header from './Header.svelte';
     import EdgeType from './EdgeType.svelte';
     import NodeCircleType from './NodeCircleType.svelte';
-    import ContextMenu from './ContextMenu.svelte';
+    import PanelContextMenu from './PanelContextMenu.svelte';
     import { hexToUtf8 } from '$lib/utils';
+    import NodeContextMenu from './NodeContextMenu.svelte';
         
     
     let connected = false;
+
+
+    let rightNodeMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null;
+    let width: number;
+    let height: number;
+    function handleNodeContextMenu({ detail: { event, node } }) {
+      // Prevent native context menu from showing
+      event.preventDefault();
+
+      // Calculate position of the context menu. We want to make sure it
+      // doesn't get positioned off-screen.
+      rightNodeMenu = {
+        id: node.id,
+        top: event.clientY < height - 200 ? event.clientY : undefined,
+        left: event.clientX < width - 200 ? event.clientX : undefined,
+        right: event.clientX >= width - 200 ? width - event.clientX : undefined,
+        bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
+      };
+    }
+
+    // Close the context menu if it's open whenever the window is clicked.
+    function handlePaneClick() {
+      rightNodeMenu = null;
+    }
 
     async function connectNautilus() {
         if (typeof ergoConnector !== 'undefined') {
@@ -188,8 +213,13 @@
   </script>
   
 
-  <div style="height:100vh;">
-    <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes} style="background: #1A192B" fitView>
+  <div style="height:100vh;" bind:clientWidth={width} bind:clientHeight={height}>
+    <SvelteFlow 
+      on:nodecontextmenu={handleNodeContextMenu} 
+      on:paneclick={handlePaneClick}
+      {nodes} {edges} {nodeTypes} {edgeTypes} 
+      style="background: #1A192B" fitView
+      >
       <Background />
       <Header />
       <Controls>
@@ -199,5 +229,18 @@
       </Controls>
       <MiniMap />
     </SvelteFlow>
-    <ContextMenu />
+    
+    {#if rightNodeMenu}
+      <NodeContextMenu
+        onClick={handlePaneClick}
+        id={rightNodeMenu.id}
+        top={rightNodeMenu.top}
+        left={rightNodeMenu.left}
+        right={rightNodeMenu.right}
+        bottom={rightNodeMenu.bottom}
+      />
+    {:else}
+      <PanelContextMenu />
+    {/if}
+    
   </div>
