@@ -164,8 +164,9 @@
             b.object_value && b.object_type &&
             b.object_type == ObjectType.PlainText
           ) {
+            let node_id = 'node-'+b.box_id;
             $nodes.push({
-              id: 'node-'+b.box_id,
+              id: node_id,
               data: {label: hexToUtf8(b.object_value), ellipsis: ".."},
               type: "circle_type",
               sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
@@ -175,7 +176,7 @@
             _edges.push({
                 id: 'edge-'+b.box_id,
                 source: token_rendered(p),
-                target: 'node-'+b.box_id,
+                target: node_id,
                 data: {
                   box: b.box_id,
                   proportion: percentage_of_tokens,
@@ -185,8 +186,9 @@
               });
           }
           else {
+            let node_id = 'node-'+b.box_id;
             $nodes.push({
-              id: 'node-'+b.box_id,
+              id: node_id,
               data: {label: ""},
               type: "circle_type",
               sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
@@ -196,7 +198,7 @@
             _edges.push({
                 id: 'edge-'+b.box_id,
                 source: token_rendered(p),
-                target: 'node-'+b.box_id,
+                target: node_id,
                 data: {
                   box: b.box_id,
                   proportion: percentage_of_tokens,
