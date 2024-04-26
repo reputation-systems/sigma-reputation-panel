@@ -2,6 +2,9 @@
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
   
 	export let showModal: boolean; // boolean
+	export let source: string;
+	export let target: string;
+
 	let dialog: HTMLDialogElement;
   
 	let reputationTokenAmount: number;

@@ -19,6 +19,8 @@
     const connections = useHandleConnections({ nodeId: id, type: 'target' });
 
     let showModal = false;
+    let source: string = id;
+    let target: string | null = null;
   
     $: isConnectable = true; // $connections.length === 0;
   
@@ -44,6 +46,7 @@
   <div class="customNode">
     <Handle type="target" position={Position.Left} {isConnectable} />
     <Handle 
+      isConnectable={source != null}
       type="source" 
       position={Position.Right} 
       onconnect={handleConnection}
@@ -67,4 +70,6 @@
   </style>
   
 
-  <PointOneToAnother bind:showModal />
+  {#if source && target}
+    <PointOneToAnother bind:showModal bind:source bind:target/>
+  {/if}
