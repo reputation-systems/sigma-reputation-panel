@@ -16,6 +16,7 @@
     import PanelContextMenu from './PanelContextMenu.svelte';
     import { hexToUtf8 } from '$lib/utils';
     import NodeContextMenu from './NodeContextMenu.svelte';
+    import NodeProofType from './NodeProofType.svelte';
         
     
     let connected = false;
@@ -122,6 +123,7 @@
     const nodes = writable<Node[]>([]);
     const edges = writable<Edge[]>([]);
     const nodeTypes: NodeTypes = {
+      proof_type: NodeProofType,
       circle_type: NodeCircleType
     };
     const edgeTypes: EdgeTypes = {
@@ -145,6 +147,7 @@
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
             data: { label: p.token_id.slice(0, 10) },
+            type: "proof_type",
             position: { x: _x, y: _y },
           });
 
