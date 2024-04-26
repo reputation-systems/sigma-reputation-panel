@@ -21,6 +21,8 @@
     let connected = false;
 
 
+    // MENUS LOGIC
+
     let rightNodeMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null;
     let width: number;
     let height: number;
@@ -43,6 +45,8 @@
     function handlePaneClick() {
       rightNodeMenu = null;
     }
+
+    // NETWORK CONNECTION.
 
     async function connectNautilus() {
         if (typeof ergoConnector !== 'undefined') {
@@ -77,6 +81,9 @@
     $: if (connected) { fetchReputationProofs(); }
 
     // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
+
+
+    // GRAPH BUILDER
 
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -221,7 +228,7 @@
       on:paneclick={handlePaneClick}
       {nodes} {edges} {nodeTypes} {edgeTypes} 
       style="background: #1A192B" fitView
-      >
+    >
       <Background />
       <Header />
       <Controls>
