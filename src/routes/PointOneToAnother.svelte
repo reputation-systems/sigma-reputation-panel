@@ -1,18 +1,34 @@
 <script lang="ts">
+    import type { ObjectType, RPBox, ReputationProof } from '$lib/ReputationProof';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
   
 	export let showModal: boolean; // boolean
-	export let source: string;
 	export let target: string;
 
 	let dialog: HTMLDialogElement;
   
+	export let proof: ReputationProof;
+	let input_proof_box: RPBox|null;
 	let reputationTokenAmount: number;
+	let object_to_assign: string;
+	let object_type_to_assign: ObjectType | undefined;
   
 	$: if (dialog && showModal) dialog.showModal();
+
+	function handleInputProofChange(event: any) {
+		reputationTokenAmount = 0;
+		object_to_assign = "";
+	}
   
 	function generateReputationProof() {
-	  generate_reputation_proof(reputationTokenAmount);
+		console.log(reputationTokenAmount)
+		console.log(proof)
+		console.log(input_proof_box)
+		console.log(object_to_assign)
+		console.log(object_type_to_assign)
+		if (reputationTokenAmount && input_proof_box && object_to_assign && object_type_to_assign) {
+			generate_reputation_proof(reputationTokenAmount, input_proof_box, object_to_assign, object_type_to_assign);
+		}
 	}
   </script>
   
@@ -20,9 +36,18 @@
   <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
-	  <h2 class="modal-title" id="generateReputationLabel">Generate Reputation Proof</h2>
+	  <h2 class="modal-title" id="generateReputationLabel">Point from __ to __</h2>
 	  <hr />
 	  <form id="reputationForm">
+		<div class="mb-3">
+			<!-- svelte-ignore a11y-label-has-associated-control -->
+			<label class="form-label">Proof box</label>
+			<select class="form-select" bind:value={input_proof_box} on:change={handleInputProofChange}>
+				{#each proof.current_boxes as option (option.box_id)}
+					<option value={option}>{option.box_id.slice(0, 10)} - ({option.token_amount})</option>
+				{/each}
+			</select>
+		</div>
 		<div class="mb-3">
 		  <label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
 		  <input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
@@ -31,7 +56,7 @@
 	  <hr />
 	  <!-- svelte-ignore a11y-autofocus -->
 	  <div class="row">
-		<button on:click={generateReputationProof} disabled={!reputationTokenAmount}>Generate proof</button>
+		<button on:click={generateReputationProof}>Generate proof</button>
 	  </div>
 	</div>
   </dialog>
@@ -67,12 +92,16 @@
 	  font-weight: bold;
 	}
   
-	.form-control {
+	.form-select, .form-control {
 	  width: 100%;
 	  padding: 0.5em;
 	  font-size: 1rem;
 	  border: 0.025px solid #ccc;
 	  border-radius: 0.25em;
+	}
+  
+	.form-select {
+	  height: 2.5em;
 	}
   
 	.required {

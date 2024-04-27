@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow, type Connection } from '@xyflow/svelte';
     import PointOneToAnother from './PointOneToAnother.svelte';
+    import type { RPBox, ReputationProof } from '$lib/ReputationProof';
     type $$Props = NodeProps;
   
     export let id: $$Props['id'];
@@ -19,7 +20,7 @@
     const connections = useHandleConnections({ nodeId: id, type: 'target' });
 
     let showModal = false;
-    let source: string = id;
+    let proof: ReputationProof = data.proof;
     let target: string | null = null;
   
     $: isConnectable = true; // $connections.length === 0;
@@ -37,7 +38,7 @@
 
     function handleConnection(connections: Connection[]) {
       let connection = connections[0];
-      console.log(connections)
+      target = connection.target;
       showModal = true;
     }
   
@@ -45,8 +46,7 @@
   
   <div class="customNode">
     <Handle type="target" position={Position.Left} {isConnectable} />
-    <Handle 
-      isConnectable={source != null}
+    <Handle
       type="source" 
       position={Position.Right} 
       onconnect={handleConnection}
@@ -70,6 +70,6 @@
   </style>
   
 
-  {#if source && target}
-    <PointOneToAnother bind:showModal bind:source bind:target/>
+  {#if proof && target}
+    <PointOneToAnother bind:showModal bind:proof bind:target/>
   {/if}

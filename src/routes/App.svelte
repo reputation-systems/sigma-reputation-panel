@@ -146,7 +146,7 @@
             id: token_rendered(p),
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
-            data: { label: p.token_id.slice(0, 10) },
+            data: { label: p.token_id.slice(0, 10), proof: p},
             type: "proof_type",
             position: { x: _x, y: _y },
           });
