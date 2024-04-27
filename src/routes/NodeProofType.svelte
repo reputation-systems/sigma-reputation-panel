@@ -2,6 +2,7 @@
     import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow, type Connection } from '@xyflow/svelte';
     import PointOneToAnother from './PointOneToAnother.svelte';
     import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
+    import { hexToUtf8 } from '$lib/utils';
     type $$Props = NodeProps;
   
     export let id: $$Props['id'];
@@ -43,7 +44,7 @@
 
       let __target_node_id = connection.target.split("::");
       console.log(__target_node_id)
-      object_to_assign = __target_node_id[1]
+      object_to_assign = hexToUtf8(__target_node_id[1]);
       switch (__target_node_id[0]) {
         case "proof": {
           object_type_to_assign = ObjectType.ProofByToken

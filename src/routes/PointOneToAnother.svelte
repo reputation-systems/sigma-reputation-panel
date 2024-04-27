@@ -34,7 +34,7 @@
   <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
-	  <h2 class="modal-title" id="generateReputationLabel">Point from {proof.token_id} to {object_to_assign}</h2>
+	  <h2 class="modal-title" id="generateReputationLabel">Point from {proof.token_id.slice(0, 10)} to {object_to_assign.slice(0, 10)}</h2>
 	  <hr />
 	  <form id="reputationForm">
 		<div class="mb-3">
