@@ -43,7 +43,6 @@
       showModal = true;
 
       let __target_node_id = connection.target.split("::");
-      console.log(__target_node_id)
       object_to_assign = hexToUtf8(__target_node_id[1]);
       switch (__target_node_id[0]) {
         case "proof": {

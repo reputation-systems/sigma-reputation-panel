@@ -19,13 +19,11 @@
 	}
   
 	function generateReputationProof() {
-		console.log(reputationTokenAmount)
-		console.log(proof)
-		console.log(input_proof_box)
-		console.log(object_to_assign)
-		console.log(object_type_to_assign)
 		if (reputationTokenAmount && input_proof_box && object_to_assign && object_type_to_assign) {
 			generate_reputation_proof(reputationTokenAmount, input_proof_box, object_to_assign, object_type_to_assign);
+		}
+		else {
+			console.log("not ready to generate.");
 		}
 	}
   </script>
