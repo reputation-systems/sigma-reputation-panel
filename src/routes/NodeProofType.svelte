@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow, type Connection } from '@xyflow/svelte';
     import PointOneToAnother from './PointOneToAnother.svelte';
-    import type { RPBox, ReputationProof } from '$lib/ReputationProof';
+    import type { ObjectType, RPBox, ReputationProof } from '$lib/ReputationProof';
     type $$Props = NodeProps;
   
     export let id: $$Props['id'];
@@ -21,7 +21,8 @@
 
     let showModal = false;
     let proof: ReputationProof = data.proof;
-    let target: string | null = null;
+    let object_to_assign: string | null = null;
+    let object_type_to_assign: ObjectType | null = null;
   
     $: isConnectable = true; // $connections.length === 0;
   
@@ -38,8 +39,12 @@
 
     function handleConnection(connections: Connection[]) {
       let connection = connections[0];
-      target = connection.target;
       showModal = true;
+
+      let __target_node_id = connection.target;
+      console.log(__target_node_id)
+      object_to_assign = null;
+      object_type_to_assign = null;
     }
   
   </script>
@@ -70,6 +75,6 @@
   </style>
   
 
-  {#if proof && target}
-    <PointOneToAnother bind:showModal bind:proof bind:target/>
+  {#if proof && object_to_assign && object_type_to_assign}
+    <PointOneToAnother bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
   {/if}

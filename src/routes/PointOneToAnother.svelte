@@ -2,22 +2,20 @@
     import type { ObjectType, RPBox, ReputationProof } from '$lib/ReputationProof';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
   
-	export let showModal: boolean; // boolean
-	export let target: string;
+	export let showModal: boolean;
 
 	let dialog: HTMLDialogElement;
   
 	export let proof: ReputationProof;
-	let input_proof_box: RPBox|null;
+	let input_proof_box: RPBox | null;
 	let reputationTokenAmount: number;
-	let object_to_assign: string;
-	let object_type_to_assign: ObjectType | undefined;
+	export let object_to_assign: string;
+	export let object_type_to_assign: ObjectType;
   
 	$: if (dialog && showModal) dialog.showModal();
 
 	function handleInputProofChange(event: any) {
 		reputationTokenAmount = 0;
-		object_to_assign = "";
 	}
   
 	function generateReputationProof() {
