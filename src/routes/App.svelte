@@ -143,7 +143,7 @@
       let _edges: Edge[] = [];
       proofs.map(p => {
         $nodes.push({
-            id: token_rendered(p),
+            id: "proof::"+token_rendered(p),
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
             data: { label: p.token_id.slice(0, 10), proof: p},
@@ -158,9 +158,9 @@
               b.object_type == ObjectType.ProofByToken
             ) {
               _edges.push({
-                id: 'edge-'+b.box_id,
-                source: token_rendered(p),
-                target: b.object_value,
+                id: 'box-edge::'+b.box_id,
+                source: "proof::"+token_rendered(p),
+                target: "proof::"+b.object_value,
                 animated: true,
                 data: {
                   box: b.box_id,
@@ -174,7 +174,7 @@
             b.object_value && b.object_type &&
             b.object_type == ObjectType.PlainText
           ) {
-            let node_id = 'node-'+b.box_id;
+            let node_id = 'plain-node::'+b.object_value;
             $nodes.push({
               id: node_id,
               data: {label: hexToUtf8(b.object_value), ellipsis: ".."},
@@ -184,8 +184,8 @@
               position: { x: _x, y: _y },
             });
             _edges.push({
-                id: 'edge-'+b.box_id,
-                source: token_rendered(p),
+                id: 'box-edge::'+b.box_id,
+                source: "proof::"+token_rendered(p),
                 target: node_id,
                 data: {
                   box: b.box_id,
@@ -196,7 +196,7 @@
               });
           }
           else {
-            let node_id = 'node-'+b.box_id;
+            let node_id = 'empty-node::'+b.box_id;
             $nodes.push({
               id: node_id,
               data: {label: ""},
@@ -206,8 +206,8 @@
               position: { x: _x, y: _y },
             });
             _edges.push({
-                id: 'edge-'+b.box_id,
-                source: token_rendered(p),
+                id: 'box-edge::'+b.box_id,
+                source: "proof::"+token_rendered(p),
                 target: node_id,
                 data: {
                   box: b.box_id,
