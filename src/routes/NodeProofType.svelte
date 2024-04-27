@@ -22,8 +22,10 @@
 
     let showModal = false;
     let proof: ReputationProof = data.proof;
+    let edge_id: string | null;
     let object_to_assign: string | null = null;
     let object_type_to_assign: ObjectType | null = null;
+    let delete_edge_function = data.delete_edge_function;
   
     $: isConnectable = true; // $connections.length === 0;
   
@@ -38,9 +40,10 @@
       }
     }
 
-    function handleConnection(connections: Connection[]) {
+    function handleConnection(connections: any[]) {  // <-- type HandleConnection[]
       let connection = connections[0];
       showModal = true;
+      edge_id = connection.edgeId
 
       let __target_node_id = connection.target.split("::");
       object_to_assign = hexToUtf8(__target_node_id[1]);
@@ -88,6 +91,6 @@
   </style>
   
 
-  {#if proof && object_to_assign && object_type_to_assign}
-    <PointOneToAnother bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
+  {#if proof && edge_id && delete_edge_function && object_to_assign && object_type_to_assign}
+    <PointOneToAnother bind:delete_edge_function bind:edge_id bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
   {/if}

@@ -137,6 +137,11 @@
       $edges = layoutedElements.edges;
     }
 
+    function delete_edge(id: string) {
+      console.log(id);
+      $edges = $edges.filter(edge => edge.id !== id);
+    }
+
     function build_graph(proofs: ReputationProof[]) {
       $nodes = [];
       let _x = 0; let _y = 0;
@@ -146,7 +151,7 @@
             id: "proof::"+token_rendered(p),
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
             targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
-            data: { label: p.token_id.slice(0, 10), proof: p},
+            data: { label: p.token_id.slice(0, 10), proof: p, delete_edge_function: delete_edge},
             type: "proof_type",
             position: { x: _x, y: _y },
           });

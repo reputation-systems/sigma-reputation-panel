@@ -7,6 +7,8 @@
 	let dialog: HTMLDialogElement;
   
 	export let proof: ReputationProof;
+	export let delete_edge_function: CallableFunction;
+	export let edge_id: string;
 	let input_proof_box: RPBox | null;
 	let reputationTokenAmount: number;
 	export let object_to_assign: string;
@@ -15,6 +17,7 @@
 	$: if (dialog && showModal) dialog.showModal();
 
 	function close() {
+		delete_edge_function(edge_id);
 		showModal = false;
 	}
 
