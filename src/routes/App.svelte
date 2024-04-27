@@ -174,7 +174,7 @@
             b.object_value && b.object_type &&
             b.object_type == ObjectType.PlainText
           ) {
-            let node_id = 'plain-node::'+b.object_value;
+            let node_id = 'plain-node::'+b.object_value+"::"+b.box_id;
             $nodes.push({
               id: node_id,
               data: {label: hexToUtf8(b.object_value), ellipsis: ".."},
