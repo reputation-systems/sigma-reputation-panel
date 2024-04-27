@@ -14,6 +14,10 @@
   
 	$: if (dialog && showModal) dialog.showModal();
 
+	function close() {
+		showModal = false;
+	}
+
 	function handleInputProofChange(event: any) {
 		reputationTokenAmount = 0;
 	}
@@ -29,7 +33,7 @@
   </script>
   
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-  <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
+  <dialog bind:this={dialog} on:close={() => close()} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
 	  <h2 class="modal-title" id="generateReputationLabel">Point from {proof.token_id.slice(0, 10)} to {object_to_assign.slice(0, 10)}</h2>
