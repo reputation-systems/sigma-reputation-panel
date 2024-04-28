@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 
     import FormModal from "./Modal.svelte";
     import SettingModal from "./Settings.svelte";
@@ -14,6 +14,7 @@
     let showSearch = false;
     let showForm = false;
     let showSetting = false;
+    export let setter: CallableFunction;
 
 
     function rightClickContextMenu(e){
@@ -113,7 +114,7 @@
 
 <FormModal bind:showModal={showForm} />
 <Search bind:showSearch />
-<SettingModal bind:showModal={showSetting} />
+<SettingModal bind:showModal={showSetting} bind:setter />
 
 
 <style>

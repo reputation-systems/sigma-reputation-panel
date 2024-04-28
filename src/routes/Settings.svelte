@@ -2,8 +2,10 @@
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
   
-    let zen_mode = false;  
-    let advance_mode = false;  
+    export let setter: CallableFunction;
+    let zen_mode = setter("zen", null);  
+    let advance_mode = setter("advance", null);
+    let fetch_all = setter("fetch_all", null);
 
     $: if (dialog && showModal) dialog.showModal();
 </script>
@@ -17,14 +19,20 @@
       <hr />
       <form id="settingsForm">
         <label>
-          <input type="checkbox" bind:checked={zen_mode} on:change={() => console.log(`Zen mode: ${zen_mode}`)}>
+          <input type="checkbox" bind:checked={zen_mode} on:change={() => setter("zen", zen_mode)}>
           <span class="ml">Zen mode</span>
         </label>
 
         <label>
-          <input type="checkbox" bind:checked={advance_mode} on:change={() => console.log(`Advance mode: ${advance_mode}`)}>
+          <input type="checkbox" bind:checked={advance_mode} on:change={() => setter("advance", advance_mode)}>
           <span class="ml">Advance mode</span>
         </label>
+
+        <label>
+          <input type="checkbox" bind:checked={fetch_all} on:change={() => setter("fetch_all", fetch_all)}>
+          <span class="ml">Fetch all</span>
+        </label>
+
       </form>
     </div>
 </dialog>

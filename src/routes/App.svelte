@@ -161,6 +161,39 @@
       }
     }
 
+    async function setter(key: string, value: any|null) {
+      console.log(key, value)
+      if (value !== null) {
+        switch (key) {
+          case "zen": {
+            zen_mode = value;
+            break;
+          }
+          case "advance": {
+            advance_mode = value;
+            break;
+          }
+          case "fetch_all": {
+            fetch_all = value;
+            await fetchReputationProofs();
+            break;
+          }
+        }        
+      } else {
+        switch (key) {
+          case "zen": {
+            return zen_mode;
+          }
+          case "advance": {
+            return advance_mode;
+          }
+          case "fetch_all": {
+            return fetch_all;
+          }
+        }
+      }
+    }
+
     function build_graph(proofs: ReputationProof[]) {
       $nodes = [];
       let _x = 0; let _y = 0;
@@ -285,7 +318,7 @@
         bottom={rightNodeMenu.bottom}
       />
     {:else}
-      <PanelContextMenu />
+      <PanelContextMenu setter={setter} />
     {/if}
     
   </div>
