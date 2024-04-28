@@ -11,8 +11,10 @@ import { ergo_tree_address } from './envs';
 import { generate_pk_proposition, stringToSerialized } from './utils';
 
 export async function generate_reputation_proof(token_amount: number, input_proof?: RPBox,
-                                                object_to_assign?: string, object_type_to_assign: ObjectType = ObjectType.PlainText
-                                              ) {
+                                                object_to_assign?: string, 
+                                                object_type_to_assign: ObjectType = ObjectType.PlainText
+                                              ): Promise<string|null>
+{
 
     /*
           Once the user accepts the connection request, this API will be injected in the same
@@ -95,5 +97,5 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     const transactionId = await ergo.submit_tx(signedTransaction);
 
     console.log("Transaction id -> ", transactionId)
-    alert("Transaction id -> " + transactionId)
+    return transactionId;
 }

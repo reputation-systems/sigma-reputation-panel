@@ -8,16 +8,18 @@
   
 	export let proof: ReputationProof;
 	export let delete_edge_function: CallableFunction;
-	export let edge_id: string;
+	export let connection: any;
 	let input_proof_box: RPBox | null;
 	let reputationTokenAmount: number;
 	export let object_to_assign: string;
 	export let object_type_to_assign: ObjectType;
+
+	let submited: string | null = null;
   
 	$: if (dialog && showModal) dialog.showModal();
 
 	function close() {
-		delete_edge_function(edge_id);
+		delete_edge_function(connection, submited);
 		showModal = false;
 	}
 
@@ -25,9 +27,10 @@
 		reputationTokenAmount = 0;
 	}
   
-	function generateReputationProof() {
+	async function generateReputationProof() {
 		if (reputationTokenAmount && input_proof_box && object_to_assign && object_type_to_assign) {
-			generate_reputation_proof(reputationTokenAmount, input_proof_box, object_to_assign, object_type_to_assign);
+			const _tx = await generate_reputation_proof(reputationTokenAmount, input_proof_box, object_to_assign, object_type_to_assign);
+			if (_tx) {submited = _tx;}
 		}
 		else {
 			console.log("not ready to generate.");

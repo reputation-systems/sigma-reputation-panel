@@ -1,5 +1,5 @@
 import { reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value } from "$lib/ReputationProof";
-import { generate_pk_proposition, serializedToRendered, stringToRendered } from "$lib/utils";
+import { generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -28,10 +28,29 @@ type ApiBox = {
     transactionId: string;
 };
 
-export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> 
+export async function getUnconfirmed(explorer_uri: string, ergo: any)
 {
     const wallet_pk = await ergo.get_change_address();
 
+    try {
+        const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/unconfirmed/byAddress/'+wallet_pk, {
+            method: 'GET'
+        });
+
+        if (response.ok) {
+            const apiData = await response.json();
+            console.log(apiData)
+        }        
+        else {
+            console.error('Error al realizar la solicitud POST');
+        }
+    } catch (error) {
+        console.error('Error al procesar la solicitud POST:', error);
+    }
+}
+
+export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> 
+{
     try {
         const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/search', {
         method: 'POST',

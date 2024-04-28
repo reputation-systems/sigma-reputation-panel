@@ -17,6 +17,7 @@
     import { hexToUtf8 } from '$lib/utils';
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
+    import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
         
     
     let connected = false;
@@ -127,6 +128,7 @@
       circle_type: NodeCircleType
     };
     const edgeTypes: EdgeTypes = {
+      unconfirmed: UnconfirmedEdgeType,
       edge_type: EdgeType
     };
 
@@ -137,9 +139,23 @@
       $edges = layoutedElements.edges;
     }
 
-    function delete_edge(id: string) {
-      console.log(id);
-      $edges = $edges.filter(edge => edge.id !== id);
+    async function delete_edge(connection: any, submited: string | null) {
+      $edges = $edges.filter(edge => edge.id !== connection.edgeId);
+
+      if (submited) {
+        $edges.push({
+            id: connection.edgeId,
+            source: connection.source,
+            target: connection.target,
+            animated: true,
+            data: {
+              color: "#Bfe22f",
+              tx_id: submited
+            },
+            type: 'unconfirmed'
+          });
+          onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );        
+      }
     }
 
     function build_graph(proofs: ReputationProof[]) {
