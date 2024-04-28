@@ -45,7 +45,7 @@
 
 	async function fetchReputationProofs() {
 		try {
-			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
+			const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, true);
 			unspend_reputation_proofs = data;
 		} catch (error) {
 			console.error(error);

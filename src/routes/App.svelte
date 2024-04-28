@@ -21,6 +21,9 @@
         
     
     let connected = false;
+    let fetch_all = false;
+    let advance_mode = true;
+    let zen_mode = false;
 
 
     // MENUS LOGIC
@@ -72,7 +75,7 @@
     
     async function fetchReputationProofs() {
       try {
-        const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo);
+        const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all);
         const unspend_reputation_proofs = data;
         build_graph(unspend_reputation_proofs);
       } catch (error) {
@@ -254,13 +257,22 @@
       style="background: #1A192B" fitView
     >
       <Background />
-      <Header />
-      <Controls>
-        <ControlButton on:click={() => onLayout('TB')}><i class="fas fa-regular fa-ruler-horizontal"></i></ControlButton>
-        <ControlButton on:click={() => onLayout('LR')}><i class="fas fa-regular fa-ruler-vertical"></i></ControlButton>
-        <Menu bind:connected/>
-      </Controls>
-      <MiniMap />
+      <Header bind:zen_mode/>
+      {#if !zen_mode}  
+        <Controls
+          showLock={advance_mode}
+          showZoom={advance_mode}
+        >
+          {#if advance_mode}
+            <ControlButton on:click={() => onLayout('TB')}><i class="fas fa-regular fa-ruler-horizontal"></i></ControlButton>
+            <ControlButton on:click={() => onLayout('LR')}><i class="fas fa-regular fa-ruler-vertical"></i></ControlButton>
+          {/if}
+          <Menu bind:connected/>
+        </Controls>
+        {#if advance_mode}
+          <MiniMap />
+        {/if}
+      {/if}
     </SvelteFlow>
     
     {#if rightNodeMenu}
