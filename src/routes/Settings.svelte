@@ -2,44 +2,54 @@
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
   
-    let setting1 = "";  
-    let setting2 = "";  
-    let setting3 = "";  
-  
-    function handleSetting1Change(event: any) {
-      setting1 = event.target.value;
-    }
-  
-    function handleSetting2Change(event: any) {
-      setting2 = event.target.value;
-    }
-  
-    function handleSetting3Change(event: any) {
-      setting3 = event.target.value;
-    }
-  
+    let zen_mode = false;  
+    let advance_mode = false;  
+
     $: if (dialog && showModal) dialog.showModal();
-  
-  </script>
-  
-  <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-  <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+</script>
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
     <div on:click|stopPropagation>
-      <h2 class="modal-title" id="settingsLabel">Panel de Ajustes</h2>
+      <h2 class="modal-title" id="settingsLabel">Settings</h2>
       <hr />
       <form id="settingsForm">
-        <label for="setting1">Ajuste 1:</label>
-        <input type="text" id="setting1" name="setting1" bind:value={setting1} on:change={handleSetting1Change}>
-  
-        <label for="setting2">Ajuste 2:</label>
-        <input type="text" id="setting2" name="setting2" bind:value={setting2} on:change={handleSetting2Change}>
-  
-        <label for="setting3">Ajuste 3:</label>
-        <input type="text" id="setting3" name="setting3" bind:value={setting3} on:change={handleSetting3Change}>
-  
-        <input type="submit" value="Guardar">
+        <label>
+          <input type="checkbox" bind:checked={zen_mode} on:change={() => console.log(`Zen mode: ${zen_mode}`)}>
+          <span class="ml">Zen mode</span>
+        </label>
+
+        <label>
+          <input type="checkbox" bind:checked={advance_mode} on:change={() => console.log(`Advance mode: ${advance_mode}`)}>
+          <span class="ml">Advance mode</span>
+        </label>
       </form>
     </div>
-  </dialog>
+</dialog>
+
+<style>
+	dialog {
+	  max-width: 32em;
+	  border-radius: 0.05em;
+	  padding: 1em;
+	  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	}
+  
+	dialog::backdrop {
+	  background: rgba(0, 0, 0, 0.5);
+	}
+  
+	h2.modal-title {
+	  font-size: 1.5rem;
+	  margin: 0;
+	}
+  
+	hr {
+	  border: none;
+	  border-top: 1px solid #ccc;
+	  margin: 1em 0;
+	}
+  </style>
   

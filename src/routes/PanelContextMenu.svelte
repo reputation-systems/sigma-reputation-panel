@@ -1,6 +1,7 @@
 <script>
 
-    import Modal from "./Modal.svelte";
+    import FormModal from "./Modal.svelte";
+    import SettingModal from "./Settings.svelte";
     import Search from "./Search.svelte";
     
     // pos is cursor position when right click occur
@@ -11,7 +12,8 @@
     let browser = { h: 0, y: 0 }
     let showMenu = false;
     let showSearch = false;
-    let showModal = false;
+    let showForm = false;
+    let showSetting = false;
 
 
     function rightClickContextMenu(e){
@@ -51,21 +53,21 @@
         }
     }
     function addItem(){
-        showModal = true
+        showForm = true
     }
     function search(){
         showSearch = true;
     }
     function setting(){
-    }
-    function remove() {
+        console.log("open setting")
+        showSetting = true;
     }
     let menuItems = [
         {
             'name': 'addItem',
             'onClick': addItem,
-            'displayText': "Add Proof",
-            'class': 'fa-solid fa-plus'
+            'displayText': "Submit",
+            'class': 'fa-solid fa-bullhorn'
         },
         {
             'name': 'search',
@@ -81,16 +83,7 @@
             'onClick': setting,
             'displayText': "Settings",
             'class': 'fa-solid fa-gear'
-        },
-        {
-            'name': 'hr',
-        },
-        {
-            'name': 'trash',
-            'onClick': remove,
-            'displayText': "Trash",
-            'class': 'fa-solid fa-trash-can'
-        },
+        }
     ]
 
 </script>
@@ -99,6 +92,30 @@
     <!-- <link rel="stylesheet" href="/icon/css/mfglabs_iconset.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </svelte:head>
+
+{#if showMenu}
+<nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
+    <div class="navbar" id="navbar">
+        <ul>
+            {#each menuItems as item}
+                {#if item.name == "hr"}
+                    <hr>
+                {:else}
+                    <li><button on:click={item.onClick}><i class={item.class}></i>{item.displayText}</button></li>
+                {/if}
+            {/each}
+        </ul>
+    </div>
+</nav>
+{/if}
+
+<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
+
+<FormModal bind:showModal={showForm} />
+<Search bind:showSearch />
+<SettingModal bind:showModal={showSetting} />
+
+
 <style>
     * {
         padding: 0;
@@ -157,24 +174,3 @@
         margin: 5px 0px;
     }
 </style>
-
-{#if showMenu}
-<nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
-    <div class="navbar" id="navbar">
-        <ul>
-            {#each menuItems as item}
-                {#if item.name == "hr"}
-                    <hr>
-                {:else}
-                    <li><button on:click={item.onClick}><i class={item.class}></i>{item.displayText}</button></li>
-                {/if}
-            {/each}
-        </ul>
-    </div>
-</nav>
-{/if}
-
-<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
-
-<Modal bind:showModal />
-<Search bind:showSearch />

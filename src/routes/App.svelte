@@ -22,7 +22,7 @@
     
     let connected = false;
     let fetch_all = false;
-    let advance_mode = true;
+    let advance_mode = false;
     let zen_mode = false;
 
 
