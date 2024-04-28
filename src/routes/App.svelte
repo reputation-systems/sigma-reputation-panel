@@ -162,7 +162,6 @@
     }
 
     async function setter(key: string, value: any|null) {
-      console.log(key, value)
       if (value !== null) {
         switch (key) {
           case "zen": {

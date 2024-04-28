@@ -24,29 +24,35 @@
     <div on:click|stopPropagation>
       <h2 class="modal-title" id="settingsLabel">Settings</h2>
       <hr />
-      <form id="settingsForm">
-        <label>
-          <input type="checkbox" bind:checked={zen_mode} on:change={() => setter("zen", zen_mode)}>
-          <span class="ml">Zen mode</span>
-        </label>
-
-        <label>
-          <input type="checkbox" bind:checked={advance_mode} on:change={() => setter("advance", advance_mode)}>
-          <span class="ml">Advance mode</span>
-        </label>
-
-        <label>
-          <input type="checkbox" bind:checked={fetch_all} on:change={() => setter("fetch_all", fetch_all)}>
-          <span class="ml">Fetch all</span>
-        </label>
-
+      <form class="modal" id="settingsForm">
+        <div style="margin-bottom: 20px;">
+          <h3>Panel modes</h3>
+          <label>
+            <input type="checkbox" bind:checked={zen_mode} on:change={() => setter("zen", zen_mode)}>
+            <span class="ml">Zen mode</span>
+          </label>
+          <br>
+          <label>
+            <input type="checkbox" bind:checked={advance_mode} on:change={() => setter("advance", advance_mode)}>
+            <span class="ml">Advance mode</span>
+          </label>
+        </div>
+      
+        <div>
+          <h3>Other options</h3>
+          <label>
+            <input type="checkbox" bind:checked={fetch_all} on:change={() => setter("fetch_all", fetch_all)}>
+            <span class="ml">Fetch all network's proofs</span>
+          </label>
+        </div>
       </form>
+      
     </div>
 </dialog>
 
 <style>
 	dialog {
-	  max-width: 32em;
+    width: 300px;
 	  border-radius: 0.05em;
 	  padding: 1em;
 	  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -66,5 +72,5 @@
 	  border-top: 1px solid #ccc;
 	  margin: 1em 0;
 	}
-  </style>
+</style>
   
