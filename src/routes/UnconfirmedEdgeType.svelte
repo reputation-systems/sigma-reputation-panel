@@ -39,11 +39,9 @@
       class="edge-label"
       style="background: {data.color}"
     > <!-- class="edge-label nodrag nopan"     For no drag over it. -->
-        unconfirmed
+    <a target="_blank" href="https://testnet.ergoplatform.com/transactions/{data.tx_id}">{data.tx_id.slice(0, 10)}</a> unconfirmed
         {#if showContent}
           , this could be taken from the explorer getUnconfirmed endpoint.
-          <br>
-          Transaction id: <a target="_blank" href="https://testnet.ergoplatform.com/transactions/{data.tx_id}">{data.tx_id.slice(0, 10)}</a>
           <br>
         {/if}
     </div>

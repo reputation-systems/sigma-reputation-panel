@@ -30,7 +30,10 @@
 	async function generateReputationProof() {
 		if (reputationTokenAmount && input_proof_box && object_to_assign && object_type_to_assign) {
 			const _tx = await generate_reputation_proof(reputationTokenAmount, input_proof_box, object_to_assign, object_type_to_assign);
-			if (_tx) {submited = _tx;}
+			if (_tx) {
+				submited = _tx;
+				close();
+			}
 		}
 		else {
 			console.log("not ready to generate.");
