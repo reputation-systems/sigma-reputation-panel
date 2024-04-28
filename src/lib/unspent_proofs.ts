@@ -52,7 +52,16 @@ export async function getUnconfirmed(explorer_uri: string, ergo: any)
 export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any): Promise<ReputationProof[]> 
 {
     try {
-        const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/search', {
+        let params = {
+            offset: 0,
+            limit: 500,
+        };
+        
+        const url = explorer_uri+'/api/v1/boxes/unspent/search';
+        const response = await fetch(url + '?' + new URLSearchParams({
+            offset: params.offset.toString(),
+            limit: params.limit.toString(),
+        }), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -61,7 +70,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 "ergoTreeTemplateHash": ergo_tree_template_hash,
                 "registers": {
                     "R4":  stringToRendered(reputation_token_label),
-                    "R7":  serializedToRendered(generate_pk_proposition((await ergo.get_change_address())))
+                   //  "R7":  serializedToRendered(generate_pk_proposition((await ergo.get_change_address())))
                 },
                 "constants": {},
                 "assets": []
@@ -70,7 +79,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
 
         if (response.ok) {
             let proofs = new Map<string, ReputationProof>();
-            (await response.json()).items.forEach((e: ApiBox) => {
+            let json_data = await response.json();
+            json_data.items.forEach((e: ApiBox) => {
                 let token_id = e.assets[0].tokenId;
                 let current_box: RPBox = {
                         box_id: e.boxId,
