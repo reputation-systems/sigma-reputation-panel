@@ -3,11 +3,18 @@
     let dialog: any; // HTMLDialogElement
   
     export let setter: CallableFunction;
-    let zen_mode = setter("zen", null);  
-    let advance_mode = setter("advance", null);
-    let fetch_all = setter("fetch_all", null);
+    let zen_mode = false;
+    let advance_mode = false;
+    let fetch_all = false;
 
-    $: if (dialog && showModal) dialog.showModal();
+    async function refresh() {
+      zen_mode = await setter("zen", null);  
+      advance_mode = await setter("advance", null);
+      fetch_all = await setter("fetch_all", null);
+      dialog.showModal();
+    }
+
+    $: if (dialog && showModal) refresh()
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
