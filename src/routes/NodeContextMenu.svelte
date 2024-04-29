@@ -46,9 +46,9 @@ on:click={onClick}
     position: absolute;
     z-index: 10;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #007bff; /* Borde azul */
+    border: 1px solid #007bff;
     animation: fadeIn 0.3s;
-    background-color: white; /* Fondo blanco para mayor contraste */
+    background-color: white;
 }
 
 @keyframes fadeIn {
@@ -58,7 +58,7 @@ on:click={onClick}
 
 .navbar {
     display: flex;
-    background-color: #ffffff; /* Fondo blanco */
+    background-color: #ffffff; 
     border-radius: 10px;
     overflow: hidden;
     flex-direction: column;
@@ -67,15 +67,15 @@ on:click={onClick}
     justify-content: center;
     width: auto;
     max-width: 300px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .navbar a {
-    color: #000000; /* Letra negra */
+    color: #000000; 
     text-decoration: none;
     margin-bottom: 0.5em;
-    font-size: 1.1em; /* Tamaño de letra más grande */
-    font-weight: bold; /* Letra en negrita */
+    font-size: 1.1em;
+    font-weight: bold;
 }
 
 .tag {
