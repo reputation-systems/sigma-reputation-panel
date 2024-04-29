@@ -1,4 +1,4 @@
-import { reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value } from "$lib/ReputationProof";
+import { reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value, Network } from "$lib/ReputationProof";
 import { generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered } from "$lib/utils";
 
 /**
@@ -117,13 +117,16 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         current_box.object_type = object_type_by_rendered_value(e.additionalRegisters.R5.renderedValue),
                         current_box.object_value = e.additionalRegisters.R6.renderedValue;
                     }
+                    const address: string = e.additionalRegisters.R7 ? e.additionalRegisters.R7.renderedValue : "";
                     let _reputation_proof: ReputationProof = proofs.has(token_id) 
                         ? proofs.get(token_id)! 
                         : {
                             current_boxes: [], 
                             token_id: token_id,
                             number_of_boxes: 0,
-                            total_amount: 0
+                            total_amount: 0,
+                            network: Network.ErgoTestnet,
+                            address: address
                         };
                     _reputation_proof.current_boxes.push(current_box);
                     _reputation_proof.total_amount += current_box.token_amount;

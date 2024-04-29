@@ -5,7 +5,9 @@ export interface ReputationProof {
     token_id: string,
     current_boxes: RPBox[],
     total_amount: number,
-    number_of_boxes: number
+    number_of_boxes: number,
+    network: Network,
+    address: string
 }
 
 export function token_rendered(proof: ReputationProof): string {
@@ -35,4 +37,11 @@ export interface RPBox {
     token_amount: number,
     object_type?: ObjectType,
     object_value?: string
+}
+
+export enum Network {
+    ErgoTestnet = "ergo-testnet",
+    ErgoMainnet = "ergo-mainnet",
+    BitcoinTestnet = "btc-testnet",
+    BitcoinMainnet = "btc-mainnet"
 }

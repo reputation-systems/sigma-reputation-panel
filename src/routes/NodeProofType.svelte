@@ -64,6 +64,7 @@
       }
     }
   
+    console.log(proof.address)
   </script>
   
   <div class="customNode">
