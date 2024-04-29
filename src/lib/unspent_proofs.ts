@@ -140,9 +140,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 return [];
             }
         }
-        const arr = Array.from(proofs.values());
-        console.log("Total proofs -> ", arr.length)
-        return arr;
+        return Array.from(proofs.values());
     } catch (error) {
         console.error('Error al procesar la solicitud POST:', error);
         return [];
