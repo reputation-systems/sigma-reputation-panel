@@ -52,7 +52,7 @@
   }
 
   .customNode:hover {
-      transform: translateY(-3px); /* Efecto de elevación al pasar el ratón */
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el ratón */
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
 </style>

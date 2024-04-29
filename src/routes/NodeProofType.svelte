@@ -86,31 +86,32 @@
   
   <style>
     .customExternalNode {
-      background: #ffffff; /* Blanco puro para un aspecto limpio */
-      padding: 16px; /* Aumento del relleno para una mejor legibilidad */
-      border-radius: 8px; /* Bordes más redondeados para un estilo suave */
-      border: 2px solid #e0e0e0; /* Borde más sutil y moderno */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
-      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves para interactividad */
+      border-left: 4px solid #ff4500;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .customNode {
-      background: #ffffff; /* Blanco puro para un aspecto limpio */
-      padding: 16px; /* Aumento del relleno para una mejor legibilidad */
-      border-radius: 8px; /* Bordes más redondeados para un estilo suave */
-      border: 2px solid #e0e0e0; /* Borde más sutil y moderno */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
-      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves para interactividad */
+      border-right: 4px solid #0074D9;
+      border-left: 4px solid #0074D9;
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .customNode:hover {
-      transform: translateY(-3px); /* Efecto de elevación al pasar el ratón */
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el ratón */
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
 
     .customExternalNode:hover {
-      transform: translateY(-3px); /* Efecto de elevación al pasar el ratón */
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el ratón */
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     }
   </style>
   
