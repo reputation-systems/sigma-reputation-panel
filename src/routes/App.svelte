@@ -28,7 +28,7 @@
 
     // MENUS LOGIC
 
-    let rightNodeMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null;
+    let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
     let width: number;
     let height: number;
     function handleNodeContextMenu({ detail: { event, node } }) {
@@ -37,13 +37,16 @@
 
       // Calculate position of the context menu. We want to make sure it
       // doesn't get positioned off-screen.
-      rightNodeMenu = {
-        id: node.id,
-        top: event.clientY < height - 200 ? event.clientY : undefined,
-        left: event.clientX < width - 200 ? event.clientX : undefined,
-        right: event.clientX >= width - 200 ? width - event.clientX : undefined,
-        bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
-      };
+      if (node.data.proof) {
+        rightNodeMenu = {
+          id: node.id,
+          proof: node.data.proof ?? null,
+          top: event.clientY < height - 200 ? event.clientY : undefined,
+          left: event.clientX < width - 200 ? event.clientX : undefined,
+          right: event.clientX >= width - 200 ? width - event.clientX : undefined,
+          bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
+        };        
+      }
     }
 
     // Close the context menu if it's open whenever the window is clicked.
@@ -310,7 +313,7 @@
     {#if rightNodeMenu}
       <NodeContextMenu
         onClick={handlePaneClick}
-        id={rightNodeMenu.id}
+        proof={rightNodeMenu.proof ?? null}
         top={rightNodeMenu.top}
         left={rightNodeMenu.left}
         right={rightNodeMenu.right}
