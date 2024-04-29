@@ -1,5 +1,5 @@
 import { reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value, Network } from "$lib/ReputationProof";
-import { generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered } from "$lib/utils";
+import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered, stringToSerialized } from "$lib/utils";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -90,7 +90,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                     moreDataAvailable = false;
                     break;
                 }
-                json_data.items.forEach((e: ApiBox) => {
+                json_data.items.forEach(async (e: ApiBox) => {
                     let token_id = e.assets[0].tokenId;
                     let current_box: RPBox = {
                             box_id: e.boxId,
@@ -117,7 +117,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         current_box.object_type = object_type_by_rendered_value(e.additionalRegisters.R5.renderedValue),
                         current_box.object_value = e.additionalRegisters.R6.renderedValue;
                     }
-                    const address: string = e.additionalRegisters.R7 ? e.additionalRegisters.R7.renderedValue : "";
+                    let r7_value = e.additionalRegisters.R7 !== undefined ? (e.additionalRegisters.R7.renderedValue ?? "") : "";
                     let _reputation_proof: ReputationProof = proofs.has(token_id) 
                         ? proofs.get(token_id)! 
                         : {
@@ -126,7 +126,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                             number_of_boxes: 0,
                             total_amount: 0,
                             network: Network.ErgoTestnet,
-                            address: address
+                            can_be_spend: await check_if_r7_is_local_addr(r7_value)
                         };
                     _reputation_proof.current_boxes.push(current_box);
                     _reputation_proof.total_amount += current_box.token_amount;

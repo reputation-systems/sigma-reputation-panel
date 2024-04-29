@@ -14,7 +14,7 @@
     import EdgeType from './EdgeType.svelte';
     import NodeCircleType from './NodeCircleType.svelte';
     import PanelContextMenu from './PanelContextMenu.svelte';
-    import { hexToUtf8 } from '$lib/utils';
+    import { generate_pk_proposition, hexToUtf8, stringToRendered } from '$lib/utils';
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';

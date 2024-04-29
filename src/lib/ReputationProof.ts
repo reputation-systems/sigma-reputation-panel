@@ -7,7 +7,7 @@ export interface ReputationProof {
     total_amount: number,
     number_of_boxes: number,
     network: Network,
-    address: string
+    can_be_spend: boolean
 }
 
 export function token_rendered(proof: ReputationProof): string {
