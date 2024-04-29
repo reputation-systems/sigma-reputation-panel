@@ -79,7 +79,7 @@
       {#if showContent}
         <br/>
         <!-- svelte-ignore a11y-missing-attribute -->
-        <a>More info ...</a>
+        <a>Ergo Platform</a>
       {/if}
     </div>
   </div>
