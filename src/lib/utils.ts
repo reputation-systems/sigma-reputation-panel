@@ -45,5 +45,5 @@ export function stringToRendered(value: string): string {
 }
 
 export async function check_if_r7_is_local_addr(value: string): Promise<boolean> {
-    return stringToRendered(generate_pk_proposition((await ergo.get_change_address()))) == stringToRendered(value);
+    return stringToRendered(generate_pk_proposition((await ergo.get_change_address()))).substring(4,) === stringToRendered(value);
 }

@@ -77,6 +77,7 @@
         {data.label}
       {#if showContent}
         <br/>
+        <!-- svelte-ignore a11y-missing-attribute -->
         <a>More info ...</a>
       {/if}
     </div>
