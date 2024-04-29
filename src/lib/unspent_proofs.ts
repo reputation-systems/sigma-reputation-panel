@@ -118,6 +118,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                         current_box.object_value = e.additionalRegisters.R6.renderedValue;
                     }
                     let r7_value = e.additionalRegisters.R7 !== undefined ? (e.additionalRegisters.R7.renderedValue ?? "") : "";
+                    let r4_value = e.additionalRegisters.R4 !== undefined ? (e.additionalRegisters.R4.renderedValue ?? "") : "";
                     let _reputation_proof: ReputationProof = proofs.has(token_id) 
                         ? proofs.get(token_id)! 
                         : {
@@ -126,7 +127,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                             number_of_boxes: 0,
                             total_amount: 0,
                             network: Network.ErgoTestnet,
-                            can_be_spend: await check_if_r7_is_local_addr(r7_value)
+                            can_be_spend: await check_if_r7_is_local_addr(r7_value),
+                            tag: hexToUtf8(r4_value)
                         };
                     _reputation_proof.current_boxes.push(current_box);
                     _reputation_proof.total_amount += current_box.token_amount;
