@@ -66,12 +66,13 @@
   
   </script>
   
-  <div class="customNode">
+  <div class={proof.can_be_spend ? "customNode" : "customExternalNode"}>
     <Handle type="target" position={Position.Left} {isConnectable} />
     <Handle
       type="source" 
       position={Position.Right} 
       onconnect={handleConnection}
+      isConnectable={proof.can_be_spend}
     />
     <div style="font-size: small;">
         {data.label}
@@ -84,11 +85,32 @@
   </div>
   
   <style>
+    .customExternalNode {
+      background: #ffffff; /* Blanco puro para un aspecto limpio */
+      padding: 16px; /* Aumento del relleno para una mejor legibilidad */
+      border-radius: 8px; /* Bordes más redondeados para un estilo suave */
+      border: 2px solid #e0e0e0; /* Borde más sutil y moderno */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves para interactividad */
+    }
+
     .customNode {
-      background: white;
-      padding: 12px;
-      border-radius: 3px;
-      border: 1px solid black;
+      background: #ffffff; /* Blanco puro para un aspecto limpio */
+      padding: 16px; /* Aumento del relleno para una mejor legibilidad */
+      border-radius: 8px; /* Bordes más redondeados para un estilo suave */
+      border: 2px solid #e0e0e0; /* Borde más sutil y moderno */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave para profundidad */
+      transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves para interactividad */
+    }
+
+    .customNode:hover {
+      transform: translateY(-3px); /* Efecto de elevación al pasar el ratón */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el ratón */
+    }
+
+    .customExternalNode:hover {
+      transform: translateY(-3px); /* Efecto de elevación al pasar el ratón */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el ratón */
     }
   </style>
   
