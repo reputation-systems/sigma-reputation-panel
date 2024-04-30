@@ -17,7 +17,7 @@
 
   const connections = useHandleConnections({ nodeId: id, type: 'target' });
 
-  $: isConnectable = $connections.length === 0;
+  $: isConnectable = $connections.length === 0 || id.split("::")[0] === "plain-node";
 
   const { viewport } = useSvelteFlow();
 
