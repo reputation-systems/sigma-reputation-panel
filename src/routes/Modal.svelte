@@ -68,7 +68,6 @@
 		  <select class="form-select" bind:value={selectedOption} on:change={handleSelectChange}>
 			<option></option>
 			<option value="new">Generate a new one</option>
-			<option value="new_from_another">Generate a new one from another</option>
 			<option value="current_one">Update a current one</option>
 		  </select>
 		</div>
@@ -77,14 +76,12 @@
 				<label for="reputationTokenAmount" class="form-label">Token amount<span class="required">*</span></label>
 				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
 			</div>
-		{/if}
-		{#if selectedOption === "new" || selectedOption === "new_from_another"}
 			<div class="mb-3">
 				<label for="reputationTokenTag" class="form-label">Tags<span class="required">*</span></label>
 				<input type="text" class="form-control" bind:value={tags} />
 			</div>
 		{/if}
-		{#if selectedOption === "current_one" || selectedOption === "new_from_another"}
+		{#if selectedOption === "current_one"}
 			<div class="mb-3">
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="form-label">Reputation proof</label>
@@ -145,7 +142,7 @@
 		<!-- svelte-ignore a11y-autofocus -->
 		<div class="row">
 			<button on:click={generateReputationProof} 
-				disabled={!reputationTokenAmount || selectedOption == "current_one" && !input_proof_box || selectedOption == "new_from_another"}>
+				disabled={!reputationTokenAmount || selectedOption == "current_one" && !input_proof_box}>
 				Generate proof
 			</button>
 		</div>
