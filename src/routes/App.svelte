@@ -155,7 +155,7 @@
             target: connection.target,
             animated: true,
             data: {
-              color: "#Bfe22f",
+              color: "#ffdf9b",
               tx_id: submited
             },
             type: 'unconfirmed'
