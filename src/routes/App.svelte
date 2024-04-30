@@ -9,12 +9,11 @@
     import { ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
-    import Menu from './Menu.svelte';
     import Header from './Header.svelte';
     import EdgeType from './EdgeType.svelte';
     import NodeCircleType from './NodeCircleType.svelte';
     import PanelContextMenu from './PanelContextMenu.svelte';
-    import { generate_pk_proposition, hexToUtf8, stringToRendered } from '$lib/utils';
+    import { hexToUtf8 } from '$lib/utils';
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
@@ -311,12 +310,12 @@
         <Controls
           showLock={advance_mode}
           showZoom={advance_mode}
+          showFitView={advance_mode}
         >
           {#if advance_mode}
             <ControlButton on:click={() => onLayout('TB')}><i class="fas fa-regular fa-ruler-horizontal"></i></ControlButton>
             <ControlButton on:click={() => onLayout('LR')}><i class="fas fa-regular fa-ruler-vertical"></i></ControlButton>
           {/if}
-          <Menu bind:connected/>
         </Controls>
         {#if advance_mode}
           <MiniMap />

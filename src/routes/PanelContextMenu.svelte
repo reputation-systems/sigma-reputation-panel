@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import FormModal from "./Modal.svelte";
+    import FormModal from "./CreateProofModal.svelte";
     import SettingModal from "./Settings.svelte";
     import Search from "./Search.svelte";
     
@@ -67,7 +67,7 @@
         {
             'name': 'addItem',
             'onClick': addItem,
-            'displayText': "Submit",
+            'displayText': "New",
             'class': 'fa-solid fa-bullhorn'
         },
         {
