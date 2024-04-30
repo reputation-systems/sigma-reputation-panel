@@ -4,7 +4,7 @@ import { generate_reputation_proof } from '$lib/generate_reputation_proof';
 import { explorer_uri, ergo_tree_hash } from '$lib/envs';
 import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
 
-export let showModal: any; // boolean
+export let showModal: boolean; // boolean
 let dialog: any; // HTMLDialogElement
 
 export let proof: ReputationProof;
@@ -27,13 +27,13 @@ function handleObjectToAssignChange(event: any) {
 }
 
 $: {
-	if (dialog && showModal) {
-		(async () => {
-			await fetchReputationProofs(true);
-			dialog.showModal();
-		})();
+		if (dialog && showModal) {
+			(async () => {
+				await fetchReputationProofs(true);
+				dialog.showModal();
+			})();
+		}
 	}
-}
 
 function generateReputationProof() {
 	generate_reputation_proof(
