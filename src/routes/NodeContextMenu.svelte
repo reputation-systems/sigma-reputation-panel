@@ -6,10 +6,6 @@
   
   export let onClick: () => void;
   export let proof: ReputationProof|null;
-  export let top: number | undefined;
-  export let left: number | undefined;
-  export let right: number | undefined;
-  export let bottom: number | undefined;
 
 
   let local_id: string = proof ? proof.token_id.slice(0, 10) : ""; 
@@ -22,7 +18,6 @@
   let browser = { h: 0, y: 0 }
   let showMenu = false;
   let showForm = false;
-  export let setter: CallableFunction;
 
 
   function rightClickContextMenu(e){
@@ -50,6 +45,7 @@
       // To make context menu disappear when
       // mouse is clicked outside context menu
       showMenu = false;
+      onClick()
   }
   function getContextMenuDimension(node){
       // This function will get context menu dimension
@@ -106,7 +102,12 @@
 </nav>
 {/if}
 
-<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
+<svelte:window 
+  on:contextmenu|preventDefault={showMenu ? onPageClick : rightClickContextMenu} 
+  on:click={onPageClick} 
+  on:wheel={onPageClick}
+  on:dblclick={onPageClick}  
+/>
 
 {#if proof}
   <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />

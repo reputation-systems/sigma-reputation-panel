@@ -327,10 +327,6 @@
       <NodeContextMenu
         onClick={handlePaneClick}
         proof={rightNodeMenu.proof ?? null}
-        top={rightNodeMenu.top}
-        left={rightNodeMenu.left}
-        right={rightNodeMenu.right}
-        bottom={rightNodeMenu.bottom}
       />
     {:else}
       <PanelContextMenu setter={setter} />
