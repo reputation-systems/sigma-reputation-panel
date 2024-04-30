@@ -143,7 +143,7 @@
   .navbar{
       display: inline-flex;
       border: 1px #999 solid;
-      width: 170px;
+      width: 250px;
       background-color: #fff;
       border-radius: 10px;
       overflow: hidden;
