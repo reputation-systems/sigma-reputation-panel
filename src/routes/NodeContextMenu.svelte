@@ -1,9 +1,6 @@
 <script lang="ts">
 
-  import FormModal from "./CreateProofModal.svelte";
-  import SettingModal from "./Settings.svelte";
-  import Search from "./Search.svelte";
-  
+  import UpdateProofModal from "./UpdateProofModal.svelte";
   import type { ReputationProof } from "$lib/ReputationProof";
 
   
@@ -24,9 +21,7 @@
   // browser/window dimension (height and width)
   let browser = { h: 0, y: 0 }
   let showMenu = false;
-  let showSearch = false;
   let showForm = false;
-  let showSetting = false;
   export let setter: CallableFunction;
 
 
@@ -68,7 +63,7 @@
   }
   function updateItem(){
       // Implement the logic for updating here
-      console.log("update item")
+      showForm = true;
   }
   let menuItems = [
       {
@@ -113,10 +108,9 @@
 
 <svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
 
-<FormModal bind:showModal={showForm} />
-<Search bind:showSearch />
-<SettingModal bind:showModal={showSetting} bind:setter />
-
+{#if proof}
+  <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />
+{/if}
 
 <style>
     .info-block {
