@@ -6,13 +6,14 @@ import {
 
 // import { SConstant, SColl, SByte } from '@fleet-sdk/serializer';
 
-import { ObjectType, reputation_token_label, type RPBox } from '$lib/ReputationProof';
+import { ObjectType, type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address } from './envs';
 import { generate_pk_proposition, stringToSerialized } from './utils';
 
 export async function generate_reputation_proof(token_amount: number, input_proof?: RPBox,
                                                 object_to_assign?: string, 
-                                                object_type_to_assign: ObjectType = ObjectType.PlainText
+                                                object_type_to_assign: ObjectType = ObjectType.PlainText,
+                                                tags?: string
                                               ): Promise<string|null>
 {
 
@@ -23,6 +24,8 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     const wallet_pk = await ergo.get_change_address();
     const inputs = input_proof ?  [...(await ergo.get_utxos()), input_proof?.box] : await ergo.get_utxos();
     let outputs: OutputBuilder[] = [];
+
+    const reputation_token_label = tags ?? "RPT";
 
     // Output builder
     const new_proof_output = new OutputBuilder(

@@ -1,4 +1,4 @@
-import { reputation_token_label, type RPBox, type ReputationProof, object_type_by_rendered_value, Network } from "$lib/ReputationProof";
+import { type RPBox, type ReputationProof, object_type_by_rendered_value, Network } from "$lib/ReputationProof";
 import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered, stringToSerialized } from "$lib/utils";
 
 /**
@@ -59,10 +59,14 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         let proofs = new Map<string, ReputationProof>();
         let moreDataAvailable = true;
 
-        const r4 = stringToRendered(reputation_token_label);
+        // const r4 = stringToRendered(reputation_token_label);
         const r7 = serializedToRendered(generate_pk_proposition((await ergo.get_change_address())));
-        const registers = all ? { "R4": r4 } : {
+       /* const registers = all ? { "R4": r4 } : {
             "R4":  r4,
+            "R7":  r7
+        }; */
+
+        const registers = all ? {} : {
             "R7":  r7
         };
 

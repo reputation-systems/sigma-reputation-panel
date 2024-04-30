@@ -15,8 +15,6 @@ export function token_rendered(proof: ReputationProof): string {
     return stringToRendered(proof.token_id);
 };
 
-export const reputation_token_label = "RPT";
-
 export enum ObjectType {
     PlainText = "plain/txt-utf8",
     ProofByToken = "token-proof"

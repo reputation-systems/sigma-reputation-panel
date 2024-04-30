@@ -13,6 +13,7 @@
 	let reputationTokenAmount: number;
 	let object_to_assign: string;
 	let object_type_to_assign: ObjectType | undefined;
+	let tags: string;
   
 	let unspend_reputation_proofs: ReputationProof[] = [];
 
@@ -39,7 +40,7 @@
 	function generateReputationProof() {
 		generate_reputation_proof(
 			reputationTokenAmount, input_proof_box ?? undefined, 
-			object_to_assign, object_type_to_assign
+			object_to_assign, object_type_to_assign, tags
 		);
 	}
 
@@ -73,8 +74,14 @@
 		</div>
 		{#if selectedOption === "new"}
 			<div class="mb-3">
-				<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+				<label for="reputationTokenAmount" class="form-label">Token amount<span class="required">*</span></label>
 				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
+			</div>
+		{/if}
+		{#if selectedOption === "new" || selectedOption === "new_from_another"}
+			<div class="mb-3">
+				<label for="reputationTokenTag" class="form-label">Tags<span class="required">*</span></label>
+				<input type="text" class="form-control" bind:value={tags} />
 			</div>
 		{/if}
 		{#if selectedOption === "current_one" || selectedOption === "new_from_another"}
@@ -101,7 +108,8 @@
 				</div>
 				{#if input_proof_box }
 					<div class="mb-3">
-						<label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
+						<!-- svelte-ignore a11y-label-has-associated-control -->
+						<label class="form-label">Token amount<span class="required">*</span></label>
 						<span style="align-self: flex-end;">Up to: {input_proof_box.token_amount}</span>
 						<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" />
 					</div>
