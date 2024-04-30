@@ -53,7 +53,7 @@
             break;
           }
           case "plain-node": {
-            object_type_to_assign = ObjectType.ProofByToken
+            object_type_to_assign = ObjectType.PlainText
             break;
           }
           default: {
