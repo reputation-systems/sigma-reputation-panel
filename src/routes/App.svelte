@@ -198,6 +198,7 @@
 
     function build_graph(proofs: ReputationProof[]) {
       $nodes = [];
+      let plain_nodes: any = {};  // Objects of plain nodes and edges.
       let _x = 0; let _y = 0;
       let _edges: Edge[] = [];
       proofs.map(p => {
@@ -233,26 +234,31 @@
             b.object_value && b.object_type &&
             b.object_type == ObjectType.PlainText
           ) {
-            let node_id = 'plain-node::'+b.object_value+"::"+b.box_id;
-            $nodes.push({
-              id: node_id,
-              data: {label: hexToUtf8(b.object_value), ellipsis: ".."},
-              type: "circle_type",
-              sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
-              targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
-              position: { x: _x, y: _y },
+            let node_id = 'plain-node::'+b.object_value;
+            if (! (node_id in plain_nodes)) {
+                plain_nodes[node_id] = {
+                  node: {
+                    id: node_id,
+                    data: {label: hexToUtf8(b.object_value), ellipsis: ".."},
+                    type: "circle_type",
+                    sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
+                    targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
+                    position: { x: _x, y: _y },
+                  },
+                  edges: []
+                }
+            }
+            plain_nodes[node_id].edges.push({
+              id: 'box-edge::'+b.box_id,
+              source: "proof::"+token_rendered(p),
+              target: node_id,
+              data: {
+                box: b.box_id,
+                proportion: percentage_of_tokens,
+                color: "#ffcc00"
+              },
+              type: 'edge_type'
             });
-            _edges.push({
-                id: 'box-edge::'+b.box_id,
-                source: "proof::"+token_rendered(p),
-                target: node_id,
-                data: {
-                  box: b.box_id,
-                  proportion: percentage_of_tokens,
-                  color: "#ffcc00"
-                },
-                type: 'edge_type'
-              });
           }
           else {
             let node_id = 'empty-node::'+b.box_id;
@@ -278,6 +284,14 @@
           }
         });
       });
+      for (const data of Object.values(plain_nodes)) {
+        try {
+          $nodes.push(data.node);
+          for (const edge of Object.values(data.edges)) {
+            _edges.push(edge);
+          }          
+        } catch {}
+      }
       $edges = _edges;
       onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );
     }
