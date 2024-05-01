@@ -2,7 +2,8 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton, type EdgeTypes, type NodeTypes } from '@xyflow/svelte';
-  
+    import { onMount } from 'svelte';
+    
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
@@ -17,10 +18,24 @@
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
+
+    
+
+    let url_params = {};
+
+    // Esta función se ejecuta cuando el componente se monta
+    onMount(() => {
+      // Obtener la URL actual
+      const url = new URL(window.location.href);
+      
+      // Obtener los parámetros de la URL
+      url_params = Object.fromEntries(url.searchParams.entries());
+      fetch_all = url_params?.all === 'true' ?? false;
+    });
         
     
     let connected = false;
-    let fetch_all = false;
+    let fetch_all = true;
     let advance_mode = false;
     let zen_mode = false;
 
@@ -203,6 +218,7 @@
       let _x = 0; let _y = 0;
       let _edges: Edge[] = [];
       let empty_edges: Edge[] = [];
+      console.log(proofs)
       proofs.map(p => {
         $nodes.push({
             id: "proof::"+token_rendered(p),
