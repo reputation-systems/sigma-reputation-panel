@@ -198,9 +198,11 @@
 
     function build_graph(proofs: ReputationProof[]) {
       $nodes = [];
+      $edges = [];
       let plain_nodes: any = {};  // Objects of plain nodes and edges.
       let _x = 0; let _y = 0;
       let _edges: Edge[] = [];
+      let empty_edges: Edge[] = [];
       proofs.map(p => {
         $nodes.push({
             id: "proof::"+token_rendered(p),
@@ -261,19 +263,10 @@
             });
           }
           else {
-            let node_id = 'empty-node::'+b.box_id;
-            $nodes.push({
-              id: node_id,
-              data: {label: ""},
-              type: "circle_type",
-              sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
-              targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
-              position: { x: _x, y: _y },
-            });
-            _edges.push({
+            empty_edges.push({
                 id: 'box-edge::'+b.box_id,
                 source: "proof::"+token_rendered(p),
-                target: node_id,
+                target: "empty-node",
                 data: {
                   box: b.box_id,
                   proportion: percentage_of_tokens,
@@ -291,6 +284,17 @@
             _edges.push(edge);
           }          
         } catch {}
+      }
+      $nodes.push({
+                id: "empty-node",
+                data: {label: ""},
+                type: "circle_type",
+                sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
+                targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
+                position: { x: _x, y: _y },
+              }); 
+      for (const empty_edge of empty_edges) {
+        _edges.push(empty_edge)
       }
       $edges = _edges;
       onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );
