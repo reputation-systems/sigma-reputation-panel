@@ -102,12 +102,11 @@
 </nav>
 {/if}
 
-<svelte:window 
-  on:contextmenu|preventDefault={showMenu ? onPageClick : rightClickContextMenu} 
-  on:click={onPageClick} 
-  on:wheel={onPageClick}
-  on:dblclick={onPageClick}  
-/>
+/* /<svelte:window 
+  on:contextmenu|preventDefault={showMenu ? onPageClick : rightClickContextMenu}
+  on:wheel|preventDefault={onPageClick}
+  on:dblclick|preventDefault={onPageClick}  
+/> 
 
 {#if proof && proof.can_be_spend}
   <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />
