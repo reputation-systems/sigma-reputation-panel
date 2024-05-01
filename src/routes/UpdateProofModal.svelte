@@ -69,14 +69,6 @@ async function fetchReputationProofs(all: boolean = true) {
 				{/each}
 			</select>
 		</div>
-		{#if input_proof_box }
-			<div class="mb-3">
-				<!-- svelte-ignore a11y-label-has-associated-control -->
-				<label class="form-label">Token amount<span class="required">*</span></label>
-				<span style="align-self: flex-end;">Up to: {input_proof_box.token_amount}</span>
-				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" />
-			</div>
-		{/if}
 		{#if input_proof_box}
 			<div class="mb-3">
 				<label for="object_to_assign" class="form-label">Object to assign reputation</label>
@@ -99,6 +91,12 @@ async function fetchReputationProofs(all: boolean = true) {
 						{/each}
 					</select>
 				{/if}
+			</div>
+			<div class="mb-3">
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+				<label class="form-label">Token amount<span class="required">*</span></label>
+				<span style="align-self: flex-end;">Up to: {input_proof_box.token_amount}</span>
+				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" />
 			</div>
 		{/if}
 		</form>

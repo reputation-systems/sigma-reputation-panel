@@ -60,36 +60,36 @@
 	  <h2 class="modal-title" id="generateReputationLabel">Generate new reputation proof</h2>
 	  <hr />
 	  <form id="reputationForm">
-		<div class="mb-3">
-			<label for="reputationTokenAmount" class="form-label">Token amount<span class="required">*</span></label>
-			<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
-		</div>
-		<div class="mb-3">
-			<label for="reputationTokenTag" class="form-label">Tags<span class="required">*</span></label>
-			<input type="text" class="form-control" bind:value={tags} />
-		</div>
-		<div class="mb-3">
-			<label for="object_to_assign" class="form-label">Object to assign all the reputation</label>
-			<select class="form-select" bind:value={object_type_to_assign}  on:change={handleInputProofChange}>
-				<option value={ObjectType.PlainText}>Plain text</option>
-				<option value={ObjectType.ProofByToken}>Other reputation proof</option>
-			</select>
-			{#if object_type_to_assign == ObjectType.PlainText}
-				<input type="text" class="form-control" bind:value={object_to_assign} />
-			{/if}
-			{#if object_type_to_assign == ObjectType.ProofByToken}
-				<select class="form-select" bind:value={object_to_assign}>
-					{#each unspend_reputation_proofs as option (option.token_id)}
-						{#if input_proof?.token_id !== option.token_id}
-							<option value={option.token_id}>
-								{option.token_id.slice(0, 10)}
-								{#if option.can_be_spend}(yours){/if}
-							</option>
-						{/if}
-					{/each}
+			<div class="mb-3">
+				<label for="reputationTokenTag" class="form-label">Tags<span class="required">*</span></label>
+				<input type="text" class="form-control" bind:value={tags} />
+			</div>
+			<div class="mb-3">
+				<label for="object_to_assign" class="form-label">Object to assign all the reputation</label>
+				<select class="form-select" bind:value={object_type_to_assign}  on:change={handleInputProofChange}>
+					<option value={ObjectType.PlainText}>Plain text</option>
+					<option value={ObjectType.ProofByToken}>Other reputation proof</option>
 				</select>
-			{/if}
-		</div>
+				{#if object_type_to_assign == ObjectType.PlainText}
+					<input type="text" class="form-control" bind:value={object_to_assign} />
+				{/if}
+				{#if object_type_to_assign == ObjectType.ProofByToken}
+					<select class="form-select" bind:value={object_to_assign}>
+						{#each unspend_reputation_proofs as option (option.token_id)}
+							{#if input_proof?.token_id !== option.token_id}
+								<option value={option.token_id}>
+									{option.token_id.slice(0, 10)}
+									{#if option.can_be_spend}(yours){/if}
+								</option>
+							{/if}
+						{/each}
+					</select>
+				{/if}
+			</div>
+			<div class="mb-3">
+				<label for="reputationTokenAmount" class="form-label">Token amount<span class="required">*</span></label>
+				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
+			</div>
 		</form>
 		<hr />
 		<!-- svelte-ignore a11y-autofocus -->
