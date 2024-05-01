@@ -61,14 +61,14 @@
       // Implement the logic for updating here
       showForm = true;
   }
-  let menuItems = [
+  let menuItems = proof?.can_be_spend ? [
       {
           'name': 'updateItem',
           'onClick': updateItem,
           'displayText': "Update",
           'class': 'fa-solid fa-pencil-alt'
       }
-  ]
+  ] : []
 
 </script>
 <svelte:head>
@@ -109,7 +109,7 @@
   on:dblclick={onPageClick}  
 />
 
-{#if proof}
+{#if proof && proof.can_be_spend}
   <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />
 {/if}
 
