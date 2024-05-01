@@ -181,6 +181,7 @@
           }
         }        
       } else {
+        // If value is null, it serves as getter.
         switch (key) {
           case "zen": {
             return zen_mode;
