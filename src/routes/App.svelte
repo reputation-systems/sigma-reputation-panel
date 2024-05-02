@@ -104,7 +104,10 @@
     }
     
     $: if (connected) { fetchReputationProofs(); }
-    $: if (searchQuery.length > 0) { console.log("Needs to filter.") }
+    $: {
+      search = searchQuery;
+      fetchReputationProofs(); 
+    }
 
     // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
 
