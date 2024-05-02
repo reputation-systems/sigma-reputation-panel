@@ -77,7 +77,7 @@ async function fetchReputationProofs(all: boolean = true) {
 					<option value={ObjectType.ProofByToken}>Other reputation proof</option>
 				</select>
 				{#if object_type_to_assign == ObjectType.PlainText}
-					<input type="text" class="form-control" bind:value={object_to_assign} />
+					<input type="text" class="form-control" bind:value={object_to_assign} style="max-width: 97%;"/>
 				{/if}
 				{#if object_type_to_assign == ObjectType.ProofByToken}
 					<select class="form-select" bind:value={object_to_assign}>
@@ -96,7 +96,7 @@ async function fetchReputationProofs(all: boolean = true) {
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="form-label">Token amount<span class="required">*</span></label>
 				<span style="align-self: flex-end;">Up to: {input_proof_box.token_amount}</span>
-				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" />
+				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" style="max-width: 97%;"/>
 			</div>
 		{/if}
 		</form>

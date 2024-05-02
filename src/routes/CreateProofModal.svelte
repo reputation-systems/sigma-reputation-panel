@@ -62,7 +62,7 @@
 	  <form id="reputationForm">
 			<div class="mb-3">
 				<label for="reputationTokenTag" class="form-label">Tags<span class="required">*</span></label>
-				<input type="text" class="form-control" bind:value={tags} />
+				<input type="text" class="form-control" bind:value={tags} style="max-width: 97%;"/>
 			</div>
 			<div class="mb-3">
 				<label for="object_to_assign" class="form-label">Object to assign all the reputation</label>
@@ -71,7 +71,7 @@
 					<option value={ObjectType.ProofByToken}>Other reputation proof</option>
 				</select>
 				{#if object_type_to_assign == ObjectType.PlainText}
-					<input type="text" class="form-control" bind:value={object_to_assign} />
+					<input type="text" class="form-control" bind:value={object_to_assign} style="max-width: 97%;"/>
 				{/if}
 				{#if object_type_to_assign == ObjectType.ProofByToken}
 					<select class="form-select" bind:value={object_to_assign}>
@@ -88,7 +88,7 @@
 			</div>
 			<div class="mb-3">
 				<label for="reputationTokenAmount" class="form-label">Token amount<span class="required">*</span></label>
-				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
+				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} style="max-width: 97%;"/>
 			</div>
 		</form>
 		<hr />

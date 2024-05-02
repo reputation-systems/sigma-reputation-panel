@@ -59,7 +59,7 @@
 		</div>
 		<div class="mb-3">
 		  <label for="reputationToken" class="form-label">Token amount<span class="required">*</span></label>
-		  <input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} />
+		  <input type="number" min="0" style="max-width: 97%;" class="form-control" bind:value={reputationTokenAmount} />
 		</div>
 	  </form>
 	  <hr />
