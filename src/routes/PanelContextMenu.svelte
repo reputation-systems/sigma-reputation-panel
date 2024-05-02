@@ -15,6 +15,7 @@
     let showForm = false;
     let showSetting = false;
     export let setter: CallableFunction;
+    export let searchQuery: string = "";
 
 
     function rightClickContextMenu(e){
@@ -113,7 +114,7 @@
 <svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
 
 <FormModal bind:showModal={showForm} />
-<Search bind:showSearch />
+<Search bind:showSearch bind:input={searchQuery} />
 <SettingModal bind:showModal={showSetting} bind:setter />
 
 

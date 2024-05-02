@@ -39,6 +39,7 @@
     let advance_mode = false;
     let zen_mode = false;
 
+    let searchQuery = "";
 
     // MENUS LOGIC
 
@@ -101,6 +102,7 @@
     }
     
     $: if (connected) { fetchReputationProofs(); }
+    $: if (searchQuery.length > 0) { console.log("Needs to filter.") }
 
     // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
 
@@ -350,7 +352,7 @@
         proof={rightNodeMenu.proof ?? null}
       />
     {:else}
-      <PanelContextMenu setter={setter} />
+      <PanelContextMenu setter={setter} bind:searchQuery />
     {/if}
     
   </div>

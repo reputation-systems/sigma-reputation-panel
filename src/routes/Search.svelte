@@ -2,18 +2,23 @@
 
 	export let showSearch: any; // boolean
 	let dialog: any; // HTMLDialogElement
+	export let input: string
+
+	function close() {
+		showSearch = false;
+	}
 
 	$: if (dialog && showSearch) dialog.showModal();
 
   </script>
   
   <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-  <dialog bind:this={dialog} on:close={() => (showSearch = false)} on:click|self={() => dialog.close()}>
+  <dialog bind:this={dialog} on:close={() => close()} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
 	  <h2 class="modal-title" id="generateReputationLabel">Search ....</h2>
 	  <form >
-		<input/>
+		<input bind:value={input} on:input={() => console.log(input)}/>
 	  </form>
 	</div>
   </dialog>
