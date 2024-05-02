@@ -31,6 +31,7 @@
       // Obtener los parámetros de la URL
       url_params = Object.fromEntries(url.searchParams.entries());
       fetch_all = url_params?.all === 'true' ?? false;
+      search = url_params?.search;
     });
         
     
@@ -39,6 +40,7 @@
     let advance_mode = false;
     let zen_mode = false;
 
+    let search = "";
     let searchQuery = "";
 
     // MENUS LOGIC
@@ -93,7 +95,7 @@
     
     async function fetchReputationProofs() {
       try {
-        const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all);
+        const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all, search);
         const unspend_reputation_proofs = data;
         build_graph(unspend_reputation_proofs);
       } catch (error) {

@@ -49,7 +49,7 @@ export async function getUnconfirmed(explorer_uri: string, ergo: any)
     }
 }
 
-export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean): Promise<ReputationProof[]> 
+export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string|null): Promise<ReputationProof[]> 
 {
     try {
         let params = {
@@ -59,16 +59,21 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         let proofs = new Map<string, ReputationProof>();
         let moreDataAvailable = true;
 
-        // const r4 = stringToRendered(reputation_token_label);
         const r7 = serializedToRendered(generate_pk_proposition((await ergo.get_change_address())));
-       /* const registers = all ? { "R4": r4 } : {
-            "R4":  r4,
-            "R7":  r7
-        }; */
-
-        const registers = all ? {} : {
-            "R7":  r7
-        };
+        let registers = {}
+        if (search) {
+            const r4 = stringToRendered(search);
+            registers = all ? { "R4": r4 } : {
+                "R4":  r4,
+                "R7":  r7
+            };
+        } 
+        else {
+            registers = all ? {} : {
+                "R7":  r7
+            };
+    
+        }
 
         while (moreDataAvailable) {
             const url = explorer_uri+'/api/v1/boxes/unspent/search';
