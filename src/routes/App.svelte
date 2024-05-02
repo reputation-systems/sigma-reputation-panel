@@ -41,7 +41,7 @@
     let zen_mode = false;
 
     let search = "";
-    let searchQuery = "";
+    let search_input_value = "";
 
     // MENUS LOGIC
 
@@ -105,7 +105,7 @@
     
     $: if (connected) { fetchReputationProofs(); }
     $: {
-      search = searchQuery;
+      search = search_input_value;
       fetchReputationProofs(); 
     }
 
@@ -333,7 +333,7 @@
       style="background: #1A192B" fitView
     >
       <Background />
-      <Header bind:zen_mode/>
+      <Header bind:zen_mode bind:search/>
       {#if !zen_mode}  
         <Controls
           showLock={advance_mode}
@@ -357,7 +357,7 @@
         proof={rightNodeMenu.proof ?? null}
       />
     {:else}
-      <PanelContextMenu setter={setter} bind:searchQuery />
+      <PanelContextMenu setter={setter} bind:searchQuery={search_input_value} />
     {/if}
     
   </div>
