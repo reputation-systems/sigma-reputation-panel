@@ -7,7 +7,7 @@
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
+    import { Network, ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
     import Header from './Header.svelte';
@@ -39,6 +39,8 @@
     let fetch_all = true;
     let advance_mode = false;
     let zen_mode = false;
+    let address = "";
+    let network = "";
 
     let search = "";
     let search_input_value = "";
@@ -77,9 +79,11 @@
         if (typeof ergoConnector !== 'undefined') {
         const nautilus = ergoConnector.nautilus;
         if (nautilus) {
-            bind: connected = await nautilus.connect();
+            connected = await nautilus.connect();
             if (connected) {
                 console.log('Connected!');
+                address = await ergo.get_change_address();
+                network = "";
             } else {
                 alert('Not connected!');
             }
@@ -201,6 +205,14 @@
             await fetchReputationProofs();
             break;
           }
+          case "address": {
+            address = value;
+            break;
+          }
+          case "network": {
+            network = value;
+            break;
+          }
         }        
       } else {
         // If value is null, it serves as getter.
@@ -213,6 +225,12 @@
           }
           case "fetch_all": {
             return fetch_all;
+          }
+          case "address": {
+            return address;
+          }
+          case "network": {
+            return network;
           }
         }
       }

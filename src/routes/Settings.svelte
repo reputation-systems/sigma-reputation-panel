@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { Network } from "$lib/ReputationProof";
+
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
   
@@ -6,11 +8,15 @@
     let zen_mode = false;
     let advance_mode = false;
     let fetch_all = false;
+    let network = "";
+    let address = "";
 
     async function refresh() {
       zen_mode = await setter("zen", null);  
       advance_mode = await setter("advance", null);
       fetch_all = await setter("fetch_all", null);
+      network = await setter("network", null);
+      address = await setter("address", null);
       dialog.showModal();
     }
 
@@ -25,6 +31,20 @@
       <h2 class="modal-title" id="settingsLabel">Settings</h2>
       <hr />
       <form class="modal" id="settingsForm">
+        <div style="margin-bottom: 20px;">
+          <h3>Networks</h3>
+          <label>
+            <a>Address {address}</a>
+          </label>
+          <br>
+          <label>
+            <span class="ml">Network</span>
+            <select bind:value={network}>
+              <option value={Network.ErgoTestnet}>Testnet</option>
+              <option value={Network.ErgoMainnet}>Mainnet</option>
+            </select>
+          </label>
+        </div>
         <div style="margin-bottom: 20px;">
           <h3>Panel modes</h3>
           <label>
@@ -52,8 +72,8 @@
 
 <style>
 	dialog {
-    width: 300px;
-	  border-radius: 0.05em;
+    width: 600px;
+	  border-radius: 1em;
 	  padding: 1em;
 	  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 	}
