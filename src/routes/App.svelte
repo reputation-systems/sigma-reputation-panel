@@ -19,7 +19,11 @@
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
 
-    
+    import init, { hello_browser } from "$lib/reputation-graph/reputation_graph";
+
+    onMount(async () => {
+      await init();
+    });
 
     let url_params = {};
 
@@ -84,6 +88,7 @@
                 console.log('Connected!');
                 address = await ergo.get_change_address();
                 network = "";
+                console.log("hello browser -> ", hello_browser())
             } else {
                 alert('Not connected!');
             }
