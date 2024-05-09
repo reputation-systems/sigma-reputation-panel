@@ -19,10 +19,6 @@
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
 
-    onMount(async () => {
-      await init();
-    });
-
     let url_params = {};
 
     // Esta función se ejecuta cuando el componente se monta
