@@ -2,6 +2,7 @@
 
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import type { ReputationProof } from "$lib/ReputationProof";
+    import ComputeSearchModal from "./ComputeSearchModal.svelte";
 
   
   export let onClick: () => void;
@@ -18,6 +19,7 @@
   let browser = { h: 0, y: 0 }
   let showMenu = false;
   let showForm = false;
+  let showComputeSearch = false;
 
 
   function rightClickContextMenu(e){
@@ -61,12 +63,21 @@
       // Implement the logic for updating here
       showForm = true;
   }
+  function computeItem(){
+    showComputeSearch = true;
+  }
   let menuItems = proof?.can_be_spend ? [
       {
           'name': 'updateItem',
           'onClick': updateItem,
           'displayText': "Update",
           'class': 'fa-solid fa-pencil-alt'
+      },
+      {
+          'name': 'computeItem',
+          'onClick': computeItem,
+          'displayText': "Compute",
+          'class': 'fa-solid fa-calculator'
       }
   ] : []
 
@@ -110,6 +121,10 @@
 
 {#if proof && proof.can_be_spend}
   <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />
+{/if}
+
+{#if proof}
+    <ComputeSearchModal bind:showModal={showComputeSearch} bind:proof={proof} />
 {/if}
 
 <style>
