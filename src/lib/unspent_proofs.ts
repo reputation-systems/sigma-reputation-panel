@@ -49,7 +49,7 @@ export async function getUnconfirmed(explorer_uri: string, ergo: any)
     }
 }
 
-export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string|null): Promise<ReputationProof[]> 
+export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string|null): Promise<Map<string, ReputationProof>> 
 {
     try {
         let params = {
@@ -148,12 +148,12 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
             } 
             else {
                 console.error('Error al realizar la solicitud POST');
-                return [];
+                return new Map();
             }
         }
-        return Array.from(proofs.values());
+        return proofs;
     } catch (error) {
         console.error('Error al procesar la solicitud POST:', error);
-        return [];
+        return new Map();
     }
 }

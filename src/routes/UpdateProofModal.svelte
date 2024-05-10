@@ -44,8 +44,8 @@ function generateReputationProof() {
 
 async function fetchReputationProofs(all: boolean = true) {
 	try {
-		const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, all);
-		unspend_reputation_proofs = data;
+		const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, all, null);
+		unspend_reputation_proofs = Array.from(data.values());
 	} catch (error) {
 		console.error(error);
 	}

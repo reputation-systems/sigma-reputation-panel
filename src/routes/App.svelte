@@ -33,6 +33,7 @@
     });
         
     
+    let proofs: Map<string, ReputationProof>;
     let connected = false;
     let fetch_all = true;
     let advance_mode = false;
@@ -97,9 +98,8 @@
     
     async function fetchReputationProofs() {
       try {
-        const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all, search);
-        const unspend_reputation_proofs = data;
-        build_graph(unspend_reputation_proofs);
+        proofs = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all, search);
+        build_graph(Array.from(proofs.values()));
       } catch (error) {
         console.error(error);
       }
@@ -371,6 +371,7 @@
       <NodeContextMenu
         onClick={handlePaneClick}
         proof={rightNodeMenu.proof ?? null}
+        proofs={proofs}
       />
     {:else}
       <PanelContextMenu setter={setter} bind:searchQuery={search_input_value} />

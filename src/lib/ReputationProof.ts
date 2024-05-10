@@ -54,6 +54,7 @@ export function compute(proofs: Map<string, ReputationProof>, proof: ReputationP
 }
 
 function computePointerReputation(proofs: Map<string, ReputationProof>, box: RPBox, object_type: ObjectType, object_value: string): number {
+    // TODO, OBJECT VALUE NEEDS TO BE COMPARED SERIALIZED.
     switch (box.object_type) {
         case ObjectType.ProofByToken:
             if (object_type === ObjectType.ProofByToken && box.object_value === object_value) {

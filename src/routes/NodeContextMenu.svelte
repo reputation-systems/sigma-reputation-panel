@@ -2,9 +2,9 @@
 
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import type { ReputationProof } from "$lib/ReputationProof";
-    import ComputeSearchModal from "./ComputeSearchModal.svelte";
+  import ComputeSearchModal from "./ComputeSearchModal.svelte";
 
-  
+  export let proofs: Map<string, ReputationProof>
   export let onClick: () => void;
   export let proof: ReputationProof|null;
 
@@ -124,7 +124,7 @@
 {/if}
 
 {#if proof}
-    <ComputeSearchModal bind:showModal={showComputeSearch} bind:proof={proof} />
+    <ComputeSearchModal proofs={proofs} bind:showModal={showComputeSearch} bind:proof={proof} />
 {/if}
 
 <style>
