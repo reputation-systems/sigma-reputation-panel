@@ -14,7 +14,13 @@
 	}
 
 	function computeResult() {
-		result = compute(proofs, proof, ObjectType.PlainText, stringToRendered(input));
+		const renderedProofs = new Map<string, ReputationProof>();
+		proofs.forEach((value, key) => {
+			const renderedKey = stringToRendered(key);
+			renderedProofs.set(renderedKey, value);
+		});
+		result = compute(renderedProofs, proof, ObjectType.PlainText, stringToRendered(input), 2);
+		console.log("FINAL RESULT -> ", result)
 	}
 
 	$: if (dialog && showModal) dialog.showModal();

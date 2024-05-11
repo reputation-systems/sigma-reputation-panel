@@ -45,21 +45,22 @@ export enum Network {
     BitcoinMainnet = "btc-mainnet"
 }
 
-export function compute(proofs: Map<string, ReputationProof>, proof: ReputationProof, object_type: ObjectType, object_value: string): number {
+export function compute(proofs: Map<string, ReputationProof>, proof: ReputationProof, object_type: ObjectType, object_value: string, deep_level: number): number {
     return proof.current_boxes.reduce((total, box) => {
         const proportion = box.token_amount / proof.total_amount;
-        const boxReputation = proportion * computePointerReputation(proofs, box, object_type, object_value);
+        const boxReputation = proportion * computePointerReputation(proofs, box, object_type, object_value, deep_level);
+        console.log(box.box_id, boxReputation)
         return total + boxReputation;
     }, 0);
 }
 
-function computePointerReputation(proofs: Map<string, ReputationProof>, box: RPBox, object_type: ObjectType, object_value: string): number {
+function computePointerReputation(proofs: Map<string, ReputationProof>, box: RPBox, object_type: ObjectType, object_value: string, deep_level: number): number {
     switch (box.object_type) {
         case ObjectType.ProofByToken:
             if (object_type === ObjectType.ProofByToken && box.object_value === object_value) {
                 return 1.00;
             } else if (box.object_value && proofs.has(box.object_value)) {
-                return compute(proofs, proofs.get(box.object_value)!, object_type, object_value);
+                return deep_level <= 0 ? 0.00 : compute(proofs, proofs.get(box.object_value)!, object_type, object_value, deep_level-1);
             } else {
                 return 0.00;
             }
