@@ -67,20 +67,22 @@
   function computeItem(){
     showComputeSearch = true;
   }
-  let menuItems = proof?.can_be_spend ? [
-      {
-          'name': 'updateItem',
-          'onClick': updateItem,
-          'displayText': "Update",
-          'class': 'fa-solid fa-pencil-alt'
-      },
-      {
-          'name': 'computeItem',
-          'onClick': computeItem,
-          'displayText': "Calculate",
-          'class': 'fa-solid fa-calculator'
-      }
-  ] : []
+  let menuItems = (proof?.can_be_spend ? [
+        {
+            'name': 'updateItem',
+            'onClick': updateItem,
+            'displayText': "Update",
+            'class': 'fa-solid fa-pencil-alt'
+        }
+    ] : []).concat([
+        {
+            'name': 'computeItem',
+            'onClick': computeItem,
+            'displayText': "Calculate",
+            'class': 'fa-solid fa-calculator'
+        }
+    ]);
+
 
 </script>
 <svelte:head>
