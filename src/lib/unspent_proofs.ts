@@ -149,13 +149,13 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 params.offset += params.limit;
             } 
             else {
-                console.error('Error al realizar la solicitud POST');
+                console.error('Error while making the POST request');
                 return new Map();
             }
         }
         return proofs;
     } catch (error) {
-        console.error('Error al procesar la solicitud POST:', error);
+        console.error('Error while making the POST request:', error);
         return new Map();
     }
 }
