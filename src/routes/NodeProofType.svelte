@@ -81,7 +81,7 @@
       {#if proof && proof.tag}
       {#each proof.tag.split(';') as tag}
         <span class="tag">
-          { tag }
+          { tag.toLowerCase().replace(/\s+/g, '-') }
         </span>
       {/each}
     {/if}

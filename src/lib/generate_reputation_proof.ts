@@ -25,7 +25,8 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     const inputs = input_proof ?  [...(await ergo.get_utxos()), input_proof?.box] : await ergo.get_utxos();
     let outputs: OutputBuilder[] = [];
 
-    const reputation_token_label = tags ?? "RPT";
+    const formatted_tags = tags !== undefined ? tags.toLowerCase().replace(/\s+/g, '-') : null;
+    const reputation_token_label = formatted_tags ?? "reputation-proof-token";    
 
     // Output builder
     const new_proof_output = new OutputBuilder(
