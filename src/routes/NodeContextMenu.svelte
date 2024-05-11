@@ -76,7 +76,7 @@
       {
           'name': 'computeItem',
           'onClick': computeItem,
-          'displayText': "Compute",
+          'displayText': "Calculate",
           'class': 'fa-solid fa-calculator'
       }
   ] : []

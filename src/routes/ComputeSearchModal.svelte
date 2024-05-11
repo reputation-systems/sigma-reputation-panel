@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ObjectType, compute, type ReputationProof } from "$lib/ReputationProof";
+    import { stringToRendered, stringToSerialized } from "$lib/utils";
 
 	export let proofs: Map<string, ReputationProof>
 	export let proof: ReputationProof;
@@ -13,8 +14,7 @@
 	}
 
 	function computeResult() {
-		result = compute(proofs, proof, ObjectType.PlainText, input);
-		console.log("result -> ", result);
+		result = compute(proofs, proof, ObjectType.PlainText, stringToRendered(input));
 	}
 
 	$: if (dialog && showModal) dialog.showModal();
