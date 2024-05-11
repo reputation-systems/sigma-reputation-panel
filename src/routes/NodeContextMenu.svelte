@@ -7,6 +7,7 @@
   export let proofs: Map<string, ReputationProof>
   export let onClick: () => void;
   export let proof: ReputationProof|null;
+  export let compute_deep_level: number|null;
 
 
   let local_id: string = proof ? proof.token_id.slice(0, 10) : ""; 
@@ -123,8 +124,8 @@
   <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />
 {/if}
 
-{#if proof}
-    <ComputeSearchModal proofs={proofs} bind:showModal={showComputeSearch} bind:proof={proof} />
+{#if proof && compute_deep_level}
+    <ComputeSearchModal proofs={proofs} bind:showModal={showComputeSearch} bind:proof={proof} bind:compute_deep_level={compute_deep_level} />
 {/if}
 
 <style>

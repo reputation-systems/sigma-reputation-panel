@@ -46,10 +46,10 @@ export enum Network {
 }
 
 export function compute(proofs: Map<string, ReputationProof>, proof: ReputationProof, object_type: ObjectType, object_value: string, deep_level: number): number {
+    console.log("Compute deep_level ", deep_level, " on ", proof.token_id)
     return proof.current_boxes.reduce((total, box) => {
         const proportion = box.token_amount / proof.total_amount;
         const boxReputation = proportion * computePointerReputation(proofs, box, object_type, object_value, deep_level);
-        console.log(box.box_id, boxReputation)
         return total + boxReputation;
     }, 0);
 }

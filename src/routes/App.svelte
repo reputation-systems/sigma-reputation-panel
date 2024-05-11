@@ -7,7 +7,7 @@
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { Network, ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
+    import { ObjectType, compute, token_rendered, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
     import Header from './Header.svelte';
@@ -40,6 +40,7 @@
     let zen_mode = false;
     let address = "";
     let network = "";
+    let compute_deep_level = 5;
 
     let search = "";
     let search_input_value = "";
@@ -211,7 +212,11 @@
             network = value;
             break;
           }
-        }        
+          case "compute_deep_level": {
+            compute_deep_level = value;
+            break;
+          }
+        }
       } else {
         // If value is null, it serves as getter.
         switch (key) {
@@ -229,6 +234,9 @@
           }
           case "network": {
             return network;
+          }
+          case "compute_deep_level": {
+            return compute_deep_level;
           }
         }
       }
@@ -372,6 +380,7 @@
         onClick={handlePaneClick}
         proof={rightNodeMenu.proof ?? null}
         proofs={proofs}
+        compute_deep_level={compute_deep_level}
       />
     {:else}
       <PanelContextMenu setter={setter} bind:searchQuery={search_input_value} />

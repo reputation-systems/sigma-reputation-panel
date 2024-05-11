@@ -10,6 +10,7 @@
     let fetch_all = false;
     let network = "";
     let address = "";
+    let compute_deep_level = 5;
 
     async function refresh() {
       zen_mode = await setter("zen", null);  
@@ -17,6 +18,7 @@
       fetch_all = await setter("fetch_all", null);
       network = await setter("network", null);
       address = await setter("address", null);
+      compute_deep_level = await setter("compute_deep_level", null);
       dialog.showModal();
     }
 
@@ -33,7 +35,9 @@
       <form class="modal" id="settingsForm">
         <div style="margin-bottom: 20px;">
           <h3>Networks</h3>
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label>
+            <!-- svelte-ignore a11y-missing-attribute -->
             <a>Address {address}</a>
           </label>
           <br>
@@ -63,6 +67,11 @@
           <label>
             <input type="checkbox" bind:checked={fetch_all} on:change={() => setter("fetch_all", fetch_all)}>
             <span class="ml">Fetch all network's proofs</span>
+          </label>
+          <br>
+          <label>
+            <input type="number" bind:value={compute_deep_level} on:change={() => setter("compute_deep_level", compute_deep_level)}>
+            <span class="ml">Compute deep level</span>
           </label>
         </div>
       </form>

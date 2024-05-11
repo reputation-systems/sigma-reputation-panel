@@ -1,7 +1,8 @@
 <script lang="ts">
     import { ObjectType, compute, type ReputationProof } from "$lib/ReputationProof";
-    import { stringToRendered, stringToSerialized } from "$lib/utils";
+    import { stringToRendered } from "$lib/utils";
 
+	export let compute_deep_level: number;
 	export let proofs: Map<string, ReputationProof>
 	export let proof: ReputationProof;
 	export let showModal: any; // boolean
@@ -19,8 +20,7 @@
 			const renderedKey = stringToRendered(key);
 			renderedProofs.set(renderedKey, value);
 		});
-		result = compute(renderedProofs, proof, ObjectType.PlainText, stringToRendered(input), 2);
-		console.log("FINAL RESULT -> ", result)
+		result = compute(renderedProofs, proof, ObjectType.PlainText, stringToRendered(input), compute_deep_level);
 	}
 
 	$: if (dialog && showModal) dialog.showModal();
@@ -35,7 +35,7 @@
 			<input bind:value={input} on:input={() => console.log(input)}/>
 			<button type="button" on:click={computeResult}>Compute</button>
 		</form>
-		{#if result}
+		{#if result !== null}
 			<!-- svelte-ignore a11y-missing-attribute -->
 			<a>Result: {result}</a>
 		{/if}
