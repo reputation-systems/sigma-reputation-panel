@@ -61,14 +61,6 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
 
         const r7 = serializedToRendered(generate_pk_proposition((await ergo.get_change_address())));
         let registers = {}
-        /* if (search) {
-            const r4 = stringToRendered(search);
-            registers = all ? { "R4": r4 } : {
-                "R4":  r4,
-                "R7":  r7
-            };
-        }  */
-
         if (search) {
             const r5 = stringToRendered(ObjectType.PlainText);
             const r6 = stringToRendered(search);
