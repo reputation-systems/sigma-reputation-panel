@@ -1,10 +1,11 @@
 <script lang="ts">
-    import { searchStore } from "$lib/store";
+    import { address, searchStore } from "$lib/store";
 
     const icon_route = "https://as2.ftcdn.net/v2/jpg/01/09/46/77/1000_F_109467785_eeYWH2tY4CnkDl9BtuYO6hWjk7hH0okU.jpg"
 
     export let show_app: boolean = false;
     let searchQuery: string = "";
+    let showMessage = false;
 
     function searchOnClick() {
         show_app = true;
@@ -16,7 +17,36 @@
             searchOnClick();
         }
     }
+
+    function copyToClipboard() {
+        const textToCopy = $address ?? ""; // Assuming $address contains the wallet address
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                showMessage = true;
+                setTimeout(() => {
+                    showMessage = false;
+                }, 5000); // Hide message after 3 seconds
+            })
+            .catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+    }
 </script>
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+{#if $address}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div class="identifier" id="walletIdentifier" on:click={copyToClipboard}>
+        <p>Wallet: {($address.slice(0, 6) + '...' + $address.slice(-4))}</p>
+    </div>
+{/if}
+
+{#if showMessage}
+    <div class="message">
+        <p>Wallet address copied to clipboard!</p>
+    </div>
+{/if}
 
 <div>
     <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank">
@@ -77,4 +107,30 @@
         transform: translateY(-50%);
         cursor: pointer;
     }
+
+    /* Styling for identifier */
+    .identifier {
+        position: absolute;
+        top: 20px;
+        right: calc(20px + 60px); /* Adjusting for GitHub logo width */
+        z-index: 998; /* Ensuring it's below GitHub logo */
+        color: white;
+        font-weight: bold;
+        border: 2px solid white;
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+
+    .message {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1000;
+    }
+
 </style>
