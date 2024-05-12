@@ -1,12 +1,11 @@
 <script lang="ts">
     import { ObjectType, compute, type ReputationProof } from "$lib/ReputationProof";
-    import { compute_deep_level } from "$lib/store";
+    import { compute_deep_level, proofs } from "$lib/store";
     import { stringToRendered } from "$lib/utils";
 
-	export let proofs: Map<string, ReputationProof>
 	export let proof: ReputationProof;
-	export let showModal: any; // boolean
-	let dialog: any; // HTMLDialogElement
+	export let showModal: any;
+	let dialog: any;
 	let input: string = ""
 	let result: number|null = null;
 
@@ -16,7 +15,7 @@
 
 	function computeResult() {
 		const renderedProofs = new Map<string, ReputationProof>();
-		proofs.forEach((value, key) => {
+		$proofs.forEach((value, key) => {
 			const renderedKey = stringToRendered(key);
 			renderedProofs.set(renderedKey, value);
 		});
@@ -32,8 +31,8 @@
 	<div on:click|stopPropagation>
 		<h2 class="modal-title" id="generateReputationLabel">Compute {proof.token_id.slice(0, 10)} to ...</h2>
 		<form>
-			<input bind:value={input} on:input={() => console.log(input)}/>
-			<button type="button" on:click={computeResult}>Compute</button>
+			<input bind:value={input}/>
+			<button type="button" on:click={computeResult}>Calculate</button>
 		</form>
 		{#if result !== null}
 			<!-- svelte-ignore a11y-missing-attribute -->

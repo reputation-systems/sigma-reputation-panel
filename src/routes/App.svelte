@@ -17,12 +17,7 @@
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
-    import { advance_mode, connected, fetch_all, searchStore } from '$lib/store';
-        
-    
-    let proofs: Map<string, ReputationProof>;
-
-    // MENUS LOGIC
+    import { advance_mode, connected, fetch_all, proofs, searchStore } from '$lib/store';
 
     let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
     let width: number;
@@ -52,8 +47,8 @@
     
     async function fetchReputationProofs() {
       try {
-        proofs = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, $fetch_all, $searchStore);
-        build_graph(Array.from(proofs.values()));
+        proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, $fetch_all, $searchStore));
+        build_graph(Array.from($proofs.values()));
       } catch (error) {
         console.error(error);
       }
@@ -143,15 +138,14 @@
       }
     }
 
-    function build_graph(proofs: ReputationProof[]) {
+    function build_graph(_proofs: ReputationProof[]) {
       $nodes = [];
       $edges = [];
       let plain_nodes: any = {};  // Objects of plain nodes and edges.
       let _x = 0; let _y = 0;
       let _edges: Edge[] = [];
       let empty_edges: Edge[] = [];
-      console.log(proofs)
-      proofs.map(p => {
+      _proofs.map(p => {
         $nodes.push({
             id: "proof::"+token_rendered(p),
             sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
@@ -278,7 +272,6 @@
       <NodeContextMenu
         onClick={handlePaneClick}
         proof={rightNodeMenu.proof ?? null}
-        proofs={proofs}
       />
     {:else}
       <PanelContextMenu />
