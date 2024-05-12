@@ -1,12 +1,11 @@
 <script lang="ts">
+    import { show_app } from "$lib/store";
     import App from "./App.svelte";
     import Main from "./Main.svelte";
 
-    let show_app: boolean = false;
-
 </script>
-{#if show_app}
-<App bind:show_app={show_app}/>
+{#if $show_app}
+    <App />
 {:else}
-<Main bind:show_app={show_app}/>
+    <Main />
 {/if}

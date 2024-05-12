@@ -3,6 +3,7 @@
     import FormModal from "./CreateProofModal.svelte";
     import SettingModal from "./Settings.svelte";
     import Search from "./Search.svelte";
+    import { show_app } from "$lib/store";
     
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
@@ -61,6 +62,9 @@
     function setting(){
         showSetting = true;
     }
+    function back_to_main(){
+        show_app.set(false);
+    }
     let menuItems = [
         {
             'name': 'addItem',
@@ -82,6 +86,12 @@
             'onClick': setting,
             'displayText': "Settings",
             'class': 'fa-solid fa-gear'
+        },
+        {
+            'name': 'main',
+            'onClick': back_to_main,
+            'displayText': "Back to init",
+            'class': 'fa-solid fa-home'
         }
     ]
 

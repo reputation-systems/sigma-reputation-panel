@@ -32,3 +32,4 @@ export const network = writable<string|null>(null);
 export const compute_deep_level = writable<number>(5);
 export const searchStore = writable<string|null>(null);
 export const connected = writable<boolean>(await connectNautilus());
+export const show_app = writable<boolean>(false);

@@ -1,15 +1,14 @@
 <script lang="ts">
-    import { address, searchStore, network } from "$lib/store";
+    import { address, searchStore, network, show_app } from "$lib/store";
 
     const icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
     let networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
 
-    export let show_app: boolean = false;
     let searchQuery: string = "";
     let showMessage = false;
 
     function searchOnClick() {
-        show_app = true;
+        show_app.set(true);
         searchStore.set(searchQuery);
     }
 

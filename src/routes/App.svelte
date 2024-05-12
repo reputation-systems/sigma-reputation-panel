@@ -17,12 +17,10 @@
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
-    import { address, advance_mode, connected, fetch_all, network, searchStore } from '$lib/store';
+    import { advance_mode, connected, fetch_all, searchStore } from '$lib/store';
         
     
     let proofs: Map<string, ReputationProof>;
-
-    export let show_app: boolean = true;
 
     // MENUS LOGIC
 
