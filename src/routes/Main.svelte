@@ -71,7 +71,7 @@
 <div class="container">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="input-wrapper">
-        <input type="text" placeholder="Calculate reputation for ..." bind:value={searchQuery} on:keydown={handleKeyPress}/>
+        <input type="text" placeholder="Check reputation for ..." bind:value={searchQuery} on:keydown={handleKeyPress}/>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span class="search-icon" on:click={searchOnClick}>
