@@ -24,7 +24,7 @@
     let connected = false;
     let fetch_all = true;
     let advance_mode = false;
-    let zen_mode = false;
+    let show_header = false;
     let address = "";
     let network = "";
     let compute_deep_level = 5;
@@ -176,8 +176,8 @@
     async function setter(key: string, value: any|null) {
       if (value !== null) {
         switch (key) {
-          case "zen": {
-            zen_mode = value;
+          case "show_header": {
+            show_header = value;
             break;
           }
           case "advance": {
@@ -205,8 +205,8 @@
       } else {
         // If value is null, it serves as getter.
         switch (key) {
-          case "zen": {
-            return zen_mode;
+          case "show_header": {
+            return show_header;
           }
           case "advance": {
             return advance_mode;
@@ -342,21 +342,19 @@
       style="background: #1A192B" fitView
     >
       <Background />
-      <Header bind:zen_mode/>
-      {#if !zen_mode}  
-        <Controls
-          showLock={advance_mode}
-          showZoom={advance_mode}
-          showFitView={advance_mode}
-        >
-          {#if advance_mode}
-            <ControlButton on:click={() => onLayout('TB')}><i class="fas fa-regular fa-ruler-horizontal"></i></ControlButton>
-            <ControlButton on:click={() => onLayout('LR')}><i class="fas fa-regular fa-ruler-vertical"></i></ControlButton>
-          {/if}
-        </Controls>
+      <Header bind:show_header={show_header}/>
+      <Controls
+        showLock={advance_mode}
+        showZoom={advance_mode}
+        showFitView={advance_mode}
+      >
         {#if advance_mode}
-          <MiniMap />
+          <ControlButton on:click={() => onLayout('TB')}><i class="fas fa-regular fa-ruler-horizontal"></i></ControlButton>
+          <ControlButton on:click={() => onLayout('LR')}><i class="fas fa-regular fa-ruler-vertical"></i></ControlButton>
         {/if}
+      </Controls>
+      {#if advance_mode}
+        <MiniMap />
       {/if}
     </SvelteFlow>
     

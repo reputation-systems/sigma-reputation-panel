@@ -5,7 +5,7 @@
     let dialog: any; // HTMLDialogElement
   
     export let setter: CallableFunction;
-    let zen_mode = false;
+    let show_header = false;
     let advance_mode = false;
     let fetch_all = false;
     let network = "";
@@ -13,7 +13,7 @@
     let compute_deep_level = 5;
 
     async function refresh() {
-      zen_mode = await setter("zen", null);  
+      show_header = await setter("show_header", null);  
       advance_mode = await setter("advance", null);
       fetch_all = await setter("fetch_all", null);
       network = await setter("network", null);
@@ -50,10 +50,10 @@
           </label>
         </div>
         <div style="margin-bottom: 20px;">
-          <h3>Panel modes</h3>
+          <h3>Panel options</h3>
           <label>
-            <input type="checkbox" bind:checked={zen_mode} on:change={() => setter("zen", zen_mode)}>
-            <span class="ml">Zen mode</span>
+            <input type="checkbox" bind:checked={show_header} on:change={() => setter("show_header", show_header)}>
+            <span class="ml">Show header</span>
           </label>
           <br>
           <label>

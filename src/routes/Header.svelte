@@ -1,13 +1,11 @@
 <script lang="ts">
     import { searchStore } from "$lib/searchStore";
 
-  export let zen_mode: boolean;
+  export let show_header: boolean;
 </script>
 
 <div>
-  {#if zen_mode}
-    <!--  -->
-  {:else}
+  {#if show_header}
     <h1 style="background-color: aliceblue; display:inline-block;">Welcome to the Sigma Reputation Panel</h1>
   
     <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank">
