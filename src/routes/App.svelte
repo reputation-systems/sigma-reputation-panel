@@ -67,7 +67,7 @@
       fetchReputationProofs();
     })
 
-    // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
+    // setInterval(() => {if ($connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
 
 
     // GRAPH BUILDER
