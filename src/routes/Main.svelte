@@ -1,11 +1,15 @@
 <script lang="ts">
+    import { connectNautilus } from "$lib/connect";
     import { address, searchStore, network, show_app } from "$lib/store";
+    import { onMount } from "svelte";
 
     const icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
     let networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
 
     let searchQuery: string = "";
     let showMessage = false;
+
+    onMount(() => connectNautilus())
 
     function searchOnClick() {
         show_app.set(true);
