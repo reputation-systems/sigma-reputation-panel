@@ -21,6 +21,8 @@
 
     let url_params = {};
 
+    export let show_app: boolean = true;
+
     // Esta función se ejecuta cuando el componente se monta
     onMount(() => {
       // Obtener la URL actual
@@ -42,7 +44,7 @@
     let network = "";
     let compute_deep_level = 5;
 
-    let search = "";
+    export let search: string|null = "";
     let search_input_value = "";
 
     // MENUS LOGIC
