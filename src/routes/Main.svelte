@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { address, searchStore } from "$lib/store";
+    import { address, searchStore, network } from "$lib/store";
 
-    const icon_route = "https://as2.ftcdn.net/v2/jpg/01/09/46/77/1000_F_109467785_eeYWH2tY4CnkDl9BtuYO6hWjk7hH0okU.jpg"
+    const icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
+    let networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
 
     export let show_app: boolean = false;
     let searchQuery: string = "";
@@ -19,28 +20,42 @@
     }
 
     function copyToClipboard() {
-        const textToCopy = $address ?? ""; // Assuming $address contains the wallet address
+        const textToCopy = $address ?? "";
         navigator.clipboard.writeText(textToCopy)
             .then(() => {
                 showMessage = true;
                 setTimeout(() => {
                     showMessage = false;
-                }, 5000); // Hide message after 3 seconds
+                }, 5000);
             })
             .catch(err => {
                 console.error('Failed to copy: ', err);
             });
+    }
+
+    $: {
+        if ($network === "ergo-testnet" || $network === "ergo-mainnet") {
+            networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
+        } else {
+            networkLogo = "https://placehold.it/50x50";
+        }
     }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if $address}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="identifier" id="walletIdentifier" on:click={copyToClipboard}>
         <p>Wallet: {($address.slice(0, 6) + '...' + $address.slice(-4))}</p>
     </div>
 {/if}
+
+<div class="network" style="display: flex; align-items: center;">
+    <img src={networkLogo} alt="Network Logo" width="25" height="25">
+    {#if $network}
+        <p>{$network}</p>
+    {/if}
+</div>
 
 {#if showMessage}
     <div class="message">
@@ -61,7 +76,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span class="search-icon" on:click={searchOnClick}>
-            <img src={icon_route} alt="Search" width="30" height="30">
+            <img src={icon_route} alt="Search" width="30" height="30" style="margin-bottom: 12px;">
         </span>
     </div>
 </div>
@@ -114,6 +129,19 @@
         top: 20px;
         right: calc(20px + 60px); /* Adjusting for GitHub logo width */
         z-index: 998; /* Ensuring it's below GitHub logo */
+        color: white;
+        font-weight: bold;
+        border: 2px solid white;
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+
+    /* Estilo para el recuadro de $network */
+    .network {
+        position: absolute;
+        top: 20px;
+        right: calc(20px + 60px + 200px); /* Adjusting for GitHub logo width and wallet identifier width */
+        z-index: 997; /* Ensuring it's below wallet identifier */
         color: white;
         font-weight: bold;
         border: 2px solid white;

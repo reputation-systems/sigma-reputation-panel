@@ -7,7 +7,7 @@ async function connectNautilus(): Promise<boolean> {
         if (await nautilus.connect()) {
             console.log('Connected!');
             address.set(await ergo.get_change_address());
-            network.set("");
+            network.set("ergo-testnet");
             return true;
         } else {
             alert('Not connected!');
