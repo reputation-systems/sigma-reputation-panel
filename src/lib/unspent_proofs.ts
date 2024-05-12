@@ -49,6 +49,25 @@ export async function getUnconfirmed(explorer_uri: string, ergo: any)
     }
 }
 
+export async function get_token_total_amount(explorer_uri: string, token_id: string): Promise<number> {
+    try {
+        const response = await fetch(`${explorer_uri}/api/v1/tokens/${token_id}`, {
+            method: 'GET'
+        });
+
+        if (response.ok) {
+            const tokenInfo = await response.json();
+            return tokenInfo.emissionAmount;
+        } else {
+            console.error('Error al realizar la solicitud GET');
+            return 0;
+        }
+    } catch (error) {
+        console.error('Error al procesar la solicitud GET:', error);
+        return 0;
+    }
+}
+
 export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string|null): Promise<Map<string, ReputationProof>> 
 {
     try {
@@ -136,13 +155,12 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                             current_boxes: [], 
                             token_id: token_id,
                             number_of_boxes: 0,
-                            total_amount: 0,
+                            total_amount: await get_token_total_amount(explorer_uri, token_id),
                             network: Network.ErgoTestnet,
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
                             tag: hexToUtf8(r4_value)
                         };
                     _reputation_proof.current_boxes.push(current_box);
-                    _reputation_proof.total_amount += current_box.token_amount;
                     _reputation_proof.number_of_boxes += 1;
                     proofs.set(token_id, _reputation_proof);
                 }                
