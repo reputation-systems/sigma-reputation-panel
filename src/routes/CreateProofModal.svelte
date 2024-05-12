@@ -4,20 +4,20 @@
 	import { explorer_uri, ergo_tree_hash } from '$lib/envs';
 	import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   
-	export let showModal: any; // boolean
-	let dialog: any; // HTMLDialogElement
-  
+	export let showModal: boolean;
+	let dialog: any;
+	let showAdvancedOptions: boolean = false;
+
 	let input_proof: null|ReputationProof;
 	let input_proof_box: null|RPBox;
-	let reputationTokenAmount: number;
+	let reputationTokenAmount: number = 100;
 	let object_to_assign: string;
 	let object_type_to_assign: ObjectType | undefined;
-	let tags: string;
+	let tags: string = "versatile-reputation-proof";
   
 	let unspend_reputation_proofs: ReputationProof[] = [];
 
 	function handleInputProofChange(event: any) {
-		reputationTokenAmount = 0;
 		object_to_assign = "";
 		handleObjectToAssignChange(event);
 	}
@@ -61,10 +61,6 @@
 	  <hr />
 	  <form id="reputationForm">
 			<div class="mb-3">
-				<label for="reputationTokenTag" class="form-label">Tags<span class="required">*</span></label>
-				<input type="text" class="form-control" bind:value={tags} style="max-width: 97%;"/>
-			</div>
-			<div class="mb-3">
 				<label for="object_to_assign" class="form-label">Object to assign all the reputation</label>
 				<select class="form-select" bind:value={object_type_to_assign}  on:change={handleInputProofChange}>
 					<option value={ObjectType.PlainText}>Plain text</option>
@@ -86,10 +82,23 @@
 					</select>
 				{/if}
 			</div>
-			<div class="mb-3">
-				<label for="reputationTokenAmount" class="form-label">Token amount<span class="required">*</span></label>
-				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} style="max-width: 97%;"/>
+
+			<div style="position: relative;">
+				<hr style="border-color: #ccc;">
+				<span on:click={() => showAdvancedOptions = !showAdvancedOptions} style="user-select: none; position: absolute; left: 40%; top: -0.75em; background-color: #fff; padding: 0 0.5em; font-size: 0.75rem;">
+					Advanced Options
+				</span>
 			</div>
+			{#if showAdvancedOptions}
+				<div class="mb-3">
+					<label for="reputationTokenAmount" class="form-label">Token amount</label>
+					<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} style="max-width: 97%;"/>
+				</div>
+				<div class="mb-3">
+					<label for="reputationTokenTag" class="form-label">Tags</label>
+					<input type="text" class="form-control" bind:value={tags} style="max-width: 97%;"/>
+				</div>
+			{/if}
 		</form>
 		<hr />
 		<!-- svelte-ignore a11y-autofocus -->
@@ -144,10 +153,6 @@
   
 	.form-select {
 	  height: 2.5em;
-	}
-  
-	.required {
-	  color: red;
 	}
   
 	.row {
