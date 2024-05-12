@@ -1,6 +1,7 @@
 <script lang="ts">
+    import { searchStore } from "$lib/searchStore";
+
   export let zen_mode: boolean;
-  export let search: string;
 </script>
 
 <div>
@@ -13,10 +14,10 @@
       <img src="https://cdn.icon-icons.com/icons2/844/PNG/512/Github_icon-icons.com_67091.png" alt="GitHub" width="50" height="50">
     </a>  
   {/if}
-  {#if search}
+  {#if $searchStore}
     <br>
     <!-- svelte-ignore a11y-missing-attribute -->
-    <a style="background-color: aliceblue; display:inline-block;">Search: {search}</a>
+    <a style="background-color: aliceblue; display:inline-block;">Search: {$searchStore}</a>
   {/if}  
   </div>
 

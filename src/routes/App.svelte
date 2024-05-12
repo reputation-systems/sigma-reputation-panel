@@ -2,12 +2,11 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton, type EdgeTypes, type NodeTypes } from '@xyflow/svelte';
-    import { onMount } from 'svelte';
     
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { ObjectType, compute, token_rendered, type ReputationProof } from '$lib/ReputationProof';
+    import { ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
     import Header from './Header.svelte';
@@ -18,19 +17,7 @@
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
-
-    let url_params = {};
-
-    // Esta función se ejecuta cuando el componente se monta
-    onMount(() => {
-      // Obtener la URL actual
-      const url = new URL(window.location.href);
-      
-      // Obtener los parámetros de la URL
-      url_params = Object.fromEntries(url.searchParams.entries());
-      fetch_all = url_params?.all === 'true' ?? false;
-      search = url_params?.search;
-    });
+    import { searchStore } from '$lib/searchStore';
         
     
     let proofs: Map<string, ReputationProof>;
@@ -43,8 +30,6 @@
     let compute_deep_level = 5;
 
     export let show_app: boolean = true;
-    export let search: string|null = "";
-    let search_input_value = "";
 
     // MENUS LOGIC
 
@@ -100,7 +85,7 @@
     
     async function fetchReputationProofs() {
       try {
-        proofs = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all, search);
+        proofs = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all, $searchStore);
         build_graph(Array.from(proofs.values()));
       } catch (error) {
         console.error(error);
@@ -108,10 +93,9 @@
     }
     
     $: if (connected) { fetchReputationProofs(); }
-    $: {
-      search = search_input_value;
+    searchStore.subscribe(function () {
       fetchReputationProofs(); 
-    }
+    });
 
     // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
 
@@ -358,7 +342,7 @@
       style="background: #1A192B" fitView
     >
       <Background />
-      <Header bind:zen_mode bind:search/>
+      <Header bind:zen_mode/>
       {#if !zen_mode}  
         <Controls
           showLock={advance_mode}
@@ -384,7 +368,7 @@
         compute_deep_level={compute_deep_level}
       />
     {:else}
-      <PanelContextMenu setter={setter} bind:searchQuery={search_input_value} />
+      <PanelContextMenu setter={setter} />
     {/if}
     
   </div>

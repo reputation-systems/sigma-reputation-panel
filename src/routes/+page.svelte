@@ -3,11 +3,10 @@
     import Main from "./Main.svelte";
 
     let show_app: boolean = false;
-    let search: string|null = null;
 
 </script>
 {#if show_app}
-<App bind:show_app={show_app} search={search}/>
+<App bind:show_app={show_app}/>
 {:else}
-<Main bind:show_app={show_app} search={search}/>
+<Main bind:show_app={show_app}/>
 {/if}

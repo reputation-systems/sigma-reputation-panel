@@ -1,26 +1,32 @@
 <script lang="ts">
+    import { searchStore } from "$lib/searchStore";
+
     export let showSearch: any;
     let dialog: any;
-    export let input: string = "";
-	let mem_input: string = "";
+	let input: string = "";
 
     function close() {
         showSearch = false;
     }
 
     function search() {
-		input = mem_input;
-        console.log(input);
+		searchStore.set(input);
         dialog.close();
     }
 
 	function clear() {
-		mem_input = "";
 		input = "";
+		searchStore.set(null);
 		dialog.close();
 	}
     
-    $: if (dialog && showSearch) dialog.showModal();
+    $: {
+        if (dialog && showSearch) {
+            input = $searchStore ?? "";
+            dialog.showModal();
+        }
+    }
+
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -29,9 +35,9 @@
     <div on:click|stopPropagation>
         <h2 class="modal-title" id="generateReputationLabel">Search ....</h2>
         <form on:submit|preventDefault={search}>
-            <input bind:value={mem_input} />
+            <input bind:value={input} />
             <button type="submit">Search</button>
-            {#if mem_input}
+            {#if input}
                 <button type="button" on:click={() => clear()}>❌</button>
             {/if}
         </form>
