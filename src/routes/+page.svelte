@@ -2,7 +2,7 @@
     import App from "./App.svelte";
     import Main from "./Main.svelte";
 
-    let show_app: boolean = false;
+    let show_app: boolean = true;
     let search: string|null = null;
 
 </script>

@@ -42,6 +42,7 @@
     let network = "";
     let compute_deep_level = 5;
 
+    export let show_app: boolean = true;
     export let search: string|null = "";
     let search_input_value = "";
 
