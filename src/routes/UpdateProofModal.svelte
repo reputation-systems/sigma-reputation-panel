@@ -86,7 +86,8 @@ async function fetchReputationProofs(all: boolean = true) {
 							{#if proof.token_id !== option.token_id}
 								<option value={option.token_id}>
 									{option.token_id.slice(0, 10)}
-									{#if option.can_be_spend}(yours){/if}
+									{#if option.tag}<span class="tag">● {option.tag}</span>{/if}
+									{#if option.can_be_spend}● yours{/if}
 								</option>
 							{/if}
 						{/each}

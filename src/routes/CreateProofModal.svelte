@@ -73,9 +73,10 @@
 					<select class="form-select" bind:value={object_to_assign}>
 						{#each unspend_reputation_proofs as option (option.token_id)}
 							{#if input_proof?.token_id !== option.token_id}
-								<option value={option.token_id}>
-									{option.token_id.slice(0, 10)}
-									{#if option.can_be_spend}(yours){/if}
+								<option class="custom-option" value={option.token_id}>
+									<span class="token-id">{option.token_id.slice(0, 10)}</span>
+									{#if option.tag}<span class="tag">● {option.tag}</span>{/if}
+									{#if option.can_be_spend}● yours{/if}
 								</option>
 							{/if}
 						{/each}
