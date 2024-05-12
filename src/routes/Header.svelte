@@ -1,11 +1,9 @@
 <script lang="ts">
-    import { searchStore } from "$lib/searchStore";
-
-  export let show_header: boolean;
+    import { searchStore, show_header } from "$lib/store";
 </script>
 
 <div>
-  {#if show_header}
+  {#if $show_header}
     <h1 style="background-color: aliceblue; display:inline-block;">Welcome to the Sigma Reputation Panel</h1>
   
     <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank">

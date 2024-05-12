@@ -14,7 +14,6 @@
     let showSearch = false;
     let showForm = false;
     let showSetting = false;
-    export let setter: CallableFunction;
 
 
     function rightClickContextMenu(e){
@@ -60,7 +59,6 @@
         showSearch = true;
     }
     function setting(){
-        console.log("open setting")
         showSetting = true;
     }
     let menuItems = [
@@ -114,7 +112,7 @@
 
 <FormModal bind:showModal={showForm} />
 <Search bind:showSearch />
-<SettingModal bind:showModal={showSetting} bind:setter />
+<SettingModal bind:showModal={showSetting} />
 
 
 <style>

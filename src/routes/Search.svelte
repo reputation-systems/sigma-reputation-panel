@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { searchStore } from "$lib/searchStore";
+    import { searchStore } from "$lib/store";
 
     export let showSearch: any;
     let dialog: any;

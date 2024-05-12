@@ -17,17 +17,10 @@
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
-    import { searchStore } from '$lib/searchStore';
+    import { address, advance_mode, connected, fetch_all, network, searchStore } from '$lib/store';
         
     
     let proofs: Map<string, ReputationProof>;
-    let connected = false;
-    let fetch_all = true;
-    let advance_mode = false;
-    let show_header = false;
-    let address = "";
-    let network = "";
-    let compute_deep_level = 5;
 
     export let show_app: boolean = true;
 
@@ -58,44 +51,23 @@
     function handlePaneClick() {
       rightNodeMenu = null;
     }
-
-    // NETWORK CONNECTION.
-
-    async function connectNautilus() {
-        if (typeof ergoConnector !== 'undefined') {
-        const nautilus = ergoConnector.nautilus;
-        if (nautilus) {
-            connected = await nautilus.connect();
-            if (connected) {
-                console.log('Connected!');
-                address = await ergo.get_change_address();
-                network = "";
-            } else {
-                alert('Not connected!');
-            }
-        } else {
-            alert('Nautilus Wallet is not active');
-        }
-        } else {
-        alert('No wallet available');
-        }
-    }
-
-    if (!connected) { connectNautilus() }
     
     async function fetchReputationProofs() {
       try {
-        proofs = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, fetch_all, $searchStore);
+        proofs = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, $fetch_all, $searchStore);
         build_graph(Array.from(proofs.values()));
       } catch (error) {
         console.error(error);
       }
     }
     
-    $: if (connected) { fetchReputationProofs(); }
+    connected.subscribe(() => fetchReputationProofs())
     searchStore.subscribe(function () {
       fetchReputationProofs(); 
     });
+    fetch_all.subscribe(function () {
+      fetchReputationProofs();
+    })
 
     // setInterval(() => {if (connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
 
@@ -170,60 +142,6 @@
             type: 'unconfirmed'
           });
           onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );        
-      }
-    }
-
-    async function setter(key: string, value: any|null) {
-      if (value !== null) {
-        switch (key) {
-          case "show_header": {
-            show_header = value;
-            break;
-          }
-          case "advance": {
-            advance_mode = value;
-            break;
-          }
-          case "fetch_all": {
-            fetch_all = value;
-            await fetchReputationProofs();
-            break;
-          }
-          case "address": {
-            address = value;
-            break;
-          }
-          case "network": {
-            network = value;
-            break;
-          }
-          case "compute_deep_level": {
-            compute_deep_level = value;
-            break;
-          }
-        }
-      } else {
-        // If value is null, it serves as getter.
-        switch (key) {
-          case "show_header": {
-            return show_header;
-          }
-          case "advance": {
-            return advance_mode;
-          }
-          case "fetch_all": {
-            return fetch_all;
-          }
-          case "address": {
-            return address;
-          }
-          case "network": {
-            return network;
-          }
-          case "compute_deep_level": {
-            return compute_deep_level;
-          }
-        }
       }
     }
 
@@ -342,18 +260,18 @@
       style="background: #1A192B" fitView
     >
       <Background />
-      <Header bind:show_header={show_header}/>
+      <Header/>
       <Controls
-        showLock={advance_mode}
-        showZoom={advance_mode}
-        showFitView={advance_mode}
+        showLock={$advance_mode}
+        showZoom={$advance_mode}
+        showFitView={$advance_mode}
       >
-        {#if advance_mode}
+        {#if $advance_mode}
           <ControlButton on:click={() => onLayout('TB')}><i class="fas fa-regular fa-ruler-horizontal"></i></ControlButton>
           <ControlButton on:click={() => onLayout('LR')}><i class="fas fa-regular fa-ruler-vertical"></i></ControlButton>
         {/if}
       </Controls>
-      {#if advance_mode}
+      {#if $advance_mode}
         <MiniMap />
       {/if}
     </SvelteFlow>
@@ -363,10 +281,9 @@
         onClick={handlePaneClick}
         proof={rightNodeMenu.proof ?? null}
         proofs={proofs}
-        compute_deep_level={compute_deep_level}
       />
     {:else}
-      <PanelContextMenu setter={setter} />
+      <PanelContextMenu />
     {/if}
     
   </div>

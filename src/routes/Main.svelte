@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { searchStore } from "$lib/searchStore";
+    import { searchStore } from "$lib/store";
 
     const icon_route = "https://as2.ftcdn.net/v2/jpg/01/09/46/77/1000_F_109467785_eeYWH2tY4CnkDl9BtuYO6hWjk7hH0okU.jpg"
 

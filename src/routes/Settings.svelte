@@ -1,28 +1,11 @@
 <script lang="ts">
     import { Network } from "$lib/ReputationProof";
+    import { address, network, show_header, fetch_all, advance_mode, compute_deep_level } from "$lib/store";
 
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
-  
-    export let setter: CallableFunction;
-    let show_header = false;
-    let advance_mode = false;
-    let fetch_all = false;
-    let network = "";
-    let address = "";
-    let compute_deep_level = 5;
 
-    async function refresh() {
-      show_header = await setter("show_header", null);  
-      advance_mode = await setter("advance", null);
-      fetch_all = await setter("fetch_all", null);
-      network = await setter("network", null);
-      address = await setter("address", null);
-      compute_deep_level = await setter("compute_deep_level", null);
-      dialog.showModal();
-    }
-
-    $: if (dialog && showModal) refresh()
+    $: if (dialog && showModal) dialog.showModal()
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -38,12 +21,12 @@
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label>
             <!-- svelte-ignore a11y-missing-attribute -->
-            <a>Address {address}</a>
+            <a>Address {$address}</a>
           </label>
           <br>
           <label>
             <span class="ml">Network</span>
-            <select bind:value={network}>
+            <select bind:value={$network}>
               <option value={Network.ErgoTestnet}>Testnet</option>
               <option value={Network.ErgoMainnet}>Mainnet</option>
             </select>
@@ -52,30 +35,29 @@
         <div style="margin-bottom: 20px;">
           <h3>Panel options</h3>
           <label>
-            <input type="checkbox" bind:checked={show_header} on:change={() => setter("show_header", show_header)}>
+            <input type="checkbox" bind:checked={$show_header} on:change={e => show_header.set(e.target.checked)}>
             <span class="ml">Show header</span>
           </label>
           <br>
           <label>
-            <input type="checkbox" bind:checked={advance_mode} on:change={() => setter("advance", advance_mode)}>
+            <input type="checkbox" bind:checked={$advance_mode} on:change={e => advance_mode.set(e.target.checked)}>
             <span class="ml">Advance mode</span>
           </label>
         </div>
-      
+        
         <div>
           <h3>Other options</h3>
           <label>
-            <input type="checkbox" bind:checked={fetch_all} on:change={() => setter("fetch_all", fetch_all)}>
+            <input type="checkbox" bind:checked={$fetch_all} on:change={e => fetch_all.set(e.target.checked)}>
             <span class="ml">Fetch all network's proofs</span>
           </label>
           <br>
           <label>
-            <input type="number" bind:value={compute_deep_level} on:change={() => setter("compute_deep_level", compute_deep_level)}>
+            <input type="number" bind:value={$compute_deep_level} on:change={e => compute_deep_level.set(Number(e.target.value))}>
             <span class="ml">Compute deep level</span>
           </label>
         </div>
-      </form>
-      
+        
     </div>
 </dialog>
 
