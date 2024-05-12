@@ -37,7 +37,8 @@ $: {
 
 function generateReputationProof() {
 	generate_reputation_proof(
-		reputationTokenAmount, input_proof_box ?? undefined, 
+		(reputationTokenAmount / 100) * proof.total_amount,
+		input_proof_box ?? undefined, 
 		object_to_assign, object_type_to_assign, tags
 	);
 }
@@ -65,7 +66,7 @@ async function fetchReputationProofs(all: boolean = true) {
 			<label class="form-label">Proof box</label>
 			<select class="form-select" bind:value={input_proof_box} on:change={handleInputProofChange}>
 				{#each proof.current_boxes as option (option.box_id)}
-					<option value={option}>{option.box_id.slice(0, 10)} - ({option.token_amount})</option>
+					<option value={option}>{option.box_id.slice(0, 10)} - ({option.token_amount / proof.total_amount * 100}%)</option>
 				{/each}
 			</select>
 		</div>
@@ -95,8 +96,8 @@ async function fetchReputationProofs(all: boolean = true) {
 			<div class="mb-3">
 				<!-- svelte-ignore a11y-label-has-associated-control -->
 				<label class="form-label">Token amount<span class="required">*</span></label>
-				<span style="align-self: flex-end;">Up to: {input_proof_box.token_amount}</span>
-				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{input_proof_box.token_amount}" style="max-width: 97%;"/>
+				<span style="align-self: flex-end;">Up to: {(input_proof_box.token_amount / proof.total_amount)*100}%</span>
+				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{(input_proof_box.token_amount / proof.total_amount)*100}" style="max-width: 97%;"/>
 			</div>
 		{/if}
 		</form>
