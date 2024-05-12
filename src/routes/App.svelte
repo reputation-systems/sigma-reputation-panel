@@ -21,8 +21,6 @@
 
     let url_params = {};
 
-    export let show_app: boolean = true;
-
     // Esta función se ejecuta cuando el componente se monta
     onMount(() => {
       // Obtener la URL actual
