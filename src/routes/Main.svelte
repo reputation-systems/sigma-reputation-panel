@@ -100,8 +100,8 @@
     </div>
 
     {#if calculateResult !== null}
-        <div class="calculation-result">
-            <p>Calculation Result: {calculateResult} %</p>
+        <div class="calculation-result {calculateResult >= 0 ? 'positive' : 'negative'}">
+            <p>Absolute reputation: {calculateResult} %</p>
         </div>
     {/if}
 </div>
@@ -111,6 +111,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
         height: 100vh;
         background-color: #1A192B;
     }
@@ -120,7 +121,7 @@
     }
 
     input {
-        padding: 15px 40px 15px 15px; /* Añadido espacio a la derecha para el icono */
+        padding: 15px 40px 15px 15px;
         border-radius: 5px;
         border: none;
         outline: none;
@@ -147,7 +148,6 @@
         cursor: pointer;
     }
 
-    /* Styling for identifier */
     .identifier {
         position: absolute;
         top: 20px;
@@ -159,8 +159,6 @@
         padding: 5px 10px;
         border-radius: 10px;
     }
-
-    /* Estilo para el recuadro de $network */
     .network {
         position: absolute;
         top: 20px;
@@ -185,4 +183,22 @@
         z-index: 1000;
     }
 
+    /* Estilo para el resultado del cálculo */
+    .calculation-result {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-size: 24px; /* Tamaño de letra aumentado */
+    }
+
+    /* Clase para cambiar el color del texto a verde */
+    .positive {
+        color: green;
+    }
+
+    /* Clase para cambiar el color del texto a rojo */
+    .negative {
+        color: red;
+    }
 </style>
