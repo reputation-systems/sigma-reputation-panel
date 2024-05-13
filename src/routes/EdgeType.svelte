@@ -40,7 +40,7 @@
       class="edge-label"
       style="background: {data.color}"
     > <!-- class="edge-label nodrag nopan"     For no drag over it. -->
-        {data.proportion}%
+        {data.negative === true ? '-' : ''}{data.proportion}%
         {#if showContent}
           <EdgeLabel label={data.box.slice(0, 10)} />
         {/if}

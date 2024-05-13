@@ -168,8 +168,9 @@
                 animated: true,
                 data: {
                   box: b.box_id,
+                  negative: b.negative,
                   proportion: percentage_of_tokens,
-                  color: "#ffcc00"
+                  color: b.negative ? "#ffcc00" : "FF3300"
                 },
                 type: 'edge_type'
               });
@@ -198,8 +199,9 @@
               target: node_id,
               data: {
                 box: b.box_id,
+                negative: b.negative,
                 proportion: percentage_of_tokens,
-                color: "#ffcc00"
+                color: b.negative ? "#ffcc00" : "FF0000"
               },
               type: 'edge_type'
             });
@@ -211,6 +213,7 @@
                 target: "empty-node",
                 data: {
                   box: b.box_id,
+                  negative: b.negative,
                   proportion: percentage_of_tokens,
                   color: "#FDEAA1"
                 },

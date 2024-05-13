@@ -37,7 +37,8 @@ export interface RPBox {
     box_id: string,
     token_amount: number,
     object_type?: ObjectType,
-    object_value?: string
+    object_value?: string,
+    negative: boolean
 }
 
 export enum Network {
