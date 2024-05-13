@@ -25,14 +25,14 @@
 
     function calculate() {
         const arr = Array.from([...$proofs.values()]).filter((val) => val.can_be_spend)
-        const result = arr
+        calculateResult = arr
             .reduce((acc, val) => {
                 return acc += compute(val, ObjectType.PlainText, searchQuery)
-            }, 0) / arr.length;
-        calculateResult = parseFloat(result.toFixed(6)*100); // 0.11030630000000001 should be 11.0306
+            }, 0) / arr.length * 100;
     }
 
     function handleKeyPress(event: KeyboardEvent) {
+        calculateResult = null;
         if (event.key === "Enter") {
             calculate();
         }
@@ -100,8 +100,9 @@
     </div>
 
     {#if calculateResult !== null}
-        <div class="calculation-result {calculateResult >= 0 ? 'positive' : 'negative'}">
-            <p>Absolute reputation: {calculateResult} %</p>
+        <div class="calculation-result">
+            <p>Absolute reputation: </p>
+            <p class="{calculateResult >= 0 ? 'positive' : 'negative'}">{calculateResult.toFixed(6)} %</p>
         </div>
     {/if}
 </div>
@@ -151,8 +152,8 @@
     .identifier {
         position: absolute;
         top: 20px;
-        right: calc(20px + 60px); /* Adjusting for GitHub logo width */
-        z-index: 998; /* Ensuring it's below GitHub logo */
+        right: calc(20px + 60px);
+        z-index: 998;
         color: white;
         font-weight: bold;
         border: 2px solid white;
@@ -162,8 +163,8 @@
     .network {
         position: absolute;
         top: 20px;
-        right: calc(20px + 60px + 200px); /* Adjusting for GitHub logo width and wallet identifier width */
-        z-index: 997; /* Ensuring it's below wallet identifier */
+        right: calc(20px + 60px + 200px);
+        z-index: 997;
         color: white;
         font-weight: bold;
         border: 2px solid white;
@@ -183,21 +184,26 @@
         z-index: 1000;
     }
 
-    /* Estilo para el resultado del cálculo */
     .calculation-result {
-        margin-top: 20px;
+        width: 430px;
+        background-color: aliceblue;
+        margin-top: 40px;
         padding: 10px;
         border-radius: 5px;
         z-index: 1000;
-        font-size: 24px; /* Tamaño de letra aumentado */
+        font-size: 30px;
+        display: flex;
+        align-items: center;
     }
 
-    /* Clase para cambiar el color del texto a verde */
+    .calculation-result p {
+        margin-right: 10px;
+    }
+
     .positive {
         color: green;
     }
 
-    /* Clase para cambiar el color del texto a rojo */
     .negative {
         color: red;
     }
