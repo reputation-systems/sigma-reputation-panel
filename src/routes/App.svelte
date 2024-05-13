@@ -249,7 +249,7 @@
       on:nodecontextmenu={handleNodeContextMenu} 
       on:paneclick={handlePaneClick}
       {nodes} {edges} {nodeTypes} {edgeTypes} 
-      style="background: #1A192B" fitView
+      style="background: #1a192bbe" fitView
     >
       <Background />
       <Header/>

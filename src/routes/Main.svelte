@@ -116,7 +116,11 @@
         align-items: center;
         flex-direction: column;
         height: 100vh;
-        background-color: #1A192B;
+        background-color: #1a192bbe;
+        background-image: url(https://docs.ergoplatform.com/assets/frame_52.png); 
+        background-repeat: no-repeat; 
+        background-size: auto; 
+        background-position: right center;
     }
 
     .input-wrapper {
