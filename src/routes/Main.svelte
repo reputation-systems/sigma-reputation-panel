@@ -25,10 +25,13 @@
 
     function calculate() {
         const arr = Array.from([...$proofs.values()]).filter((val) => val.can_be_spend)
+        let n = 0;
         calculateResult = arr
             .reduce((acc, val) => {
-                return acc += compute(val, ObjectType.PlainText, searchQuery)
-            }, 0) / arr.length * 100;
+                const v = compute(val, ObjectType.PlainText, searchQuery);
+                if (v !== 0) n += 1;
+                return acc += v
+            }, 0) / n * 100;
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -101,8 +104,7 @@
 
     {#if calculateResult !== null}
         <div class="calculation-result">
-            <p>Absolute reputation: </p>
-            <p class="{calculateResult >= 0 ? 'positive' : 'negative'}">{calculateResult.toFixed(6)} %</p>
+            <p class="{calculateResult >= 0 ? 'positive' : 'negative'}">{calculateResult.toFixed(4)} %</p>
         </div>
     {/if}
 </div>
@@ -186,17 +188,17 @@
 
     .calculation-result {
         width: 430px;
-        background-color: aliceblue;
-        margin-top: 40px;
+        background-color: rgba(240, 240, 240, 0.055);
+        margin-top: 30px;
         padding: 10px;
         border-radius: 5px;
         z-index: 1000;
-        font-size: 30px;
         display: flex;
         align-items: center;
     }
 
     .calculation-result p {
+        font-size: 50px;
         margin-right: 10px;
     }
 
