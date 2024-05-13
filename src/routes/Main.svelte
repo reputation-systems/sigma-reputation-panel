@@ -11,7 +11,7 @@
 
     let searchQuery: string = "";
     let showMessage = false;
-    let calculateResult: number|null;
+    let calculateResult: number|null = null;
 
     onMount(() => connectNautilus())
     connected.subscribe(async () => {
@@ -29,7 +29,7 @@
             .reduce((acc, val) => {
                 return acc += compute(val, ObjectType.PlainText, searchQuery)
             }, 0) / arr.length;
-        calculateResult = result; // 0.11030630000000001 should be 11.0306
+        calculateResult = parseFloat(result.toFixed(6)*100); // 0.11030630000000001 should be 11.0306
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -98,8 +98,13 @@
             <img src={icon_route} alt="Search" width="30" height="30" style="margin-bottom: 12px;">
         </span>
     </div>
-</div>
 
+    {#if calculateResult !== null}
+        <div class="calculation-result">
+            <p>Calculation Result: {calculateResult} %</p>
+        </div>
+    {/if}
+</div>
 
 <style>
     .container {
