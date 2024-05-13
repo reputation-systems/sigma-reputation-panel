@@ -3,7 +3,8 @@
 * Reputation Proof
     R5     -> Pointer to the object type.                 ex: Box, git repo, url
     R6     -> Pointer to the object to assign reputation: ex: fjdfklj4314j3lk, https...
-    R7     -> owner public key
+    R7     -> Owner public key
+    R9     -> Polarization
 */
 {
     proveDlog(SELF.R7[GroupElement].get) &&
@@ -13,7 +14,8 @@
       (
         x.R7[GroupElement].get == SELF.R7[GroupElement].get &&
         x.tokens.size == 1 &&
-        x.propositionBytes == SELF.propositionBytes
+        x.propositionBytes == SELF.propositionBytes &&
+        (x.R9[Bool] == true || x.R9[Bool] == false)
       )
     })
 }
