@@ -69,7 +69,7 @@ function internal_compute(proofs: Map<string, ReputationProof>, proof: Reputatio
     return proof.current_boxes.reduce((total, box) => {
         const proportion = box.token_amount / proof.total_amount;
         const boxReputation = proportion * computePointerReputation(proofs, box, object_type, object_value, deep_level);
-        return total + boxReputation;
+        return total + (box.negative ? -1 : 1) * boxReputation;
     }, 0);
 }
 
