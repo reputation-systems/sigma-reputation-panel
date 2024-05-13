@@ -170,7 +170,7 @@
                   box: b.box_id,
                   negative: b.negative,
                   proportion: percentage_of_tokens,
-                  color: b.negative ? "#ffcc00" : "FF3300"
+                  color: b.negative ? "#FF7000" : "#ffcc00"
                 },
                 type: 'edge_type'
               });
@@ -201,7 +201,7 @@
                 box: b.box_id,
                 negative: b.negative,
                 proportion: percentage_of_tokens,
-                color: b.negative ? "#ffcc00" : "FF0000"
+                color: b.negative ? "#FF7000" : "#ffcc00"
               },
               type: 'edge_type'
             });
@@ -215,7 +215,7 @@
                   box: b.box_id,
                   negative: b.negative,
                   proportion: percentage_of_tokens,
-                  color: "#FDEAA1"
+                  color: b.negative ? "#FDE4A1" : "#FDEAA1"
                 },
                 type: 'edge_type'
               });

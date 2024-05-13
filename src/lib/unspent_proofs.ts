@@ -122,12 +122,12 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 }
                 for (const e of json_data.items) {
                     let token_id = e.assets[0].tokenId;
-                    console.log("value -> ", e.additionalRegisters.R8.renderedValue)
+                    console.log("value -> ", e.additionalRegisters.R8.renderedValue, typeof( e.additionalRegisters.R8.renderedValue))
                     let current_box: RPBox = {
                         box_id: e.boxId,
                         token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
                         token_amount: e.assets.length > 0 ? Number(e.assets[0].amount) : 0,
-                        negative: e.additionalRegisters.R8.renderedValue,
+                        negative: e.additionalRegisters.R8.renderedValue === "false",  // R8 value it's a boolean equal to the polarization. Positive / Negative.
                         box: {
                             boxId: e.boxId,
                             value: e.value,
