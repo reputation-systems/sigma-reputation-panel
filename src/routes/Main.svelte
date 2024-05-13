@@ -1,6 +1,9 @@
 <script lang="ts">
+    import { ObjectType, compute } from "$lib/ReputationProof";
     import { connectNautilus } from "$lib/connect";
-    import { address, searchStore, network, show_app } from "$lib/store";
+    import { ergo_tree_hash, explorer_uri } from "$lib/envs";
+    import { address, searchStore, network, show_app, proofs, connected, fetch_all } from "$lib/store";
+    import { updateReputationProofList } from "$lib/unspent_proofs";
     import { onMount } from "svelte";
 
     const icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
@@ -8,17 +11,30 @@
 
     let searchQuery: string = "";
     let showMessage = false;
+    let calculateResult: number|null;
 
     onMount(() => connectNautilus())
+    connected.subscribe(async () => {
+        proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, $fetch_all, $searchStore));
+    });
 
     function searchOnClick() {
         show_app.set(true);
         searchStore.set(searchQuery);
     }
 
+    function calculate() {
+        const arr = Array.from([...$proofs.values()]).filter((val) => val.can_be_spend)
+        const result = arr
+            .reduce((acc, val) => {
+                return acc += compute(val, ObjectType.PlainText, searchQuery)
+            }, 0) / arr.length;
+        calculateResult = result; // 0.11030630000000001 should be 11.0306
+    }
+
     function handleKeyPress(event: KeyboardEvent) {
         if (event.key === "Enter") {
-            searchOnClick();
+            calculate();
         }
     }
 

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { ObjectType, compute, type ReputationProof } from "$lib/ReputationProof";
-    import { compute_deep_level, proofs } from "$lib/store";
     import { stringToRendered } from "$lib/utils";
 
 	export let proof: ReputationProof;
@@ -14,12 +13,7 @@
 	}
 
 	function computeResult() {
-		const renderedProofs = new Map<string, ReputationProof>();
-		$proofs.forEach((value, key) => {
-			const renderedKey = stringToRendered(key);
-			renderedProofs.set(renderedKey, value);
-		});
-		result = compute(renderedProofs, proof, ObjectType.PlainText, stringToRendered(input), $compute_deep_level);
+		result = compute(proof, ObjectType.PlainText, input);
 	}
 
 	$: if (dialog && showModal) dialog.showModal();
