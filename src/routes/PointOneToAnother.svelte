@@ -13,6 +13,7 @@
 	let reputationTokenAmount: number;
 	export let object_to_assign: string;
 	export let object_type_to_assign: ObjectType;
+	let negative: boolean = false;
 
 	let submited: string | null = null;
   
@@ -31,7 +32,8 @@
 		if (reputationTokenAmount && input_proof_box && object_to_assign && object_type_to_assign) {
 			const _tx = await generate_reputation_proof(
 				(reputationTokenAmount / 100) * proof.total_amount, 
-				input_proof_box, object_to_assign, object_type_to_assign
+				input_proof_box, object_to_assign, object_type_to_assign,
+				negative
 				);
 			if (_tx) {
 				submited = _tx;
@@ -62,9 +64,15 @@
 		</div>
 		{#if input_proof_box}
 			<div class="mb-3">
-			<label for="reputationToken" class="form-label">Token amount</label>
-			<input type="number" min="0" style="max-width: 97%;" class="form-control" bind:value={reputationTokenAmount} max="{(input_proof_box.token_amount / proof.total_amount)*100}" />
+				<label for="reputationToken" class="form-label">Token amount</label>
+				<input type="number" min="0" style="max-width: 97%;" class="form-control" bind:value={reputationTokenAmount} max="{(input_proof_box.token_amount / proof.total_amount)*100}" />
 			</div>
+
+			<div class="mb-3">
+                <label for="polarCheckbox" class="form-check-label">Negative</label>
+                <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
+            </div>
+
 		{/if}
 	  </form>
 	  <hr />

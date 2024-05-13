@@ -10,6 +10,7 @@
 
 	let input_proof: null|ReputationProof;
 	let input_proof_box: null|RPBox;
+	let negative: boolean = false;
 	let reputationTokenAmount: number = 100;
 	let object_to_assign: string;
 	let object_type_to_assign: ObjectType | undefined;
@@ -38,7 +39,7 @@
 	function generateReputationProof() {
 		generate_reputation_proof(
 			reputationTokenAmount, input_proof_box ?? undefined, 
-			object_to_assign, object_type_to_assign, tags
+			object_to_assign, object_type_to_assign, negative, tags
 		);
 	}
 
@@ -83,6 +84,11 @@
 					</select>
 				{/if}
 			</div>
+
+			<div class="mb-3">
+                <label for="polarCheckbox" class="form-check-label">Negative</label>
+                <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
+            </div>
 
 			<div style="position: relative;">
 				<hr style="border-color: #ccc;">

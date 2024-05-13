@@ -1,4 +1,4 @@
-import { ErgoAddress, SByte, SColl, SConstant, SGroupElement } from "@fleet-sdk/core";
+import { ErgoAddress, SBool, SByte, SColl, SConstant, SGroupElement } from "@fleet-sdk/core";
 import { stringToBytes } from "@scure/base";
 
 export function serializedToRendered(serializedValue: string): string {
@@ -42,6 +42,10 @@ export function generate_pk_proposition(wallet_pk: string): string {
 
 export function stringToSerialized(value: string): string {
     return SConstant(SColl(SByte, stringToBytes('utf8', value)));
+}
+
+export function booleanToSerializer(value: boolean): string {
+    return SConstant(SBool(value));
 }
 
 export function stringToRendered(value: string): string {

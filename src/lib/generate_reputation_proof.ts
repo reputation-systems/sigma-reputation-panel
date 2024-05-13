@@ -8,11 +8,12 @@ import {
 
 import { ObjectType, type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address } from './envs';
-import { generate_pk_proposition, stringToSerialized } from './utils';
+import { booleanToSerializer, generate_pk_proposition, stringToSerialized } from './utils';
 
 export async function generate_reputation_proof(token_amount: number, input_proof?: RPBox,
                                                 object_to_assign?: string, 
                                                 object_type_to_assign: ObjectType = ObjectType.PlainText,
+                                                negative: boolean = false,
                                                 tags?: string
                                               ): Promise<string|null>
 {
@@ -84,7 +85,8 @@ export async function generate_reputation_proof(token_amount: number, input_proo
     }
 
     new_proof_output.setAdditionalRegisters({...registers, ...{
-      R7: generate_pk_proposition((await ergo.get_change_address()))}
+      R7: generate_pk_proposition((await ergo.get_change_address()))},
+      R8: booleanToSerializer(!negative)
     })
 
     outputs.push(new_proof_output)

@@ -13,6 +13,7 @@ let reputationTokenAmount: number;
 let object_to_assign: string;
 let object_type_to_assign: ObjectType | undefined;
 let tags: string;
+let negative: boolean = false;
 
 let unspend_reputation_proofs: ReputationProof[] = [];
 
@@ -39,7 +40,7 @@ function generateReputationProof() {
 	generate_reputation_proof(
 		(reputationTokenAmount / 100) * proof.total_amount,
 		input_proof_box ?? undefined, 
-		object_to_assign, object_type_to_assign, tags
+		object_to_assign, object_type_to_assign, negative, tags
 	);
 }
 
@@ -100,6 +101,12 @@ async function fetchReputationProofs(all: boolean = true) {
 				<span style="align-self: flex-end;">Up to: {(input_proof_box.token_amount / proof.total_amount)*100}%</span>
 				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{(input_proof_box.token_amount / proof.total_amount)*100}" style="max-width: 97%;"/>
 			</div>
+
+			<div class="mb-3">
+                <label for="polarCheckbox" class="form-check-label">Negative</label>
+                <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
+            </div>
+			
 		{/if}
 		</form>
 		<hr />

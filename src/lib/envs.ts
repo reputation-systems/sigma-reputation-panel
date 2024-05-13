@@ -13,7 +13,7 @@ let contract = `{
       x.R7[GroupElement].get == SELF.R7[GroupElement].get &&
       x.tokens.size == 1 &&
       x.propositionBytes == SELF.propositionBytes &&
-      (x.R9[Boolean].get == false || x.R9[Boolean].get == true)
+      (x.R8[Boolean].get == false || x.R8[Boolean].get == true)
     )
   })
 }`;
