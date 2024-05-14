@@ -83,7 +83,10 @@
 
 <svelte:window on:contextmenu|preventDefault={() => {}} />
 <div class="container">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     {#if $address}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="identifier" id="walletIdentifier" on:click={copyToClipboard}>
             <p>Wallet: {($address.slice(0, 6) + '...' + $address.slice(-4))}</p>
         </div>
