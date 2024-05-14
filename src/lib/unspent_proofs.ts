@@ -122,7 +122,6 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 }
                 for (const e of json_data.items) {
                     let token_id = e.assets[0].tokenId;
-                    console.log("value -> ", e.additionalRegisters.R8.renderedValue, typeof( e.additionalRegisters.R8.renderedValue))
                     let current_box: RPBox = {
                         box_id: e.boxId,
                         token_id: e.assets.length > 0 ? e.assets[0].tokenId : "",
