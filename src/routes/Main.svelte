@@ -80,6 +80,7 @@
     }
 </script>
 
+<svelte:window on:contextmenu|preventDefault={() => {}} />
 <div class="container">
     {#if $address}
         <div class="identifier" id="walletIdentifier" on:click={copyToClipboard}>
