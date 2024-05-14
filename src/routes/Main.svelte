@@ -6,7 +6,8 @@
     import { updateReputationProofList } from "$lib/unspent_proofs";
     import { onMount } from "svelte";
 
-    const icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
+    const search_icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
+    const calc_icon_route = "https://cdn1.iconfinder.com/data/icons/aami-web-internet/64/aami2-42-512.png"
     let networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
 
     let searchQuery: string = "";
@@ -98,7 +99,12 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span class="search-icon" on:click={searchOnClick}>
-            <img src={icon_route} alt="Search" width="30" height="30" style="margin-bottom: 12px;">
+            <img src={search_icon_route} alt="Search" width="30" height="30">
+        </span>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <span class="calculate-icon" on:click={calculate}>
+            <img src={calc_icon_route} alt="Calculate" width="30" height="30">
         </span>
     </div>
 
@@ -140,19 +146,35 @@
         margin-top: -50px;
     }
 
-    .github-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 999;
+    .search-icon,
+    .calculate-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        margin-right: 5px;
+        top: 35%;
     }
 
     .search-icon {
         position: absolute;
         right: 10px;
-        top: 50%;
         transform: translateY(-50%);
         cursor: pointer;
+    }
+
+    .calculate-icon {
+        position: absolute;
+        right: 50px;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+
+    .github-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
     }
 
     .identifier {
