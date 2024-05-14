@@ -6,15 +6,16 @@
     import { updateReputationProofList } from "$lib/unspent_proofs";
     import { onMount } from "svelte";
 
-    const search_icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png"
-    const calc_icon_route = "https://cdn1.iconfinder.com/data/icons/aami-web-internet/64/aami2-42-512.png"
+    const search_icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png";
+    const calc_icon_route = "https://cdn1.iconfinder.com/data/icons/aami-web-internet/64/aami2-42-512.png";
     let networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
 
     let searchQuery: string = "";
     let showMessage = false;
     let calculateResult: number|null = null;
+    let animatedResult: number|null = null;
 
-    onMount(() => connectNautilus())
+    onMount(() => connectNautilus());
     connected.subscribe(async () => {
         proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, $fetch_all, $searchStore));
     });
@@ -25,14 +26,28 @@
     }
 
     function calculate() {
-        const arr = Array.from([...$proofs.values()]).filter((val) => val.can_be_spend)
+        const arr = Array.from([...$proofs.values()]).filter((val) => val.can_be_spend);
         let n = 0;
-        calculateResult = arr
-            .reduce((acc, val) => {
-                const v = compute(val, ObjectType.PlainText, searchQuery);
-                if (v !== 0) n += 1;
-                return acc += v
-            }, 0) / n * 100;
+        calculateResult = arr.reduce((acc, val) => {
+            const v = compute(val, ObjectType.PlainText, searchQuery);
+            if (v !== 0) n += 1;
+            return acc += v;
+        }, 0) / n * 100;
+        
+        // Trigger the animation
+        animateResult();
+    }
+
+    function animateResult() {
+        const increment = calculateResult ? calculateResult / 100 : 0;
+        let current = 0;
+        const interval = setInterval(() => {
+            current += increment;
+            animatedResult = current;
+            if (current >= calculateResult!) {
+                clearInterval(interval);
+            }
+        }, 10);
     }
 
     function handleKeyPress(event: KeyboardEvent) {
@@ -65,55 +80,49 @@
     }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-{#if $address}
-    <div class="identifier" id="walletIdentifier" on:click={copyToClipboard}>
-        <p>Wallet: {($address.slice(0, 6) + '...' + $address.slice(-4))}</p>
-    </div>
-{/if}
-
-<div class="network" style="display: flex; align-items: center;">
-    <img src={networkLogo} alt="Network Logo" width="25" height="25">
-    {#if $network}
-        <p>{$network}</p>
-    {/if}
-</div>
-
-{#if showMessage}
-    <div class="message">
-        <p>Wallet address copied to clipboard!</p>
-    </div>
-{/if}
-
-<div>
-    <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank">
-      <img src="https://cdn.icon-icons.com/icons2/844/PNG/512/Github_icon-icons.com_67091.png" alt="GitHub" width="50" height="50">
-    </a> 
-</div>
-  
 <div class="container">
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    {#if $address}
+        <div class="identifier" id="walletIdentifier" on:click={copyToClipboard}>
+            <p>Wallet: {($address.slice(0, 6) + '...' + $address.slice(-4))}</p>
+        </div>
+    {/if}
+
+    <div class="network" style="display: flex; align-items: center;">
+        <img src={networkLogo} alt="Network Logo" width="25" height="25">
+        {#if $network}
+            <p>{$network}</p>
+        {/if}
+    </div>
+
+    {#if showMessage}
+        <div class="message">
+            <p>Wallet address copied to clipboard!</p>
+        </div>
+    {/if}
+
+    <div>
+        <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank">
+            <img src="https://cdn.icon-icons.com/icons2/844/PNG/512/Github_icon-icons.com_67091.png" alt="GitHub" width="50" height="50">
+        </a> 
+    </div>
+  
     <div class="input-wrapper">
         <input type="text" placeholder="Check reputation for ..." bind:value={searchQuery} on:keydown={handleKeyPress}/>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span class="search-icon" on:click={searchOnClick}>
             <img src={search_icon_route} alt="Search" width="30" height="30">
         </span>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span class="calculate-icon" on:click={calculate}>
             <img src={calc_icon_route} alt="Calculate" width="30" height="30">
         </span>
     </div>
 
-    {#if calculateResult !== null}
+    {#if animatedResult !== null}
         <div class="calculation-result">
-            <p class="{calculateResult >= 0 ? 'positive' : 'negative'}">{calculateResult.toFixed(4)} %</p>
+            <p class="{animatedResult >= 0 ? 'positive' : 'negative'}">{animatedResult.toFixed(4)} %</p>
         </div>
     {/if}
 </div>
+
 
 <style>
     .container {
