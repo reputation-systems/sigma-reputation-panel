@@ -7,6 +7,7 @@
     import { onMount } from "svelte";
 
     const search_icon_route = "https://cdn0.iconfinder.com/data/icons/art-designing-glyph/2048/1871_-_Magnifier-512.png";
+    const network_icon_route = "https://cdn1.iconfinder.com/data/icons/aami-web-internet/64/aami2-29-512.png";
     const calc_icon_route = "https://cdn1.iconfinder.com/data/icons/aami-web-internet/64/aami2-42-512.png";
     let networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
 
@@ -107,10 +108,17 @@
         </a> 
     </div>
   
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="input-wrapper">
         <input type="text" placeholder="Check reputation for ..." bind:value={searchQuery} on:keydown={handleKeyPress}/>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <span class="search-icon" on:click={searchOnClick}>
-            <img src={search_icon_route} alt="Search" width="30" height="30">
+            {#if searchQuery}
+                <img src={search_icon_route} alt="Search" width="30" height="30">
+            {:else}
+                <img src={network_icon_route} alt="Search" width="30" height="30">
+            {/if}
         </span>
         <span class="calculate-icon" on:click={calculate}>
             <img src={calc_icon_route} alt="Calculate" width="30" height="30">
