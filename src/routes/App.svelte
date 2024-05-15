@@ -6,13 +6,14 @@
     import '@xyflow/svelte/dist/style.css';
     import { updateReputationProofList } from '$lib/unspent_proofs';
     import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { ObjectType, token_rendered, type ReputationProof } from '$lib/ReputationProof';
+    import { ObjectType, token_rendered, type RPBox, type ReputationProof } from '$lib/ReputationProof';
     import dagre from '@dagrejs/dagre';
 
     import Header from './Header.svelte';
     import EdgeType from './EdgeType.svelte';
     import NodeCircleType from './NodeCircleType.svelte';
     import PanelContextMenu from './PanelContextMenu.svelte';
+    import EdgeContextMenu from './EdgeContextMenu.svelte';
     import { hexToUtf8 } from '$lib/utils';
     import NodeContextMenu from './NodeContextMenu.svelte';
     import NodeProofType from './NodeProofType.svelte';
@@ -21,6 +22,7 @@
     import { onMount } from 'svelte';
 
     let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
+    let rightEdgeMenu: { id: string; box?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
     let width: number;
     let height: number;
     function handleNodeContextMenu({ detail: { event, node } }) {
@@ -41,9 +43,28 @@
       }
     }
 
+    function handleEdgeContextMenu({ detail: { event, edge } }) {
+      // Prevent native context menu from showing
+      event.preventDefault();
+
+      // Calculate position of the context menu. We want to make sure it
+      // doesn't get positioned off-screen.
+      if (edge.data.box) {
+        rightEdgeMenu = {
+          id: edge.id,
+          box: edge.data.box ?? null,
+          top: event.clientY < height - 200 ? event.clientY : undefined,
+          left: event.clientX < width - 200 ? event.clientX : undefined,
+          right: event.clientX >= width - 200 ? width - event.clientX : undefined,
+          bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
+        };        
+      }
+    }
+
     // Close the context menu if it's open whenever the window is clicked.
     function handlePaneClick() {
       rightNodeMenu = null;
+      rightEdgeMenu = null;
     }
     
     async function fetchReputationProofs() {
@@ -254,6 +275,7 @@
   <div style="height:100vh;" bind:clientWidth={width} bind:clientHeight={height}>
     <SvelteFlow 
       on:nodecontextmenu={handleNodeContextMenu} 
+      on:edgecontextmenu={handleEdgeContextMenu}
       on:paneclick={handlePaneClick}
       {nodes} {edges} {nodeTypes} {edgeTypes} 
       style="background: #1a192bbe" fitView
@@ -279,6 +301,11 @@
       <NodeContextMenu
         onClick={handlePaneClick}
         proof={rightNodeMenu.proof ?? null}
+      />
+    {:else if rightEdgeMenu}
+      <EdgeContextMenu
+        onClick={handlePaneClick}
+        box_id={rightEdgeMenu.box ?? null}
       />
     {:else}
       <PanelContextMenu />
