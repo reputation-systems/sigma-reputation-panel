@@ -3,7 +3,7 @@
     import FormModal from "./CreateProofModal.svelte";
     import SettingModal from "./Settings.svelte";
     import Search from "./Search.svelte";
-    import { show_app } from "$lib/store";
+    import { connected, show_app } from "$lib/store";
     
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
@@ -65,6 +65,7 @@
     function back_to_main(){
         show_app.set(false);
     }
+
     let menuItems = [
         {
             'name': 'addItem',
@@ -93,7 +94,7 @@
             'displayText': "Back to init",
             'class': 'fa-solid fa-home'
         }
-    ]
+    ].filter(item => $connected || item.name !== 'addItem');
 
 </script>
 <svelte:head>
