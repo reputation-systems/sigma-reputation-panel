@@ -18,6 +18,7 @@
     import NodeProofType from './NodeProofType.svelte';
     import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
     import { advance_mode, connected, fetch_all, proofs, searchStore } from '$lib/store';
+    import { onMount } from 'svelte';
 
     let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
     let width: number;
@@ -47,13 +48,15 @@
     
     async function fetchReputationProofs() {
       try {
-        proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, $fetch_all, $searchStore));
+        if (!(connected)) fetch_all.set(true);
+        proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, (typeof ergo !== "undefined")  ? ergo : null, $fetch_all, $searchStore));
         build_graph(Array.from($proofs.values()));
       } catch (error) {
         console.error(error);
       }
     }
     
+    onMount(() => fetchReputationProofs())
     connected.subscribe(() => fetchReputationProofs())
     searchStore.subscribe(function () {
       fetchReputationProofs(); 
@@ -139,6 +142,7 @@
     }
 
     function build_graph(_proofs: ReputationProof[]) {
+      console.log("build graph")
       $nodes = [];
       $edges = [];
       let plain_nodes: any = {};  // Objects of plain nodes and edges.

@@ -17,7 +17,7 @@
     let animatedResult: number|null = null;
 
     onMount(async () => {
-        await updateReputationProofList(explorer_uri, ergo_tree_hash, null, $fetch_all, $searchStore)
+        proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, null, $fetch_all, $searchStore))
         connectNautilus();
     });
     connected.subscribe(async () => {
