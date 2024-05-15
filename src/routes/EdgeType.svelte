@@ -46,6 +46,8 @@
 
 <BaseEdge path={edgePath} />
 <EdgeLabelRenderer>
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
       on:click={copyToClipboard}
       style:transform="translate(-50%, -50%) translate({labelX}px,{labelY}px)"

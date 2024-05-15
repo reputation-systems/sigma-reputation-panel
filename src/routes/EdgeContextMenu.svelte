@@ -1,10 +1,4 @@
-<script lang="ts">
-
-    import UpdateProofModal from "./UpdateProofModal.svelte";
-    import type { RPBox, ReputationProof } from "$lib/ReputationProof";
-    import ComputeSearchModal from "./ComputeSearchModal.svelte";
-      import { network } from "$lib/store";
-  
+<script lang="ts">  
     export let onClick: () => void;
     export let box_id: string|null;
   
@@ -18,8 +12,6 @@
     // browser/window dimension (height and width)
     let browser = { h: 0, y: 0 }
     let showMenu = false;
-    let showForm = false;
-    let showComputeSearch = false;
   
   
     function rightClickContextMenu(e){
