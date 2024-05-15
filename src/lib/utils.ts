@@ -1,5 +1,7 @@
 import { ErgoAddress, SBool, SByte, SColl, SConstant, SGroupElement } from "@fleet-sdk/core";
 import { stringToBytes } from "@scure/base";
+import { connected } from "./store";
+import { get } from "svelte/store";
 
 export function serializedToRendered(serializedValue: string): string {
     // Assuming the serialized value always starts with a pattern to strip (e.g., '0e')
@@ -53,5 +55,6 @@ export function stringToRendered(value: string): string {
 }
 
 export async function check_if_r7_is_local_addr(value: string): Promise<boolean> {
+    if (!get(connected)) return false;
     return stringToRendered(generate_pk_proposition((await ergo.get_change_address()))).substring(4,) === stringToRendered(value);
 }

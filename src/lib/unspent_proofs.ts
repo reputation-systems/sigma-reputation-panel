@@ -1,5 +1,7 @@
 import { type RPBox, type ReputationProof, object_type_by_rendered_value, Network, ObjectType } from "$lib/ReputationProof";
 import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered, stringToSerialized } from "$lib/utils";
+import { get } from "svelte/store";
+import { connected } from "./store";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -70,6 +72,9 @@ export async function get_token_total_amount(explorer_uri: string, token_id: str
 
 export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string|null): Promise<Map<string, ReputationProof>> 
 {
+
+    if (!get(connected)) all = true;
+
     try {
         let params = {
             offset: 0,
@@ -78,7 +83,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
         let proofs = new Map<string, ReputationProof>();
         let moreDataAvailable = true;
 
-        const r7 = serializedToRendered(generate_pk_proposition((await ergo.get_change_address())));
+        const r7 = get(connected) ? serializedToRendered(generate_pk_proposition((await ergo.get_change_address()))) : "";
         let registers = {}
         if (search) {
             const r5 = stringToRendered(ObjectType.PlainText);
