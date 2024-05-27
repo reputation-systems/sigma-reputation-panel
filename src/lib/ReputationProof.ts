@@ -9,6 +9,7 @@ export interface ReputationProof {
     total_amount: number,
     number_of_boxes: number,
     network: Network,
+    format: string|null,
     can_be_spend: boolean,
     tag: string|null,
 }

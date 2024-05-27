@@ -33,6 +33,7 @@ export async function fetch_proofs_over_runes(): Promise<Map<string, ReputationP
     number_of_boxes: 0,
     total_amount: 100,
     network: Network.Bitcoin,
+    format: "sigma-rune",
     can_be_spend: true,
     tag: "only-a-test"
   })
