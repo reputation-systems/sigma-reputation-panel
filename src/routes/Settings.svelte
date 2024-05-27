@@ -1,11 +1,21 @@
 <script lang="ts">
     import { Network } from "$lib/ReputationProof";
-    import { address, network, show_header, fetch_all, advance_mode, compute_deep_level } from "$lib/store";
+    import { address, network, show_header, fetch_all, advance_mode, compute_deep_level, btc_connector } from "$lib/store";
 
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
 
     $: if (dialog && showModal) dialog.showModal()
+
+    let btc_conn_obj = {
+      protocol: 'http',
+      url: '',
+      port: ''
+    };
+
+    $: {
+      btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}`)
+    }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -42,6 +52,21 @@
           <label>
             <input type="checkbox" bind:checked={$advance_mode} on:change={e => advance_mode.set(e.target.checked)}>
             <span class="ml">Advance mode</span>
+          </label>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h3>Other chains</h3>
+          <h4>Bitcoin Network</h4>
+          <label>
+            URL:
+            <select bind:value={btc_conn_obj.protocol}>
+              <option value="http">http://</option>
+              <option value="https">https://</option>
+            </select>
+            <input type="text" placeholder="example.com or 192.168.1.1" bind:value={btc_conn_obj.url}>
+            :
+            <input type="text" placeholder="port" bind:value={btc_conn_obj.port}>
           </label>
         </div>
         
