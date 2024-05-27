@@ -3,6 +3,7 @@
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
 	import { explorer_uri, ergo_tree_hash } from '$lib/envs';
 	import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
+    import { post_raw_data, post_sigma_rune } from '$lib/bitcoin_connector';
   
 	export let showModal: boolean;
 	let dialog: any;
@@ -39,10 +40,27 @@
 	}
   
 	function generateReputationProof() {
-		generate_reputation_proof(
-			reputationTokenAmount, input_proof_box ?? undefined, 
-			object_to_assign, object_type_to_assign, negative, tags
-		);
+		if (network == "ergo") {
+			generate_reputation_proof(
+				reputationTokenAmount, input_proof_box ?? undefined, 
+				object_to_assign, object_type_to_assign, negative, tags
+			);		
+		}
+		if (network == "bitcoin") {
+			if (proofFormat == "sigma-rune")
+			{
+				post_sigma_rune(
+					reputationTokenAmount, input_proof_box ?? undefined, 
+					object_to_assign, object_type_to_assign, negative, tags
+				);				
+			} else {
+				post_raw_data(
+					reputationTokenAmount, input_proof_box ?? undefined, 
+					object_to_assign, object_type_to_assign, negative, tags
+				);
+			}
+		}
+
 	}
 
 	async function fetchReputationProofs(all: boolean = true) {
