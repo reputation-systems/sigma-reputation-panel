@@ -1,4 +1,5 @@
-import { address, connected, network } from "./store";
+import { NetworkType } from "./ReputationProof";
+import { address, connected, network_type } from "./store";
 
 
 export async function connectNautilus() {
@@ -8,7 +9,7 @@ export async function connectNautilus() {
         if (await nautilus.connect()) {
             console.log('Connected!');
             address.set(await ergo.get_change_address());
-            network.set("ergo-testnet");
+            network_type.set(NetworkType.ErgoTestnet);
             connected.set(true);
         } else {
             alert('Not connected!');

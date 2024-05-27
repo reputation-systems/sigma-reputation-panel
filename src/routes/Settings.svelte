@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Network } from "$lib/ReputationProof";
-    import { address, network, show_header, fetch_all, advance_mode, compute_deep_level, btc_connector } from "$lib/store";
+    import { NetworkType } from "$lib/ReputationProof";
+    import { address, network_type, show_header, fetch_all, advance_mode, compute_deep_level, btc_connector } from "$lib/store";
 
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
@@ -47,10 +47,10 @@
             </label>
             <br><br>
             <label>
-              <span class="ml">Network</span>
-              <select bind:value={$network}>
-                <option value={Network.ErgoTestnet}>Testnet</option>
-                <option value={Network.ErgoMainnet}>Mainnet</option>
+              <span class="ml">Ergo network</span>
+              <select bind:value={$network_type}>
+                <option value={NetworkType.ErgoTestnet}>Testnet</option>
+                <option value={NetworkType.ErgoMainnet}>Mainnet</option>
               </select>
             </label>            
           </div>

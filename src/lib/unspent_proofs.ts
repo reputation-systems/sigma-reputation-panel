@@ -162,7 +162,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                             token_id: token_id,
                             number_of_boxes: 0,
                             total_amount: await get_token_total_amount(explorer_uri, token_id),
-                            network: Network.ErgoTestnet,
+                            network: Network.Ergo,
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
                             tag: hexToUtf8(r4_value)
                         };

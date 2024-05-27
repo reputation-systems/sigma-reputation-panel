@@ -3,7 +3,7 @@
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import type { ReputationProof } from "$lib/ReputationProof";
   import ComputeSearchModal from "./ComputeSearchModal.svelte";
-    import { network } from "$lib/store";
+    import { network_type } from "$lib/store";
 
   export let onClick: () => void;
   export let proof: ReputationProof|null;
@@ -96,7 +96,7 @@
     <div class="info-block">
       <p>
           <span class="label">Proof:</span> <a>{local_id}</a><br>
-          <span class="label">Network:</span> <a>{$network}</a><br>
+          <span class="label">Network:</span> <a>{$network_type}</a><br>
           {#if proof}
               <span class="label">Tags:</span> <a>{proof.tag}</a>
           {/if}

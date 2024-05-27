@@ -2,7 +2,7 @@
     import { ObjectType, compute } from "$lib/ReputationProof";
     import { connectNautilus } from "$lib/connect";
     import { ergo_tree_hash, explorer_uri } from "$lib/envs";
-    import { address, searchStore, network, show_app, proofs, connected, fetch_all } from "$lib/store";
+    import { address, searchStore, network_type, show_app, proofs, connected, fetch_all } from "$lib/store";
     import { updateReputationProofList } from "$lib/unspent_proofs";
     import { onMount } from "svelte";
 
@@ -76,7 +76,7 @@
     }
 
     $: {
-        if ($network === "ergo-testnet" || $network === "ergo-mainnet") {
+        if ($network_type === "ergo-testnet" || $network_type === "ergo-mainnet") {
             networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
         } else {
             networkLogo = "https://placehold.it/50x50";
@@ -97,8 +97,8 @@
 
     <div class="network" style="display: flex; align-items: center;">
         <img src={networkLogo} alt="Network Logo" width="25" height="25">
-        {#if $network}
-            <p>{$network}</p>
+        {#if $network_type}
+            <p>{$network_type}</p>
         {/if}
     </div>
 
