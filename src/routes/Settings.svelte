@@ -10,19 +10,17 @@
     let btc_conn_obj = {
       protocol: 'http',
       url: '',
-      port: '',
-      contract_type: ''
+      port: ''
     };
 
     $: {
-      btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}/${btc_conn_obj.contract_type}`)
+      btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}`)
     }
 
     let compute_conn_obj = {
       protocol: 'http',
       url: '',
-      port: '',
-      contract_type: ''
+      port: ''
     };
 </script>
 
@@ -79,15 +77,7 @@
                 <input type="text" placeholder="example.com or 192.168.1.1" bind:value={btc_conn_obj.url}>
                 :
                 <input type="text" placeholder="port" bind:value={btc_conn_obj.port}>
-              </label>          
-              <br><br>
-              <label>
-                Proof format:
-                <select bind:value={btc_conn_obj.contract_type}>
-                  <option value="Sigma Rune">Sigma Rune</option>
-                  <option value="Raw data">Raw data</option>
-                </select>
-              </label>  
+              </label>      
           </div>
         </div>
         <br>

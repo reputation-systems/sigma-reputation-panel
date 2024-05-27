@@ -15,6 +15,8 @@
 	let object_to_assign: string;
 	let object_type_to_assign: ObjectType | undefined;
 	let tags: string = "versatile-reputation-proof";
+	let network: 'bitcoin'|'ergo'|null;
+	let proofFormat: 'sigma-rune'|'raw-data'|null;
   
 	let unspend_reputation_proofs: ReputationProof[] = [];
 
@@ -97,6 +99,22 @@
 				</span>
 			</div>
 			{#if showAdvancedOptions}
+				<div class="mb-3">
+					<label for="networkSelect" class="form-label">Network</label>
+					<select id="networkSelect" class="form-select" bind:value={network}>
+						<option value="ergo">Ergo Platform</option>
+						<option value="bitcoin">Bitcoin Network</option>
+					</select>
+				</div>
+				{#if network == "bitcoin"}
+					<div class="mb-3">
+						<label for="proofFormatSelect" class="form-label">Proof Format</label>
+						<select id="proofFormatSelect" class="form-select" bind:value={proofFormat}>
+							<option value="raw-data">Raw Data</option>
+							<option value="sigma-rune">Sigma Rune</option>
+						</select>
+					</div>
+				{/if}
 				<div class="mb-3">
 					<label for="reputationTokenAmount" class="form-label">Token amount</label>
 					<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} style="max-width: 97%;"/>
