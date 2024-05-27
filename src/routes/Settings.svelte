@@ -17,6 +17,13 @@
     $: {
       btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}/${btc_conn_obj.contract_type}`)
     }
+
+    let compute_conn_obj = {
+      protocol: 'http',
+      url: '',
+      port: '',
+      contract_type: ''
+    };
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -95,27 +102,45 @@
             <input type="checkbox" bind:checked={$advance_mode} on:change={e => advance_mode.set(e.target.checked)}>
             <span class="ml">Advance mode</span>
           </label>
-        </div>
-        
-        <br>
-        <div>
-          <h3>Other options</h3>
+          <br>
           <label>
             <input type="checkbox" bind:checked={$fetch_all} on:change={e => fetch_all.set(e.target.checked)}>
             <span class="ml">Fetch all network's proofs</span>
           </label>
-          <br>
+        </div>
+        
+        <br>
+        <div>
+          <h3>Reputation compute module</h3>
+          <small>
+            Responsible for evaluating the reputation of an item based on the selected proof, or based on all user-owned proofs if performed on the init page.
+          </small>
+          <br><br>
+          <h5>By browser compute module</h5>
           <label>
             <input type="number" bind:value={$compute_deep_level} on:change={e => compute_deep_level.set(Number(e.target.value))}>
             <span class="ml">Compute deep level</span>
           </label>
+
+          <h5>By external service</h5>
+          <label>
+            Service URL:
+            <select bind:value={compute_conn_obj.protocol}>
+              <option value="http">http://</option>
+              <option value="https">https://</option>
+            </select>
+            <input type="text" placeholder="example.com or 192.168.1.1" bind:value={compute_conn_obj.url}>
+            :
+            <input type="text" placeholder="port" bind:value={compute_conn_obj.port}>
+          </label> 
         </div>
+        <br>
         
     </div>
 </dialog>
 
 <style>
-  h4 {
+  h4, h5 {
       margin-bottom: 0;
     }
 	dialog {
