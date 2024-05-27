@@ -31,12 +31,16 @@
           <h3>Networks</h3>
           <div>
             <h4>Ergo Platform</h4>
+            <small>
+              It connects through Nautilus wallet.
+            </small>
+            <br><br>
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label>
               <!-- svelte-ignore a11y-missing-attribute -->
               <a>Address {$address}</a>
             </label>
-            <br>
+            <br><br>
             <label>
               <span class="ml">Network</span>
               <select bind:value={$network}>
@@ -46,10 +50,21 @@
             </label>            
           </div>
 
+          <br>
           <div>
             <h4>Bitcoin Network</h4>
+              <small>
+                It connects through a remote service. The seed of a wallet must be provided, or the service will create a new one.
+              </small>
+              <br>
+              <small>
+                Within Bitcoin, there are two available reputation proof formats: 
+              </small><br>
+              <small>- Sigma runes allow specifying sigma protocols on each rune.</small><br>
+              <small>- Raw data is more compact, less network overhead.</small>
+              <br><br>
               <label>
-                URL:
+                Service URL:
                 <select bind:value={btc_conn_obj.protocol}>
                   <option value="http">http://</option>
                   <option value="https">https://</option>
@@ -58,9 +73,9 @@
                 :
                 <input type="text" placeholder="port" bind:value={btc_conn_obj.port}>
               </label>          
-              <br>
+              <br><br>
               <label>
-                Contract:
+                Proof format:
                 <select bind:value={btc_conn_obj.contract_type}>
                   <option value="Sigma Rune">Sigma Rune</option>
                   <option value="Raw data">Raw data</option>
@@ -68,6 +83,7 @@
               </label>  
           </div>
         </div>
+        <br>
         <div style="margin-bottom: 20px;">
           <h3>Panel options</h3>
           <label>
@@ -81,6 +97,7 @@
           </label>
         </div>
         
+        <br>
         <div>
           <h3>Other options</h3>
           <label>
@@ -98,6 +115,9 @@
 </dialog>
 
 <style>
+  h4 {
+      margin-bottom: 0;
+    }
 	dialog {
     width: 600px;
 	  border-radius: 1em;
