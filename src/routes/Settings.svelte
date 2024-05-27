@@ -10,11 +10,12 @@
     let btc_conn_obj = {
       protocol: 'http',
       url: '',
-      port: ''
+      port: '',
+      contract_type: ''
     };
 
     $: {
-      btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}`)
+      btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}/${btc_conn_obj.contract_type}`)
     }
 </script>
 
@@ -28,19 +29,44 @@
       <form class="modal" id="settingsForm">
         <div style="margin-bottom: 20px;">
           <h3>Networks</h3>
-          <!-- svelte-ignore a11y-label-has-associated-control -->
-          <label>
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <a>Address {$address}</a>
-          </label>
-          <br>
-          <label>
-            <span class="ml">Network</span>
-            <select bind:value={$network}>
-              <option value={Network.ErgoTestnet}>Testnet</option>
-              <option value={Network.ErgoMainnet}>Mainnet</option>
-            </select>
-          </label>
+          <div>
+            <h4>Ergo Platform</h4>
+            <!-- svelte-ignore a11y-label-has-associated-control -->
+            <label>
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <a>Address {$address}</a>
+            </label>
+            <br>
+            <label>
+              <span class="ml">Network</span>
+              <select bind:value={$network}>
+                <option value={Network.ErgoTestnet}>Testnet</option>
+                <option value={Network.ErgoMainnet}>Mainnet</option>
+              </select>
+            </label>            
+          </div>
+
+          <div>
+            <h4>Bitcoin Network</h4>
+              <label>
+                URL:
+                <select bind:value={btc_conn_obj.protocol}>
+                  <option value="http">http://</option>
+                  <option value="https">https://</option>
+                </select>
+                <input type="text" placeholder="example.com or 192.168.1.1" bind:value={btc_conn_obj.url}>
+                :
+                <input type="text" placeholder="port" bind:value={btc_conn_obj.port}>
+              </label>          
+              <br>
+              <label>
+                Contract:
+                <select bind:value={btc_conn_obj.contract_type}>
+                  <option value="Sigma Rune">Sigma Rune</option>
+                  <option value="Raw data">Raw data</option>
+                </select>
+              </label>  
+          </div>
         </div>
         <div style="margin-bottom: 20px;">
           <h3>Panel options</h3>
@@ -52,21 +78,6 @@
           <label>
             <input type="checkbox" bind:checked={$advance_mode} on:change={e => advance_mode.set(e.target.checked)}>
             <span class="ml">Advance mode</span>
-          </label>
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <h3>Other chains</h3>
-          <h4>Bitcoin Network</h4>
-          <label>
-            URL:
-            <select bind:value={btc_conn_obj.protocol}>
-              <option value="http">http://</option>
-              <option value="https">https://</option>
-            </select>
-            <input type="text" placeholder="example.com or 192.168.1.1" bind:value={btc_conn_obj.url}>
-            :
-            <input type="text" placeholder="port" bind:value={btc_conn_obj.port}>
           </label>
         </div>
         
