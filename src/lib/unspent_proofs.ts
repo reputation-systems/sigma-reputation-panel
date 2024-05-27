@@ -2,6 +2,7 @@ import { type RPBox, type ReputationProof, object_type_by_rendered_value, Networ
 import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered, stringToSerialized } from "$lib/utils";
 import { get } from "svelte/store";
 import { connected } from "./store";
+import { fetch_proofs_over_runes } from "./bitcoin_connector";
 
 /**
     https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
@@ -80,6 +81,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
             offset: 0,
             limit: 500,
         };
+        const btc_proofs = await fetch_proofs_over_runes();
         let proofs = new Map<string, ReputationProof>();
         let moreDataAvailable = true;
 
@@ -177,7 +179,8 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                 return new Map();
             }
         }
-        return proofs;
+
+        return new Map<string, ReputationProof>([...proofs, ...btc_proofs]);
     } catch (error) {
         console.error('Error while making the POST request:', error);
         return new Map();
