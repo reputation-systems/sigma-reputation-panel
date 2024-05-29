@@ -11,4 +11,4 @@ export const compute_deep_level = writable<number>(5);
 export const searchStore = writable<string|null>(null);
 export const connected = writable<boolean>(false);
 export const show_app = writable<boolean>(false);
-export const btc_connector = writable<string|null>(null);
+export const sigma_runes_service = writable<string|null>(null);

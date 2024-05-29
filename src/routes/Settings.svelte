@@ -1,6 +1,6 @@
 <script lang="ts">
     import { NetworkType } from "$lib/ReputationProof";
-    import { address, network_type, show_header, fetch_all, advance_mode, compute_deep_level, btc_connector } from "$lib/store";
+    import { address, network_type, show_header, fetch_all, advance_mode, compute_deep_level, sigma_runes_service } from "$lib/store";
 
     export let showModal: any; // boolean
     let dialog: any; // HTMLDialogElement
@@ -14,7 +14,7 @@
     };
 
     $: {
-      btc_connector.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}`)
+      sigma_runes_service.set(`${btc_conn_obj.protocol}://${btc_conn_obj.url}${btc_conn_obj.port ? ':' + btc_conn_obj.port : ''}`)
     }
 
     let compute_conn_obj = {

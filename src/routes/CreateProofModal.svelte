@@ -40,6 +40,7 @@
 	}
   
 	function generateReputationProof() {
+		console.log(network, proofFormat)
 		if (network == "ergo") {
 			generate_reputation_proof(
 				reputationTokenAmount, input_proof_box ?? undefined, 
