@@ -9,8 +9,8 @@
 
     let btc_conn_obj = {
       protocol: 'http',
-      url: '',
-      port: ''
+      url: 'localhost',
+      port: '8000'
     };
 
     $: {

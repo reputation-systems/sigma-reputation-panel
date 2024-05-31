@@ -40,32 +40,32 @@ async function addBox(box: Box): Promise<null> {
 }
 
 export async function post_sigma_rune(token_amount: number, input_proof?: RPBox,
-    object_to_assign?: string, 
-    object_type_to_assign: ObjectType = ObjectType.PlainText,
-    negative: boolean = false,
-    tags?: string
-  ): Promise<string|null> 
-  {
-    const formatted_tags = tags !== undefined ? tags.toLowerCase().replace(/\s+/g, '-') : null;
-    const reputation_token_label = formatted_tags ?? "reputation-proof-token";   
+  object_to_assign?: string, 
+  object_type_to_assign: ObjectType = ObjectType.PlainText,
+  negative: boolean = false,
+  tags?: string
+): Promise<string|null> 
+{
+  const formatted_tags = tags !== undefined ? tags.toLowerCase().replace(/\s+/g, '-') : null;
+  const reputation_token_label = formatted_tags ?? "reputation-proof-token";   
 
-    const concatenatedString = `${reputation_token_label},${object_type_to_assign?? ""},${object_to_assign ?? ""}`;
-    const token_id = concatenatedString;
+  const concatenatedString = `${reputation_token_label},${object_type_to_assign?? ""},${object_to_assign ?? ""}`;
+  const token_id = concatenatedString;
 
-    return await addBox({
-      sigma_script: ergo_tree_hash,
-      tokens: [{
-        "id": token_id,
-        "amount": token_amount
-      }],
-      r4: stringToSerialized(reputation_token_label),
-      r5: stringToSerialized(object_type_to_assign),
-      r6: stringToSerialized(object_to_assign ?? ""),
-      r7: "",
-      r8: "",
-      r9: ""
-    });
-  }
+  return await addBox({
+    sigma_script: ergo_tree_hash,
+    tokens: [{
+      "id": token_id,
+      "amount": token_amount
+    }],
+    r4: stringToSerialized(reputation_token_label),
+    r5: stringToSerialized(object_type_to_assign),
+    r6: stringToSerialized(object_to_assign ?? ""),
+    r7: "",
+    r8: "",
+    r9: ""
+  });
+}
 
 export async function post_raw_data(token_amount: number, input_proof?: RPBox,
     object_to_assign?: string, 
@@ -79,20 +79,30 @@ export async function post_raw_data(token_amount: number, input_proof?: RPBox,
     return await ""
   }
 
-export async function fetch_proofs_over_runes(): Promise<Map<string, ReputationProof>> 
-{
-  let proofs = new Map<string, ReputationProof>();
+export async function fetch_proofs_over_runes(): Promise<Map<string, ReputationProof>> {
+  try {
+    const response = await axios.get(get(sigma_runes_service) + '/fetch/');
+    const proofsData: Box[] = response.data;
 
-  proofs.set("btc-test-proof", {
-    current_boxes: [], 
-    token_id: "btc-test-proof",
-    number_of_boxes: 0,
-    total_amount: 100,
-    network: Network.Bitcoin,
-    format: "sigma-rune",
-    can_be_spend: true,
-    tag: "only-a-test"
-  });
+    let proofs = new Map<string, ReputationProof>();
 
-  return await proofs;
+    // Parse the response data and populate the proofs map
+    for (const proofData of proofsData) {
+      proofs.set(proofData.tokens[0]['id'], {
+        current_boxes: [],
+        token_id: proofData.tokens[0]['id'],
+        number_of_boxes: 1,
+        total_amount: proofData.tokens[0]['amount'],
+        network: Network.Bitcoin,
+        format: "sigma-rune",
+        can_be_spend: false,
+        tag: proofData.r4 ?? ""
+      });
+    }
+
+    return proofs;
+  } catch (error) {
+    console.error('Error fetching proofs over runes:', error);
+    return new Map<string, ReputationProof>();
+  }
 }
