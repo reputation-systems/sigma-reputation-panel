@@ -66,6 +66,13 @@
   function computeItem(){
     showComputeSearch = true;
   }
+    function linkExplorer() {
+        if (!proof) return;
+        let tx_id = proof.current_boxes[0].box.transactionId;
+        let explorer_tx_id =
+            "https://testnet.ergoplatform.com/en/transactions/" + tx_id;
+        window.open(explorer_tx_id, "_blank");
+    }
   let menuItems = (proof?.can_be_spend ? [
         {
             'name': 'updateItem',
@@ -79,6 +86,13 @@
             'onClick': computeItem,
             'displayText': "Calculate",
             'class': 'fa-solid fa-calculator'
+        },
+        {
+
+            name: "explorerLink",
+            onClick: linkExplorer,
+            displayText: "Check on explorer",
+            class: "fa-solid fa-search",
         }
     ]);
 
