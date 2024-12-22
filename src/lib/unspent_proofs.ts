@@ -164,10 +164,16 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                             total_amount: await get_token_total_amount(explorer_uri, token_id),
                             network: Network.ErgoTestnet,
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
-                            tag: hexToUtf8(r4_value)
+                            tag: hexToUtf8(r4_value),
+                            data: {}
                         };
                     _reputation_proof.current_boxes.push(current_box);
                     _reputation_proof.number_of_boxes += 1;
+                    
+                    if (current_box.object_type === ObjectType.ProofByToken && stringToRendered(token_id) == current_box.object_value) {
+                        _reputation_proof.data = JSON.parse(hexToUtf8(e.additionalRegisters.R9.renderedValue) ?? "");
+                    }
+
                     proofs.set(token_id, _reputation_proof);
                 }                
                 params.offset += params.limit;

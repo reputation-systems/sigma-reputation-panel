@@ -11,6 +11,7 @@ export interface ReputationProof {
     network: Network,
     can_be_spend: boolean,
     tag: string|null,
+    data: object
 }
 
 export function token_rendered(proof: ReputationProof): string {

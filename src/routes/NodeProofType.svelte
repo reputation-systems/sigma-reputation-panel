@@ -84,6 +84,10 @@
           { tag.toLowerCase().replace(/\s+/g, '-') }
         </span>
       {/each}
+
+      {#if Object.keys(proof.data).length > 0}
+        <pre><code>{JSON.stringify(proof.data, null, 2)}</code></pre>
+      {/if}
     {/if}
     {/if}
   </div>
@@ -122,6 +126,19 @@
   .tag {
     padding: 4px 8px;
     color: black;
+    font-size: 8px;
+  }
+
+  pre {
+    background: #f4f4f4;
+    padding: 5px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 8px;
+  }
+
+  code {
+    font-family: 'Courier New', Courier, monospace;
     font-size: 8px;
   }
 </style>
