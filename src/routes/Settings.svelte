@@ -26,8 +26,8 @@
           <br>
           <label>
             <span class="ml">Network</span>
-            <select bind:value={$network}>
-              <option value={Network.ErgoTestnet}>Testnet</option>
+            <select disabled bind:value={$network}>
+             <!-- <option value={Network.ErgoTestnet}>Testnet</option> -->
               <option value={Network.ErgoMainnet}>Mainnet</option>
             </select>
           </label>

@@ -44,9 +44,9 @@ export interface RPBox {
 
 export enum Network {
     ErgoTestnet = "ergo-testnet",
-    ErgoMainnet = "ergo-mainnet",
+    ErgoMainnet = "ergo",
     BitcoinTestnet = "btc-testnet",
-    BitcoinMainnet = "btc-mainnet"
+    BitcoinMainnet = "btc"
 }
 
 export function compute(proof: ReputationProof, object_type: ObjectType, object_value: string): number

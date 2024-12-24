@@ -2,7 +2,7 @@ import { compile } from "@fleet-sdk/compiler";
 import { ErgoAddress, Network } from "@fleet-sdk/core";
 import { sha256, hex } from "@fleet-sdk/crypto";
 
-export const explorer_uri = "https://api-testnet.ergoplatform.com";
+export const explorer_uri = "https://api.ergoplatform.com";
 
 let contract = `{
   proveDlog(SELF.R7[GroupElement].get) &&
@@ -19,7 +19,7 @@ let contract = `{
 }`;
 let ergoTree = compile(contract, {version: 1})
 
-let ergoTreeAddress = ErgoAddress.fromErgoTree(ergoTree.toHex(), Network.Testnet).toString()
+let ergoTreeAddress = ErgoAddress.fromErgoTree(ergoTree.toHex(), Network.Mainnet).toString()
 let ergoTreeHash = hex.encode(sha256(ergoTree.template.toBytes()))
 
 export const ergo_tree_hash = ergoTreeHash

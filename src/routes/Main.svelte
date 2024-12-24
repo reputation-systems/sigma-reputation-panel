@@ -76,7 +76,7 @@
     }
 
     $: {
-        if ($network === "ergo-testnet" || $network === "ergo-mainnet") {
+        if ($network === "ergo-testnet" || $network === "ergo") {
             networkLogo = "https://spectrum.fi/logos/ergo/0000000000000000000000000000000000000000000000000000000000000000.svg?vMgQKXaSAo";
         } else {
             networkLogo = "https://placehold.it/50x50";
