@@ -1,5 +1,6 @@
 <script lang="ts">
     import { data_store } from '$lib/store';
+    import { renderedToString } from '$lib/utils';
 </script>
 
 <div>
@@ -25,11 +26,11 @@
                             <thead>
                                 <tr>
                                     <th>Box ID</th>
-                                    <th>Token Amount</th>
                                     <th>Proportion (%)</th>
+                                    <th>Token Amount</th>
                                     <th>Negative</th>
-                                    <th>Object Value</th>
                                     <th>Object Type</th>
+                                    <th>Object Value</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -40,7 +41,7 @@
                                         <td>{b.token_amount}</td>
                                         <td>{b.negative ? 'Yes' : 'No'}</td>
                                         <td>{b.object_type}</td>
-                                        <td>{b.object_value}</td>
+                                        <td>{renderedToString(b.object_value)}</td>
                                     </tr>
                                 {/each}
                             </tbody>

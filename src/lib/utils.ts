@@ -54,6 +54,30 @@ export function stringToRendered(value: string): string {
     return serializedToRendered(stringToSerialized(value));
 }
 
+function renderedToSerialized(renderedValue: string): string {
+    const patternToStrip = '0e';
+    const serializedValue = patternToStrip + 'xx' + renderedValue;
+    return serializedValue;
+  }
+  
+function serializedToString(serialized: string): string {
+    try {
+        const byteArray = Uint8Array.from(serialized.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+        const decoder = new TextDecoder('utf-8');
+        const utf8String = decoder.decode(byteArray);
+        return utf8String;
+    } catch {
+        console.log("Error al convertir el valor serializado a string con", serialized);
+        return '';
+    }
+}
+
+export function renderedToString(renderedValue: string): string {
+    const serialized = renderedToSerialized(renderedValue);
+    return serializedToString(serialized);
+  }
+
+
 export async function check_if_r7_is_local_addr(value: string): Promise<boolean> {
     if (!get(connected)) return false;
     return stringToRendered(generate_pk_proposition((await ergo.get_change_address()))).substring(4,) === stringToRendered(value);
