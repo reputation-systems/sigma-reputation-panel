@@ -11,4 +11,4 @@ export const compute_deep_level = writable<number>(5);
 export const searchStore = writable<string|null>(null);
 export const connected = writable<boolean>(false);
 export const show_app = writable<boolean>(false);
-export const data_store = writable<[string, any] | null>(null);
+export const data_store = writable<any | null>(null);

@@ -87,8 +87,8 @@
         {/each}
 
         <br/>
-        {#if proof && proof.data}
-          <button on:click={() => data_store.set([proof.token_id.slice(0, 10), proof.data])}>Show info</button>
+        {#if proof}
+          <button on:click={() => data_store.set(proof)}>Show info</button>
         {/if}
       {/if}
     {/if}

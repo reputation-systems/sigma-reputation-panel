@@ -4,14 +4,16 @@
 
 <div>
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-    {#if $data_store !== null}
+{#if $data_store !== null}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div class="modal" on:click={() => data_store.set(null)}>
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="modal-content" on:click|stopPropagation>
-            <h2>{ $data_store[0] }</h2>
-            <pre><code>{JSON.stringify($data_store[1], null, 2)}</code></pre>
+            <h2>{ $data_store.token_id.slice(0, 10) }</h2>
+            {#if $data_store.data !== null}
+                <pre><code>{JSON.stringify($data_store.data, null, 2)}</code></pre>
+            {/if}
         </div>
     </div>
 {/if}
