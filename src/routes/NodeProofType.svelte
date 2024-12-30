@@ -3,6 +3,7 @@
   import PointOneToAnother from './PointOneToAnother.svelte';
   import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   import { hexToUtf8 } from '$lib/utils';
+    import { data_store } from '$lib/store';
   type $$Props = NodeProps;
 
   export let id: $$Props['id'];
@@ -79,16 +80,17 @@
     {#if showContent}
       <br/>
       {#if proof && proof.tag}
-      {#each proof.tag.split(';') as tag}
-        <span class="tag">
-          { tag.toLowerCase().replace(/\s+/g, '-') }
-        </span>
-      {/each}
+        {#each proof.tag.split(';') as tag}
+          <span class="tag">
+            { tag.toLowerCase().replace(/\s+/g, '-') }
+          </span>
+        {/each}
 
-      {#if Object.keys(proof.data).length > 0}
-        <pre><code>{JSON.stringify(proof.data, null, 2)}</code></pre>
+        <br/>
+        {#if proof && proof.data}
+          <button on:click={() => data_store.set([proof.token_id.slice(0, 10), proof.data])}>Show info</button>
+        {/if}
       {/if}
-    {/if}
     {/if}
   </div>
 </div>
