@@ -70,7 +70,7 @@
         if (!proof) return;
         let tx_id = proof.current_boxes[0].box.transactionId;
         let explorer_tx_id =
-            "https://sigmaspace.io/en/transaction/en/transactions/" + tx_id;
+            "https://sigmaspace.io/en/transaction/" + tx_id;
         window.open(explorer_tx_id, "_blank");
     }
   let menuItems = (proof?.can_be_spend ? [
