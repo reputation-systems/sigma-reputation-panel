@@ -263,6 +263,7 @@
       } catch {}
     }
 
+    // Check if there are empty edges.
     if (empty_edges.length > 0) {
       $nodes.push({
               id: "empty-node",
@@ -276,6 +277,49 @@
         _edges.push(empty_edge)
       }
     }
+
+    // Control for double edges.
+    const edgeMap = new Map();
+
+    _edges.forEach(edge => {
+      const key = `${edge.source}-${edge.target}`;
+      const reverseKey = `${edge.target}-${edge.source}`;
+
+      if (edgeMap.has(reverseKey)) {
+        const existingEdge = edgeMap.get(reverseKey);
+        _edges = _edges.filter(e => e.id !== existingEdge.id && e.id !== edge.id);
+        _edges.push({
+            id: `both-${existingEdge.id}-${edge.id}`,
+            source: existingEdge.source,
+            target: existingEdge.target,
+            animated: true,
+            data: {
+              source: {
+                box: existingEdge.data.box,
+                negative: existingEdge.data.negative,
+                proportion: existingEdge.data.proportion,
+                color: existingEdge.data.color
+              },
+              target: {
+                box: edge.data.box,
+                negative: edge.data.negative,
+                proportion: edge.data.proportion,
+                color: edge.data.color
+              }
+            },
+            type: 'edge_type_both'
+          });
+
+          _edges.push({
+            id: `both-${edge.id}-${existingEdge.id}`,
+            source: existingEdge.target,
+            target: existingEdge.source,
+            animated: true,
+          });
+      } else {
+        edgeMap.set(key, edge);
+      }
+    });
 
     $edges = _edges;
     onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );

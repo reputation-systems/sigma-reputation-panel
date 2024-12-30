@@ -1,74 +1,148 @@
 <script lang="ts">
-  import { type EdgeProps, getBezierPath, BaseEdge, EdgeLabelRenderer, useSvelteFlow } from '@xyflow/svelte';
-  import EdgeLabel from './EdgeLabel.svelte';
-
-  type $$Props = EdgeProps;
-
-  export let sourceX: $$Props['sourceX'];
-  export let sourceY: $$Props['sourceY'];
-  export let sourcePosition: $$Props['sourcePosition'];
-  export let targetX: $$Props['targetX'];
-  export let targetY: $$Props['targetY'];
-  export let targetPosition: $$Props['targetPosition'];
-  export let data: $$Props['data'] = undefined;
-
-  const { viewport } = useSvelteFlow();
-
-  let showContent = false;
-  $: {
-      if ($viewport.zoom > 1.8) {
-          showContent = true;
-      } else {
-          showContent = false;
-      }
-  }
-
-  $: [edgePath, labelX, labelY] = getBezierPath({
-      sourceX,
-      sourceY,
-      sourcePosition,
-      targetX,
-      targetY,
-      targetPosition
-  });
-
-  // Function to copy data.box to clipboard
-  const copyToClipboard = () => {
-      if (data && data.box) {
-          navigator.clipboard.writeText(data.box).then(() => {
-              console.log('Text copied to clipboard:', data.box);
-          }).catch((error) => {
-              console.error('Error copying text to clipboard:', error);
-          });
-      }
-  };
-</script>
-
-<BaseEdge path={edgePath} />
-<EdgeLabelRenderer>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div
-      on:click={copyToClipboard}
-      style:transform="translate(-50%, -50%) translate({labelX}px,{labelY}px)"
-      class="edge-label"
-      style="background: {data.color}"
-  >
-      <!-- class="edge-label nodrag nopan" For no drag over it. -->
-      {data.negative === true ? '-' : ''}{data.proportion}%
-      {#if showContent}
-          <EdgeLabel label={data.box.slice(0, 10)} />
-      {/if}
-  </div>
-</EdgeLabelRenderer>
-
-<style>
-  .edge-label {
-      pointer-events: all;
-      position: absolute;
-      padding: 5px;
-      border-radius: 5px;
-      font-size: 8px;
-      font-weight: 700;
-  }
-</style>
+    import { type EdgeProps, getBezierPath, BaseEdge, EdgeLabelRenderer, useSvelteFlow } from '@xyflow/svelte';
+    import EdgeLabel from './EdgeLabel.svelte';
+  
+    type $$Props = EdgeProps;
+  
+    export let sourceX: $$Props['sourceX'];
+    export let sourceY: $$Props['sourceY'];
+    export let sourcePosition: $$Props['sourcePosition'];
+    export let targetX: $$Props['targetX'];
+    export let targetY: $$Props['targetY'];
+    export let targetPosition: $$Props['targetPosition'];
+    export let data: $$Props['data'] = undefined;
+  
+    // Extract source and target data
+    let sourceData = data?.source;
+    let targetData = data?.target;
+  
+    const { viewport } = useSvelteFlow();
+  
+    let showContent = false;
+    $: {
+        if ($viewport.zoom > 1.8) {
+            showContent = true;
+        } else {
+            showContent = false;
+        }
+    }
+  
+    $: [edgePath, labelX, labelY] = getBezierPath({
+        sourceX,
+        sourceY,
+        sourcePosition,
+        targetX,
+        targetY,
+        targetPosition
+    });
+  
+    // Function to copy source or target data to clipboard
+    const copyToClipboard = (content: string) => {
+        if (content) {
+            navigator.clipboard.writeText(content).then(() => {
+                console.log('Text copied to clipboard:', content);
+            }).catch((error) => {
+                console.error('Error copying text to clipboard:', error);
+            });
+        }
+    };
+  </script>
+  
+  <BaseEdge path={edgePath} />
+  <EdgeLabelRenderer>
+    <!-- Main container -->
+    <div
+        style:transform="translate(-50%, -50%) translate({labelX}px,{labelY}px)"
+        class="edge-label-container"
+    >
+        <!-- Left section: Target -->
+        <div
+            on:click={() => copyToClipboard(targetData?.box || '')}
+            class="edge-label edge-label-left"
+            style="background: {targetData?.color || '#CCCCCC'}"
+        >
+            <!-- Arrow and content -->
+            <span class="arrow arrow-left"></span>
+            {targetData?.negative === true ? '-' : ''}{targetData?.proportion}%
+            {#if showContent}
+                <EdgeLabel label={targetData?.box.slice(0, 10)} />
+            {/if}
+        </div>
+        
+        <!-- Right section: Source -->
+        <div
+            on:click={() => copyToClipboard(sourceData?.box || '')}
+            class="edge-label edge-label-right"
+            style="background: {sourceData?.color || '#CCCCCC'}"
+        >
+            <!-- Arrow and content -->
+            {sourceData?.negative === true ? '-' : ''}{sourceData?.proportion}%
+            {#if showContent}
+                <EdgeLabel label={sourceData?.box.slice(0, 10)} />
+            {/if}
+            <span class="arrow arrow-right"></span>
+        </div>
+    </div>
+  </EdgeLabelRenderer>
+  
+  <style>
+    .edge-label-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: all;
+        position: absolute;
+        width: 120px; /* Adjust width if needed */
+    }
+  
+    .edge-label {
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 8px;
+        font-weight: 700;
+        position: relative;
+        pointer-events: all;
+        display: flex;
+        align-items: center;
+    }
+  
+    .edge-label-left {
+        text-align: left;
+        position: relative;
+    }
+  
+    .edge-label-right {
+        text-align: right;
+        position: relative;
+    }
+  
+    /* Arrow styles */
+    .arrow {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-style: solid;
+    }
+  
+    .arrow-left {
+        margin-right: 5px;
+        border-width: 5px 7px 5px 0;
+        border-color: transparent #000000 transparent transparent;
+    }
+  
+    .arrow-right {
+        margin-left: 5px;
+        border-width: 5px 0 5px 7px;
+        border-color: transparent transparent transparent #000000;
+    }
+  
+    /* Optional: Hover effects for clarity */
+    .edge-label:hover .arrow-left {
+        border-color: transparent #555555 transparent transparent;
+    }
+  
+    .edge-label:hover .arrow-right {
+        border-color: transparent transparent transparent #555555;
+    }
+  </style>
+  
