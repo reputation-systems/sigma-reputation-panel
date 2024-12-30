@@ -21,6 +21,7 @@
   import { advance_mode, connected, fetch_all, proofs, searchStore } from '$lib/store';
   import { onMount } from 'svelte';
     import DataModal from './DataModal.svelte';
+    import EdgeTypeBoth from './EdgeTypeBoth.svelte';
 
   let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightEdgeMenu: { id: string; box?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
@@ -134,7 +135,8 @@
   };
   const edgeTypes: EdgeTypes = {
     unconfirmed: UnconfirmedEdgeType,
-    edge_type: EdgeType
+    edge_type: EdgeType,
+    edge_type_both: EdgeTypeBoth
   };
 
   function onLayout(direction: string) {
@@ -187,19 +189,22 @@
             b.object_value && b.object_type &&
             b.object_type == ObjectType.ProofByToken
           ) {
-            _edges.push({
-              id: 'box-edge::'+b.box_id,
-              source: "proof::"+token_rendered(p),
-              target: "proof::"+b.object_value,
-              animated: true,
-              data: {
-                box: b.box_id,
-                negative: b.negative,
-                proportion: percentage_of_tokens,
-                color: b.negative ? "#FF7000" : "#ffcc00"
-              },
-              type: 'edge_type'
-            });
+            let source = token_rendered(p);
+            if (source !== b.object_value) {
+              _edges.push({
+                id: 'box-edge::'+b.box_id,
+                source: "proof::"+source,
+                target: "proof::"+b.object_value,
+                animated: true,
+                data: {
+                  box: b.box_id,
+                  negative: b.negative,
+                  proportion: percentage_of_tokens,
+                  color: b.negative ? "#FF7000" : "#ffcc00"
+                },
+                type: 'edge_type'
+              });
+            }
         }
         else if (
           b.object_value && b.object_type &&
@@ -248,6 +253,7 @@
         }
       });
     });
+
     for (const data of Object.values(plain_nodes)) {
       try {
         $nodes.push(data.node);
@@ -256,7 +262,9 @@
         }          
       } catch {}
     }
-    $nodes.push({
+
+    if (empty_edges.length > 0) {
+      $nodes.push({
               id: "empty-node",
               data: {label: ""},
               type: "circle_type",
@@ -264,9 +272,11 @@
               targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
               position: { x: _x, y: _y },
             }); 
-    for (const empty_edge of empty_edges) {
-      _edges.push(empty_edge)
+      for (const empty_edge of empty_edges) {
+        _edges.push(empty_edge)
+      }
     }
+
     $edges = _edges;
     onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );
   }
