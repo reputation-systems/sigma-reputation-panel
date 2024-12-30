@@ -11,7 +11,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div class="modal-content" on:click|stopPropagation>
-                <h2>{ $data_store.token_id.slice(0, 10) }</h2>
+                <h2>Details of the proof { $data_store.token_id }</h2>
                 
                 <!-- JSON data display -->
                 {#if $data_store.data !== null}
@@ -29,7 +29,7 @@
                                     <th>Proportion (%)</th>
                                     <th>Token Amount</th>
                                     <th>Negative</th>
-                                    <th>Object Type</th>
+                                     <th>Object Type</th>
                                     <th>Object Value</th>
                                 </tr>
                             </thead>
