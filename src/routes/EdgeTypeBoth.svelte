@@ -61,11 +61,10 @@
             class="edge-label edge-label-left"
             style="background: {targetData?.color || '#CCCCCC'}"
         >
-            <!-- Arrow and content -->
-            <span class="arrow arrow-left"></span>
-            {targetData?.negative === true ? '-' : ''}{targetData?.proportion}%
+            <!-- Content -->
+            <div>{targetData?.negative === true ? '-' : ''}{targetData?.proportion}%</div>
             {#if showContent}
-                <EdgeLabel label={targetData?.box.slice(0, 10)} />
+                <div class="box-id">{targetData?.box.slice(0, 10)}</div>
             {/if}
         </div>
         
@@ -75,12 +74,11 @@
             class="edge-label edge-label-right"
             style="background: {sourceData?.color || '#CCCCCC'}"
         >
-            <!-- Arrow and content -->
-            {sourceData?.negative === true ? '-' : ''}{sourceData?.proportion}%
+            <!-- Content -->
+            <div>{sourceData?.negative === true ? '-' : ''}{sourceData?.proportion}%</div>
             {#if showContent}
-                <EdgeLabel label={sourceData?.box.slice(0, 10)} />
+                <div class="box-id">{sourceData?.box.slice(0, 10)}</div>
             {/if}
-            <span class="arrow arrow-right"></span>
         </div>
     </div>
   </EdgeLabelRenderer>
@@ -103,6 +101,7 @@
         position: relative;
         pointer-events: all;
         display: flex;
+        flex-direction: column; /* Stack percentage and box ID */
         align-items: center;
     }
   
@@ -116,33 +115,11 @@
         position: relative;
     }
   
-    /* Arrow styles */
-    .arrow {
-        display: inline-block;
-        width: 0;
-        height: 0;
-        border-style: solid;
-    }
-  
-    .arrow-left {
-        margin-right: 5px;
-        border-width: 5px 7px 5px 0;
-        border-color: transparent #000000 transparent transparent;
-    }
-  
-    .arrow-right {
-        margin-left: 5px;
-        border-width: 5px 0 5px 7px;
-        border-color: transparent transparent transparent #000000;
-    }
-  
-    /* Optional: Hover effects for clarity */
-    .edge-label:hover .arrow-left {
-        border-color: transparent #555555 transparent transparent;
-    }
-  
-    .edge-label:hover .arrow-right {
-        border-color: transparent transparent transparent #555555;
+    /* Box ID styles */
+    .box-id {
+        font-size: 7px;
+        color: #333333; /* Optional: change to fit your theme */
+        margin-top: 2px;
     }
   </style>
   
