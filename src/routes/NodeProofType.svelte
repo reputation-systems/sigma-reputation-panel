@@ -3,13 +3,13 @@
   import PointOneToAnother from './PointOneToAnother.svelte';
   import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   import { hexToUtf8 } from '$lib/utils';
-    import { data_store } from '$lib/store';
+  import { data_store } from '$lib/store';
   type $$Props = NodeProps;
 
   export let id: $$Props['id'];
   export let data: $$Props['data']; data;
   export let dragHandle: $$Props['dragHandle'] = undefined; dragHandle;
-  export let type: $$Props['type']  = undefined; type;
+  export let type: $$Props['type'] = undefined; type;
   export let selected: $$Props['selected'] = undefined; selected;
   export let isConnectable: $$Props['isConnectable'] = undefined; isConnectable;
   export let zIndex: $$Props['zIndex'] = undefined; zIndex;
@@ -41,6 +41,10 @@
     }
   }
 
+  function handleDblClick() {
+    data_store.set(proof);
+  }
+
   function handleConnection(connections: any[]) {  // <-- type HandleConnection[]
     connection = connections[0];
     if (connection) {
@@ -70,12 +74,13 @@
 <div class={proof.can_be_spend ? "customNode" : "customExternalNode"}>
   <Handle type="target" position={Position.Left} {isConnectable} />
   <Handle
-    type="source" 
+    type="source"
     position={Position.Right} 
     onconnect={handleConnection}
     isConnectable={proof.can_be_spend}
   />
-  <div style="font-size: small;">
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div style="font-size: small;" on:dblclick={handleDblClick}>
       {data.label}
     {#if showContent}
       <br/>
@@ -85,11 +90,7 @@
             { tag.toLowerCase().replace(/\s+/g, '-') }
           </span>
         {/each}
-
         <br/>
-        {#if proof}
-          <button on:click={() => data_store.set(proof)}>Show info</button>
-        {/if}
       {/if}
     {/if}
   </div>
@@ -144,7 +145,6 @@
     font-size: 8px;
   }
 </style>
-
 
 {#if proof && connection && delete_edge_function && object_to_assign && object_type_to_assign}
   <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>

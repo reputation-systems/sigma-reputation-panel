@@ -3,7 +3,7 @@
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import type { ReputationProof } from "$lib/ReputationProof";
   import ComputeSearchModal from "./ComputeSearchModal.svelte";
-    import { network } from "$lib/store";
+    import { data_store, network } from "$lib/store";
 
   export let onClick: () => void;
   export let proof: ReputationProof|null;
@@ -66,35 +66,48 @@
   function computeItem(){
     showComputeSearch = true;
   }
-    function linkExplorer() {
+
+  function handleDblClick() {
+    data_store.set(proof);
+  }
+
+  function linkExplorer() {
         if (!proof) return;
         let tx_id = proof.current_boxes[0].box.transactionId;
         let explorer_tx_id =
             "https://sigmaspace.io/en/transaction/" + tx_id;
         window.open(explorer_tx_id, "_blank");
     }
-  let menuItems = (proof?.can_be_spend ? [
+
+    let menuItems = [
         {
-            'name': 'updateItem',
-            'onClick': updateItem,
-            'displayText': "Update",
-            'class': 'fa-solid fa-pencil-alt'
-        }
-    ] : []).concat([
+            name: "openInfo",
+            onClick: handleDblClick,
+            displayText: "Details",
+            class: "fa-solid fa-info"
+        },
+        {
+            name: "explorerLink",
+            onClick: linkExplorer,
+            displayText: "Check on explorer",
+            class: "fa-solid fa-search",
+        },
         {
             'name': 'computeItem',
             'onClick': computeItem,
             'displayText': "Calculate",
             'class': 'fa-solid fa-calculator'
-        },
-        {
-
-            name: "explorerLink",
-            onClick: linkExplorer,
-            displayText: "Check on explorer",
-            class: "fa-solid fa-search",
         }
-    ]);
+    ];
+
+    if (proof?.can_be_spend) {
+        menuItems.push({
+            'name': 'updateItem',
+            'onClick': updateItem,
+            'displayText': "Update",
+            'class': 'fa-solid fa-pencil-alt'
+        });
+    }
 
 
 </script>
