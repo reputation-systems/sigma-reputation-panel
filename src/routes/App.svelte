@@ -131,6 +131,7 @@
   // Object uuid functions  on TypeScript
 
   import { v4 as uuidv4 } from 'uuid';
+    import { type LinkedHash } from '$lib/LinkedObject';
 
   type Hashes = { [key: string]: string };
 
@@ -154,8 +155,15 @@
     return newUuid;
   }
 
-  function get_object_hashes(uuid: string): Hashes | null {
-    return current_objects[uuid] || null;
+  function get_object_hashes(uuid: string): LinkedHash[] | null {
+    return hashesToLinkedHash(current_objects[uuid]) || null;
+  }
+
+  function hashesToLinkedHash(hashes: Hashes): LinkedHash[] {
+    return Object.entries(hashes).map(([algorithm, value]) => ({
+      algorithm,
+      value,
+    }));
   }
 
   // End
