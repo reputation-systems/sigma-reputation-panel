@@ -17,7 +17,12 @@ let negative: boolean = false;
 
 let unspend_reputation_proofs: ReputationProof[] = [];
 
-let linkedHashes = [
+interface LinkedHash {
+        algorithm: string | null;
+        value: string;
+    }
+
+let linkedHashes: LinkedHash[] = [
     { algorithm: null, value: '' }
 ];
 
@@ -55,10 +60,18 @@ $: {
 	}
 
 function generateReputationProof() {
+
+	if (object_type_to_assign === ObjectType.LinkedObject) {
+		object_to_assign = JSON.stringify(linkedHashes.filter(item => typeof(item.algorithm) === "string" && item.algorithm.length >= 64));
+	}
+
 	generate_reputation_proof(
 		(reputationTokenAmount / 100) * proof.total_amount,
 		input_proof_box ?? undefined, 
-		object_to_assign, object_type_to_assign, negative, tags
+		object_to_assign, 
+		object_type_to_assign, 
+		negative, 
+		tags
 	);
 }
 
