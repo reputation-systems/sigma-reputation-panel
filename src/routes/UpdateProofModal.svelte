@@ -2,6 +2,7 @@
 import { updateReputationProofList } from '$lib/unspent_proofs';
 import { generate_reputation_proof } from '$lib/generate_reputation_proof';
 import { explorer_uri, ergo_tree_hash } from '$lib/envs';
+import { type LinkedHash } from '$lib/LinkedObject';
 import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
 
 export let showModal: boolean; // boolean
@@ -16,11 +17,6 @@ let tags: string;
 let negative: boolean = false;
 
 let unspend_reputation_proofs: ReputationProof[] = [];
-
-interface LinkedHash {
-        algorithm: string | null;
-        value: string;
-    }
 
 let linkedHashes: LinkedHash[] = [
     { algorithm: null, value: '' }
