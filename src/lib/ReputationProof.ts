@@ -20,7 +20,8 @@ export function token_rendered(proof: ReputationProof): string {
 
 export enum ObjectType {
     PlainText = "plain/txt-utf8",
-    ProofByToken = "token-proof"
+    ProofByToken = "token-proof",
+    LinkedObject = "linked-object"
 }
 
 export function object_type_by_rendered_value(value: string): ObjectType {

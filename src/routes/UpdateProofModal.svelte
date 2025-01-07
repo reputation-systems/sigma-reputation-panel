@@ -17,10 +17,28 @@ let negative: boolean = false;
 
 let unspend_reputation_proofs: ReputationProof[] = [];
 
+let linkedHashes = [
+    { algorithm: null, value: '' }
+];
+
+const baseHashes = {
+    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'SHA2 256',
+    'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a': 'SHA3 256',
+    '46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f': 'SHAKE 256'
+};
+
 function handleInputProofChange(event: any) {
 	reputationTokenAmount = 0;
 	object_to_assign = "";
 	handleObjectToAssignChange(event);
+}
+
+function addNewHash() {
+    linkedHashes = [...linkedHashes, { algorithm: null, value: '' }];
+}
+
+function removeHash(index: number) {
+    linkedHashes = linkedHashes.filter((_, i) => i !== index);
 }
 
 function handleObjectToAssignChange(event: any) {
@@ -58,7 +76,7 @@ async function fetchReputationProofs(all: boolean = true) {
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation>
+	<div on:click|stopPropagation class="modal-content">
 		<h2 class="modal-title" id="generateReputationLabel">Update reputation proof</h2>
 		<hr />
 		<form id="reputationForm">
@@ -76,7 +94,8 @@ async function fetchReputationProofs(all: boolean = true) {
 				<label for="object_to_assign" class="form-label">Object to assign reputation</label>
 				<select class="form-select" bind:value={object_type_to_assign}  on:change={handleInputProofChange}>
 					<option value={ObjectType.PlainText}>Plain text</option>
-					<option value={ObjectType.ProofByToken}>Other reputation proof</option>
+					<option value={ObjectType.ProofByToken}>Reputation proof</option>
+					<option value={ObjectType.LinkedObject}>Linked Object</option>
 				</select>
 				{#if object_type_to_assign == ObjectType.PlainText}
 					<input type="text" class="form-control" bind:value={object_to_assign} style="max-width: 97%;"/>
@@ -93,6 +112,55 @@ async function fetchReputationProofs(all: boolean = true) {
 							{/if}
 						{/each}
 					</select>
+				{/if}
+				{#if object_type_to_assign === ObjectType.LinkedObject}
+					<div class="linked-hashes mt-2">
+						{#each linkedHashes as hash, i}
+						<div class="hash-pair mb-2">
+							{#if hash.algorithm === null}
+								<select class="form-select mb-1" bind:value={hash.algorithm}>
+									<option value="">Select Algorithm</option>
+									{#each Object.entries(baseHashes) as [hashValue, name]}
+										{#if !linkedHashes.some(linked => linked.algorithm === hashValue)}
+											<option value={hashValue}>{name}</option>
+										{/if}
+									{/each}
+									<option value="">Other</option>
+								</select>
+							{:else if hash.algorithm.length < 64}
+								<input
+									type="text"
+									class="form-control mb-1"
+									placeholder="Enter hash identifier"
+									bind:value={hash.algorithm}
+								/>
+							{:else if hash.algorithm !== null && hash.algorithm in baseHashes}
+								<!-- svelte-ignore a11y-missing-attribute -->
+								<input
+									type="text"
+									disabled
+									class="form-control mb-1"
+									placeholder="Enter hash identifier"
+									bind:value={baseHashes[String(hash.algorithm)]}
+								>
+							{/if}
+							<input 
+								type="text" 
+								class="form-control"
+								placeholder="Hash value"
+								bind:value={hash.value}
+							/>
+							<button
+								type="button"
+								class="btn btn-danger btn-sm"
+								on:click={() => removeHash(i)}
+							>
+								Delete
+							</button>
+						</div>
+						{/each}
+						<button class="btn btn-primary" type="button" on:click={addNewHash}>Add Hash</button>
+					</div>
 				{/if}
 			</div>
 			<div class="mb-3">
@@ -123,7 +191,7 @@ async function fetchReputationProofs(all: boolean = true) {
 
 <style>
 dialog {
-	max-width: 32em;
+	max-width: 100rem;;
 	border-radius: 1em;
 	padding: 1em;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -158,6 +226,22 @@ hr {
 	font-size: 1rem;
 	border: 0.025px solid #ccc;
 	border-radius: 0.25em;
+	margin-bottom: 0.5rem;
+}
+
+.modal-content {
+	width: 90%;
+	max-width: 900px;
+	margin: auto;
+}
+.hash-pair {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.tag {
+    color: #666;
 }
 
 .form-select {

@@ -90,9 +90,8 @@
                     on:change={handleInputProofChange}
                 >
                     <option value={ObjectType.PlainText}>Plain text</option>
-                    <option value={ObjectType.ProofByToken}
-                        >Other reputation proof</option
-                    >
+                    <option value={ObjectType.ProofByToken}>Reputation proof</option>
+                    <option value={ObjectType.LinkedObject}>Linked Object</option>
                 </select>
                 {#if object_type_to_assign == ObjectType.PlainText}
                     <input
