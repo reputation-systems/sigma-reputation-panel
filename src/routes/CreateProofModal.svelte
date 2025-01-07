@@ -254,7 +254,7 @@
 
 <style>
     dialog {
-        max-width: 100rem;;
+        max-width: 100rem;
         border-radius: 1em;
         padding: 1em;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
