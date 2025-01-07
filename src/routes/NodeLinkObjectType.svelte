@@ -46,9 +46,9 @@
   <Handle type="target" position={Position.Left} {isConnectable} />
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div style="font-size: small;" on:dblclick={handleDblClick}>
-      {data.hashes}
+      {hashes}
     {#if showContent}
-      
+    
     {/if}
   </div>
 </div>

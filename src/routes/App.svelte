@@ -275,9 +275,9 @@
         }
         else if (
           b.object_value && b.object_type &&
-          b.object_type == ObjectType.PlainText
+          b.object_type == ObjectType.LinkedObject
         ) {
-          let hashes = JSON.parse(b.object_value);
+          let hashes = JSON.parse(hexToUtf8(b.object_value));
           let object_uuid = get_object_uuid(hashes);
           let node_id = 'object-node::'+object_uuid;
           if (! (node_id in object_nodes)) {
