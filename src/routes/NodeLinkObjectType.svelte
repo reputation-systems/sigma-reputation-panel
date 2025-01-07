@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow, type Connection } from '@xyflow/svelte';
-  import PointOneToAnother from './PointOneToAnother.svelte';
-  import { ObjectType } from '$lib/ReputationProof';
+  import { Position, type NodeProps, Handle, useSvelteFlow } from '@xyflow/svelte';;
   import { data_store } from '$lib/store';
-    import { LinkedHash } from '$lib/LinkedObject';
+  import { type LinkedHash } from '$lib/LinkedObject';
+  
   type $$Props = NodeProps;
 
   export let id: $$Props['id'];
@@ -23,10 +22,6 @@
 
   let showModal = false;
   let hashes: LinkedHash = data.hashes;
-  let connection: any | null;
-  let object_to_assign: string | null = null;
-  let object_type_to_assign: ObjectType | null = null;
-  let delete_edge_function = data.delete_edge_function;
 
   $: isConnectable = true; // $connections.length === 0;
 
@@ -107,7 +102,3 @@
     font-size: 8px;
   }
 </style>
-
-{#if proof && connection && delete_edge_function && object_to_assign && object_type_to_assign}
-  <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
-{/if}

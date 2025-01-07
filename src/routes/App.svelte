@@ -22,6 +22,7 @@
   import { onMount } from 'svelte';
     import DataModal from './DataModal.svelte';
     import EdgeTypeBoth from './EdgeTypeBoth.svelte';
+    import NodeLinkObjectType from './NodeLinkObjectType.svelte';
 
   let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightEdgeMenu: { id: string; box?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
@@ -127,11 +128,45 @@
     return { nodes, edges };
   }
 
+  // Object uuid functions  on TypeScript
+
+  import { v4 as uuidv4 } from 'uuid';
+
+  type Hashes = { [key: string]: string };
+
+  let current_objects: { [uuid: string]: Hashes } = {};
+
+  function get_object_uuid(hashes: Hashes): string {
+    // Check if any of the provided hashes exist in current_objects
+    for (const [key, value] of Object.entries(hashes)) {
+      for (const [uuid, existingHashes] of Object.entries(current_objects)) {
+        if (existingHashes[key] === value) {
+          // If the hash exists, add new hashes to the existing UUID entry and return that UUID
+          current_objects[uuid] = { ...existingHashes, ...hashes };
+          return uuid;
+        }
+      }
+    }
+
+    // No existing hash found, create a new UUID and add the hashes
+    const newUuid = uuidv4();
+    current_objects[newUuid] = hashes;
+    return newUuid;
+  }
+
+  function get_object_hashes(uuid: string): Hashes | null {
+    return current_objects[uuid] || null;
+  }
+
+  // End
+
+
   const nodes = writable<Node[]>([]);
   const edges = writable<Edge[]>([]);
   const nodeTypes: NodeTypes = {
     proof_type: NodeProofType,
-    circle_type: NodeCircleType
+    circle_type: NodeCircleType,
+    linked_object_type: NodeLinkObjectType
   };
   const edgeTypes: EdgeTypes = {
     unconfirmed: UnconfirmedEdgeType,
@@ -170,6 +205,7 @@
     $nodes = [];
     $edges = [];
     let plain_nodes: any = {};  // Objects of plain nodes and edges.
+    let object_nodes: any = {};
     let _x = 0; let _y = 0;
     let _edges: Edge[] = [];
     let empty_edges: Edge[] = [];
@@ -237,6 +273,39 @@
             type: 'edge_type'
           });
         }
+        else if (
+          b.object_value && b.object_type &&
+          b.object_type == ObjectType.PlainText
+        ) {
+          let hashes = JSON.parse(b.object_value);
+          let object_uuid = get_object_uuid(hashes);
+          let node_id = 'object-node::'+object_uuid;
+          if (! (node_id in object_nodes)) {
+            object_nodes[node_id] = {
+                node: {
+                  id: node_id,
+                  data: {hashes: {}, uuid: object_uuid},
+                  type: "linked_object_type",
+                  sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
+                  targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
+                  position: { x: _x, y: _y },
+                },
+                edges: []
+              }
+          }
+          object_nodes[node_id].edges.push({
+            id: 'box-edge::'+b.box_id,
+            source: "proof::"+token_rendered(p),
+            target: node_id,
+            data: {
+              box: b.box_id,
+              negative: b.negative,
+              proportion: percentage_of_tokens,
+              color: b.negative ? "#FF7000" : "#ffcc00"
+            },
+            type: 'edge_type'
+          });
+        }
         else {
           empty_edges.push({
               id: 'box-edge::'+b.box_id,
@@ -253,6 +322,16 @@
         }
       });
     });
+
+    for (const data of Object.values(object_nodes)) {
+      try {
+        data.node.data.hashes = get_object_hashes(data.node.data.uuid);
+        $nodes.push(data.node);
+        for (const edge of Object.values(data.edges)) {
+          _edges.push(edge);
+        }          
+      } catch {}
+    }
 
     for (const data of Object.values(plain_nodes)) {
       try {
