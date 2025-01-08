@@ -60,12 +60,14 @@
             });
     };
 
-    let menuItems = {
+    let menuItems = [
+            {
               'name': 'copy',
               'onClick': copyToClipboard,
               'displayText': "Copy",
               'class': 'fa-solid fa-pencil-alt'
-          };
+            }
+        ];
   
   
   </script>
