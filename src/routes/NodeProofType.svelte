@@ -61,7 +61,7 @@
           object_type_to_assign = ObjectType.PlainText
           break;
         }
-        case "linked-object": {
+        case "object-node": {
           object_type_to_assign = ObjectType.LinkedObject
           break;
         }
@@ -99,6 +99,10 @@
     {/if}
   </div>
 </div>
+
+{#if proof && connection && delete_edge_function && object_to_assign && object_type_to_assign}
+  <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
+{/if}
 
 <style>
   .customExternalNode {
@@ -149,7 +153,3 @@
     font-size: 8px;
   }
 </style>
-
-{#if proof && connection && delete_edge_function && object_to_assign && object_type_to_assign}
-  <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
-{/if}
