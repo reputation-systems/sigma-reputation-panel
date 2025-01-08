@@ -4,6 +4,8 @@
   import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   import { hexToUtf8 } from '$lib/utils';
   import { data_store } from '$lib/store';
+  import PointOneToAnObject from './PointOneToAnObject.svelte';
+
   type $$Props = NodeProps;
 
   export let id: $$Props['id'];
@@ -101,7 +103,13 @@
 </div>
 
 {#if proof && connection && delete_edge_function && object_to_assign && object_type_to_assign}
-  <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
+  {#if object_type_to_assign === ObjectType.ProofByToken}
+    <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
+  {:else if object_type_to_assign === ObjectType.PlainText}
+    <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
+  {:else if object_type_to_assign === ObjectType.LinkedObject}
+    <PointOneToAnObject bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
+  {/if}
 {/if}
 
 <style>
