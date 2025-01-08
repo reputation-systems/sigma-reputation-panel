@@ -127,10 +127,6 @@
 	  height: 2.5em;
 	}
   
-	.required {
-	  color: red;
-	}
-  
 	.row {
 	  display: flex;
 	  justify-content: flex-end;
