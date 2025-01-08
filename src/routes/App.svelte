@@ -245,7 +245,7 @@
                 id: 'box-edge::'+b.box_id,
                 source: "proof::"+source,
                 target: "proof::"+b.object_value,
-                animated: true,
+                animated: false,
                 data: {
                   box: b.box_id,
                   negative: b.negative,
@@ -386,7 +386,7 @@
             id: `both-${existingEdge.id}-${edge.id}`,
             source: existingEdge.source,
             target: existingEdge.target,
-            animated: true,
+            animated: false,
             data: {
               source: {
                 box: existingEdge.data.box,
@@ -408,7 +408,7 @@
             id: `both-${edge.id}-${existingEdge.id}`,
             source: existingEdge.target,
             target: existingEdge.source,
-            animated: true,
+            animated: false,
           });
       } else {
         edgeMap.set(key, edge);
