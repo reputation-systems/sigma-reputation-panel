@@ -2,8 +2,8 @@ import { writable } from 'svelte/store';
 import type { ReputationProof } from './ReputationProof';
 
 export const proofs = writable<Map<string, ReputationProof>>(new Map());
-export const show_header = writable<boolean>(false);
-export const advance_mode = writable<boolean>(false);
+export const show_header = writable<boolean>(true);
+export const advance_mode = writable<boolean>(true);
 export const fetch_all = writable<boolean>(true);
 export const address = writable<string|null>(null);
 export const network = writable<string|null>(null);
