@@ -2,7 +2,7 @@
   import { Position, type NodeProps, Handle, useSvelteFlow } from '@xyflow/svelte';
   import { data_store } from '$lib/store';
   import { type LinkedHash } from '$lib/LinkedObject';
-  
+
   type $$Props = NodeProps;
 
   export let id: $$Props['id'];
@@ -17,6 +17,12 @@
   export let dragging: $$Props['dragging'];
   export let targetPosition: $$Props['targetPosition'] = undefined;
   export let sourcePosition: $$Props['sourcePosition'] = undefined;
+
+  const baseHashes = {
+      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'SHA2 256',
+      'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a': 'SHA3 256',
+      '46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f': 'SHAKE 256'
+  };
 
   let showModal = false;
   let hashes: LinkedHash[] = data.hashes;
@@ -39,17 +45,11 @@
   <Handle type="target" position={Position.Left} {isConnectable} />
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div style="font-size: smaller;" on:dblclick={handleDblClick}>
-    {#if showContent}
-      {#each hashes as { algorithm, value }}
-        <div><strong>{algorithm ?? 'Unknown'}:</strong> {value}</div>
-      {/each}
-    {:else}
-      {#if hashes.length > 0}
-        {hashes[0].value}
-      {:else}
-        No data available
-      {/if}
-    {/if}
+    {#each hashes as {algorithm, value}}
+      <div>
+        <strong>{baseHashes[algorithm] ?? algorithm?.slice(0, 6) ?? 'Unknown'}:</strong> {value.slice(0, 6)}
+      </div>
+    {/each}
   </div>
 </div>
 

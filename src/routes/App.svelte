@@ -156,14 +156,7 @@
   }
 
   function get_object_hashes(uuid: string): LinkedHash[] | null {
-    return hashesToLinkedHash(current_objects[uuid]) || null;
-  }
-
-  function hashesToLinkedHash(hashes: Hashes): LinkedHash[] {
-    return Object.entries(hashes).map(([algorithm, value]) => ({
-      algorithm,
-      value,
-    }));
+    return current_objects[uuid] || null;
   }
 
   // End
@@ -334,6 +327,7 @@
     for (const data of Object.values(object_nodes)) {
       try {
         data.node.data.hashes = get_object_hashes(data.node.data.uuid);
+        console.log(data.node.data.hashes)
         $nodes.push(data.node);
         for (const edge of Object.values(data.edges)) {
           _edges.push(edge);
