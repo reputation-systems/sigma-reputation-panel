@@ -24,7 +24,8 @@
     import EdgeTypeBoth from './EdgeTypeBoth.svelte';
     import NodeLinkObjectType from './NodeLinkObjectType.svelte';
 
-  let rightNodeMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
+  let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
+  let rightNodeForObjectMenu: { id: string, uuid: string, top?: number; left?: number; right?: number; bottom?: number  } | null;
   let rightEdgeMenu: { id: string; box?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   let width: number;
   let height: number;
@@ -35,7 +36,7 @@
     // Calculate position of the context menu. We want to make sure it
     // doesn't get positioned off-screen.
     if (node.data.proof) {
-      rightNodeMenu = {
+      rightNodeForProofMenu = {
         id: node.id,
         proof: node.data.proof ?? null,
         top: event.clientY < height - 200 ? event.clientY : undefined,
@@ -43,6 +44,16 @@
         right: event.clientX >= width - 200 ? width - event.clientX : undefined,
         bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
       };        
+    }
+    else if (node.data.hashes) {
+      rightNodeForObjectMenu = {
+        id: node.id,
+        uuid: node.data.uuid,
+        top: event.clientY < height - 200 ? event.clientY : undefined,
+        left: event.clientX < width - 200 ? event.clientX : undefined,
+        right: event.clientX >= width - 200 ? width - event.clientX : undefined,
+        bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
+      }; 
     }
   }
 
@@ -66,7 +77,7 @@
 
   // Close the context menu if it's open whenever the window is clicked.
   function handlePaneClick() {
-    rightNodeMenu = null;
+    rightNodeForProofMenu = null;
     rightEdgeMenu = null;
   }
   
@@ -132,6 +143,7 @@
 
   import { v4 as uuidv4 } from 'uuid';
     import { type LinkedHash } from '$lib/LinkedObject';
+    import NodeObjectContextMenu from './NodeObjectContextMenu.svelte';
 
   type Hashes = { [key: string]: string };
 
@@ -433,11 +445,16 @@
     {/if}
   </SvelteFlow>
   
-  {#if rightNodeMenu}
+  {#if rightNodeForProofMenu}
     <NodeContextMenu
       onClick={handlePaneClick}
-      proof={rightNodeMenu.proof ?? null}
+      proof={rightNodeForProofMenu.proof ?? null}
     />
+  {:else if rightNodeForObjectMenu}
+    <NodeObjectContextMenu
+        onClick={handlePaneClick}
+        uuid={rightNodeForObjectMenu.uuid}
+      />
   {:else if rightEdgeMenu}
     <EdgeContextMenu
       onClick={handlePaneClick}
