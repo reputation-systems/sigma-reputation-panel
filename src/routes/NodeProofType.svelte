@@ -61,6 +61,10 @@
           object_type_to_assign = ObjectType.PlainText
           break;
         }
+        case "linked-object": {
+          object_type_to_assign = ObjectType.LinkedObject
+          break;
+        }
         default: {
           object_type_to_assign = null;
           break;
