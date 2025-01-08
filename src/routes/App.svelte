@@ -78,6 +78,7 @@
   // Close the context menu if it's open whenever the window is clicked.
   function handlePaneClick() {
     rightNodeForProofMenu = null;
+    rightNodeForObjectMenu = null;
     rightEdgeMenu = null;
   }
   
