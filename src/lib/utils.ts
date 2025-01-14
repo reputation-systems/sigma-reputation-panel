@@ -37,6 +37,7 @@ export function hexToUtf8(hexString: string): string | null {
   }
 
 export function generate_pk_proposition(wallet_pk: string): string {
+    // ErgoValue(SigmaProp(ProveDlog(ECPoint(8696f0,515cda,...))), ErgoType(SigmaProp))
     const pk = ErgoAddress.fromBase58(wallet_pk).getPublicKeys()[0];
     const encodedProp = SGroupElement(pk);
     return encodedProp.toHex();
