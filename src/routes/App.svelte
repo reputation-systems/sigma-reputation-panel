@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 <script lang="ts">
-  import { writable } from 'svelte/store';
+  import { derived, get, writable } from 'svelte/store';
   import { SvelteFlow, Background, type Node, Controls, MiniMap, Position, type Edge, ControlButton, type EdgeTypes, type NodeTypes } from '@xyflow/svelte';
   
   import '@xyflow/svelte/dist/style.css';
@@ -18,7 +18,7 @@
   import NodeContextMenu from './NodeContextMenu.svelte';
   import NodeProofType from './NodeProofType.svelte';
   import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
-  import { advance_mode, connected, fetch_all, proofs, searchStore } from '$lib/store';
+  import { advance_mode, building_graph, connected, fetch_all, proofs, searchStore } from '$lib/store';
   import { onMount } from 'svelte';
     import DataModal from './DataModal.svelte';
     import EdgeTypeBoth from './EdgeTypeBoth.svelte';
@@ -82,7 +82,12 @@
     rightEdgeMenu = null;
   }
   
+  let isFetching = false;
   async function fetchReputationProofs() {
+    if (isFetching) return;
+    isFetching = true;
+    
+    console.log("FETCH DATA!!")
     try {
       if (!(connected)) fetch_all.set(true);
       proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, (typeof ergo !== "undefined")  ? ergo : null, $fetch_all, $searchStore));
@@ -92,14 +97,20 @@
     }
   }
   
-  onMount(() => fetchReputationProofs())
-  connected.subscribe(() => fetchReputationProofs())
-  searchStore.subscribe(function () {
-    fetchReputationProofs(); 
-  });
-  fetch_all.subscribe(function () {
-    fetchReputationProofs();
-  })
+    const combinedStore = derived(
+      [connected, searchStore, fetch_all],
+      ([$connected, $searchStore, $fetch_all]) => {
+        return { $connected, $searchStore, $fetch_all };
+      }
+    );
+
+    onMount(() => {
+      fetchReputationProofs();
+    });
+
+    combinedStore.subscribe(() => {
+      fetchReputationProofs();
+    });
 
   // setInterval(() => {if ($connected) { fetchReputationProofs(); }; console.log("refesh.")}, 1000);
 
@@ -214,7 +225,10 @@
     }
   }
 
+  const isBuildingGraph = get(building_graph);
   function build_graph(_proofs: ReputationProof[]) {
+    if (isBuildingGraph) { return; }
+    building_graph.set(true);
     console.log("build graph")
     $nodes = [];
     $edges = [];
@@ -417,6 +431,8 @@
 
     $edges = _edges;
     onLayout(window.innerWidth < window.innerHeight ? 'TB' : 'LR', );
+    building_graph.set(false);
+    console.log("Ends build graph.")
   }
 </script>
 

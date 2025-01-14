@@ -3,8 +3,9 @@
   import PointOneToAnother from './PointOneToAnother.svelte';
   import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   import { hexToUtf8 } from '$lib/utils';
-  import { data_store } from '$lib/store';
+  import { building_graph, data_store } from '$lib/store';
   import PointOneToAnObject from './PointOneToAnObject.svelte';
+  import { get } from 'svelte/store';
 
   type $$Props = NodeProps;
 
@@ -47,13 +48,16 @@
     data_store.set(proof);
   }
 
+  const isBuildingGraph = get(building_graph);
+
   function handleConnection(connections: any[]) {  // <-- type HandleConnection[]
     connection = connections[0];
-    if (connection) {
+    if (connection && isBuildingGraph === false) {
       showModal = true;
 
       let __target_node_id = connection.target.split("::");
       object_to_assign = hexToUtf8(__target_node_id[1]);
+      console.log("Object to asssign "+__target_node_id[0]+ " And "+isBuildingGraph)
       switch (__target_node_id[0]) {
         case "proof": {
           object_type_to_assign = ObjectType.ProofByToken
