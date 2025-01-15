@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type LinkedHash } from "$lib/LinkedObject";
+    import { type LinkedObject } from "$lib/LinkedObject";
 
 
   import { data_store } from "$lib/store";
@@ -8,8 +8,7 @@
 
 
 
-  export let uuid: string;
-  export let hashes: LinkedHash[]
+    export let linked_object: LinkedObject;
   
 
   // pos is cursor position when right click occur
@@ -62,7 +61,7 @@
   }
 
   function handleDblClick() {
-    data_store.set({hashes: hashes, uuid: uuid});
+    data_store.set(linked_object);
   }
 
     let menuItems = [

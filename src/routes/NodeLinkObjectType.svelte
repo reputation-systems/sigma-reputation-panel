@@ -26,7 +26,6 @@
 
   let showModal = false;
   let hashes: LinkedHash[] = data.hashes;
-  console.log(hashes)
 
   $: isConnectable = true;
 

@@ -24,8 +24,12 @@
     import EdgeTypeBoth from './EdgeTypeBoth.svelte';
     import NodeLinkObjectType from './NodeLinkObjectType.svelte';
 
+    import { v4 as uuidv4 } from 'uuid';
+    import { type LinkedObject, type LinkedHash } from '$lib/LinkedObject';
+    import NodeObjectContextMenu from './NodeObjectContextMenu.svelte';
+
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
-  let rightNodeForObjectMenu: { id: string, uuid: string, hashes: LinkedHash[], top?: number; left?: number; right?: number; bottom?: number  } | null;
+  let rightNodeForObjectMenu: { id: string, linked_object?: LinkedObject, top?: number; left?: number; right?: number; bottom?: number  } | null;
   let rightEdgeMenu: { id: string; box?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   let width: number;
   let height: number;
@@ -48,8 +52,7 @@
     else if (node.data.hashes) {
       rightNodeForObjectMenu = {
         id: node.id,
-        uuid: node.data.uuid,
-        hashes: node.data.hashes,
+        linked_object: node.data,
         top: event.clientY < height - 200 ? event.clientY : undefined,
         left: event.clientX < width - 200 ? event.clientX : undefined,
         right: event.clientX >= width - 200 ? width - event.clientX : undefined,
@@ -153,11 +156,6 @@
   }
 
   // Object uuid functions  on TypeScript
-
-  import { v4 as uuidv4 } from 'uuid';
-    import { type LinkedHash } from '$lib/LinkedObject';
-    import NodeObjectContextMenu from './NodeObjectContextMenu.svelte';
-
 
   let current_objects: { [uuid: string]: LinkedHash[] } = {};
 
@@ -481,8 +479,7 @@
   {:else if rightNodeForObjectMenu}
     <NodeObjectContextMenu
         onClick={handlePaneClick}
-        uuid={rightNodeForObjectMenu.uuid}
-        hashes={rightNodeForObjectMenu.hashes}
+        linked_object={rightNodeForObjectMenu.linked_object}
       />
   {:else if rightEdgeMenu}
     <EdgeContextMenu
