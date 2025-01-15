@@ -1,6 +1,7 @@
 <script lang="ts">
     import { data_store } from '$lib/store';
     import { renderedToString } from '$lib/utils';
+    import { slide } from 'svelte/transition';
 
     const baseHashes = {
       'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'SHA2 256',
@@ -23,6 +24,12 @@
                         {#each $data_store.hashes as {algorithm, value}}
                         <div>
                           <strong>{baseHashes[algorithm] ?? algorithm ?? 'Unknown'}:</strong> {value}
+                        </div>
+                      {/each}
+
+                      {#each $data_store.opinions as {proof_id, data}}
+                        <div>
+                          <strong>{proof_id.slide(6, 0) ?? 'Unknown'}:</strong> {data}
                         </div>
                       {/each}
                     </div>

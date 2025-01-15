@@ -328,7 +328,8 @@
                   targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
                   position: { x: _x, y: _y },
                 },
-                edges: []
+                edges: [],
+                opinions: []
               }
           }
           object_nodes[node_id].edges.push({
@@ -343,6 +344,7 @@
             },
             type: 'edge_type'
           });
+          object_nodes[node_id].opinions.push({proof_id: p.token_id, content: b.data})
         }
         else {
           empty_edges.push({

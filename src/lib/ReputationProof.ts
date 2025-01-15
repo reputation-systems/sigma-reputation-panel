@@ -40,7 +40,8 @@ export interface RPBox {
     token_amount: number,
     object_type?: ObjectType,
     object_value?: string,
-    negative: boolean
+    negative: boolean,
+    data: object
 }
 
 export enum Network {
