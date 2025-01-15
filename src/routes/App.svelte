@@ -322,7 +322,7 @@
             object_nodes[node_id] = {
                 node: {
                   id: node_id,
-                  data: {hashes: {}, uuid: object_uuid},
+                  data: {hashes: [], opinions: [], uuid: object_uuid},
                   type: "linked_object_type",
                   sourcePosition: window.innerWidth > window.innerHeight ? Position.Right : Position.Bottom, 
                   targetPosition: window.innerWidth > window.innerHeight ? Position.Left : Position.Top,
