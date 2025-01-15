@@ -158,9 +158,8 @@
     import { type LinkedHash } from '$lib/LinkedObject';
     import NodeObjectContextMenu from './NodeObjectContextMenu.svelte';
 
-  type Hashes = { [key: string]: string };
 
-  let current_objects: { [uuid: string]: Hashes } = {};
+  let current_objects: { [uuid: string]: LinkedHash[] } = {};
 
   function mergeUniqueHashes(existingHashes, newHashes) {
     const merged = [...existingHashes, ...newHashes]; // Combina ambos arreglos
