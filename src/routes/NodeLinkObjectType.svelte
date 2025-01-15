@@ -36,15 +36,12 @@
     showContent = $viewport.zoom > 1.8;
   }
 
-  function handleDblClick() {
-    data_store.set(hashes);
-  }
 </script>
 
 <div class="customNode">
   <Handle type="target" position={Position.Left} {isConnectable} />
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div style="font-size: smaller;" on:dblclick={handleDblClick}>
+  <div style="font-size: smaller;">
     {#each hashes as {algorithm, value}}
       <div>
         <strong>{baseHashes[algorithm] ?? algorithm?.slice(0, 6) ?? 'Unknown'}:</strong> {value.slice(0, 6)}

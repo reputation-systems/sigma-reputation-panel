@@ -25,7 +25,7 @@
     import NodeLinkObjectType from './NodeLinkObjectType.svelte';
 
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
-  let rightNodeForObjectMenu: { id: string, uuid: string, top?: number; left?: number; right?: number; bottom?: number  } | null;
+  let rightNodeForObjectMenu: { id: string, uuid: string, hashes: LinkedHash[], top?: number; left?: number; right?: number; bottom?: number  } | null;
   let rightEdgeMenu: { id: string; box?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   let width: number;
   let height: number;
@@ -49,6 +49,7 @@
       rightNodeForObjectMenu = {
         id: node.id,
         uuid: node.data.uuid,
+        hashes: node.data.hashes,
         top: event.clientY < height - 200 ? event.clientY : undefined,
         left: event.clientX < width - 200 ? event.clientX : undefined,
         right: event.clientX >= width - 200 ? width - event.clientX : undefined,
@@ -471,6 +472,7 @@
     <NodeObjectContextMenu
         onClick={handlePaneClick}
         uuid={rightNodeForObjectMenu.uuid}
+        hashes={rightNodeForObjectMenu.hashes}
       />
   {:else if rightEdgeMenu}
     <EdgeContextMenu
