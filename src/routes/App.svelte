@@ -162,13 +162,25 @@
 
   let current_objects: { [uuid: string]: Hashes } = {};
 
+  function mergeUniqueHashes(existingHashes, newHashes) {
+    const merged = [...existingHashes, ...newHashes]; // Combina ambos arreglos
+
+    // Usa un Map para garantizar unicidad por el campo 'algorithm'
+    const uniqueHashes = Array.from(
+      merged.reduce((map, obj) => map.set(obj.algorithm, obj), new Map()).values()
+    );
+
+    return uniqueHashes;
+  }
+
   function get_object_uuid(hashes: Hashes): string {
     // Check if any of the provided hashes exist in current_objects
     for (const [key, value] of Object.entries(hashes)) {
       for (const [uuid, existingHashes] of Object.entries(current_objects)) {
-        if (existingHashes[key] === value) {
+        console.log("Compare "+existingHashes[key].value+" with "+value.value)
+        if (existingHashes[key].value == value.value) {
           // If the hash exists, add new hashes to the existing UUID entry and return that UUID
-          current_objects[uuid] = { ...existingHashes, ...hashes };
+          current_objects[uuid] = mergeUniqueHashes(existingHashes, hashes);
           return uuid;
         }
       }
@@ -355,7 +367,6 @@
     for (const data of Object.values(object_nodes)) {
       try {
         data.node.data.hashes = get_object_hashes(data.node.data.uuid);
-        console.log(data.node.data.hashes)
         $nodes.push(data.node);
         for (const edge of Object.values(data.edges)) {
           _edges.push(edge);
