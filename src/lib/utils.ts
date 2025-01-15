@@ -1,4 +1,4 @@
-import { ErgoAddress, SBool, SByte, SColl, SConstant, SGroupElement } from "@fleet-sdk/core";
+import { ErgoAddress, SBool, SByte, SColl, SConstant, SSigmaProp, SGroupElement } from "@fleet-sdk/core";
 import { stringToBytes } from "@scure/base";
 import { connected } from "./store";
 import { get } from "svelte/store";
@@ -36,11 +36,20 @@ export function hexToUtf8(hexString: string): string | null {
     }
   }
 
+// ErgoValue(SigmaProp(ProveDlog(ECPoint(8696f0,515cda,...))), ErgoType(SigmaProp))
+
 export function generate_pk_proposition(wallet_pk: string): string {
-    // ErgoValue(SigmaProp(ProveDlog(ECPoint(8696f0,515cda,...))), ErgoType(SigmaProp))
+    // Decode the address and extract the public key
     const pk = ErgoAddress.fromBase58(wallet_pk).getPublicKeys()[0];
-    const encodedProp = SGroupElement(pk);
-    return encodedProp.toHex();
+    
+    // Create a SGroupElement from the public key
+    const groupElement = SGroupElement(pk);
+    
+    // Wrap the SGroupElement with SSigmaProp to create a Sigma proposition
+    const sigmaProp = SSigmaProp(groupElement);
+    
+    // Return the hex representation of the Sigma proposition
+    return sigmaProp.toHex();
 }
 
 export function stringToSerialized(value: string): string {
@@ -81,5 +90,5 @@ export function renderedToString(renderedValue: string): string {
 
 export async function check_if_r7_is_local_addr(value: string): Promise<boolean> {
     if (!get(connected)) return false;
-    return stringToRendered(generate_pk_proposition((await ergo.get_change_address()))).substring(4,) === stringToRendered(value);
+    return generate_pk_proposition((await ergo.get_change_address())).substring(4,) === value;
 }
