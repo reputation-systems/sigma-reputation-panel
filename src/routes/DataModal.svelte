@@ -27,10 +27,12 @@
                         </div>
                       {/each}
 
-                      {#each $data_store.opinions as {proof_id, data}}
+                      {#each $data_store.opinions as {proof_id, content}}
+                        {#if Object.keys(content).length > 0}
                         <div>
-                          <strong>{proof_id.slide(6, 0) ?? 'Unknown'}:</strong> {data}
+                          <strong>{proof_id.slice(0, 10) ?? 'Unknown'}:</strong> {JSON.stringify(content)}
                         </div>
+                        {/if}
                       {/each}
                     </div>
                 {:else}

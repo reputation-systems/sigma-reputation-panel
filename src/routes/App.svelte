@@ -363,20 +363,21 @@
       });
     });
 
-    for (const data of Object.values(object_nodes)) {
+    for (const _obj of Object.values(object_nodes)) {
       try {
-        data.node.data.hashes = get_object_hashes(data.node.data.uuid);
-        $nodes.push(data.node);
-        for (const edge of Object.values(data.edges)) {
+        _obj.node.data.hashes = get_object_hashes(_obj.node.data.uuid);
+        _obj.node.data.opinions = _obj.opinions;
+        $nodes.push(_obj.node);
+        for (const edge of Object.values(_obj.edges)) {
           _edges.push(edge);
         }          
       } catch {}
     }
 
-    for (const data of Object.values(plain_nodes)) {
+    for (const _obj of Object.values(plain_nodes)) {
       try {
-        $nodes.push(data.node);
-        for (const edge of Object.values(data.edges)) {
+        $nodes.push(_obj.node);
+        for (const edge of Object.values(_obj.edges)) {
           _edges.push(edge);
         }          
       } catch {}

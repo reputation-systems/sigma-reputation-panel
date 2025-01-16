@@ -147,7 +147,7 @@ export async function updateReputationProofList(explorer_uri: string, ergo_tree_
                             index: e.index,
                             transactionId: e.transactionId
                         },
-                        data: e.additionalRegisters.R9 ? JSON.parse(hexToUtf8(e.additionalRegisters.R9.renderedValue) ?? "") : {"test": "opinion."}
+                        data: e.additionalRegisters.R9 ? JSON.parse(hexToUtf8(e.additionalRegisters.R9.renderedValue) ?? "") : {}
                     };
                 
                     if (e.additionalRegisters.R6 !== undefined && e.additionalRegisters.R5 !== undefined) {
