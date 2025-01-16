@@ -14,7 +14,8 @@ export async function generate_reputation_proof(token_amount: number, input_proo
                                                 object_to_assign?: string, 
                                                 object_type_to_assign: ObjectType = ObjectType.PlainText,
                                                 negative: boolean = false,
-                                                tags?: string
+                                                tags?: string,
+                                                data?: object
                                               ): Promise<string|null>
 {
 
@@ -84,14 +85,10 @@ export async function generate_reputation_proof(token_amount: number, input_proo
       R6: stringToSerialized(r6)
     }
 
-    // TODO R9 could be set on the form.
-    // const r9Object = {"nodo_info": "This is a reputation proof for the node info"};
-    // const r9Serialized = stringToSerialized(JSON.stringify(r9Object));
-
     new_proof_output.setAdditionalRegisters({...registers, ...{
       R7: generate_pk_proposition((await ergo.get_change_address()))},
       R8: booleanToSerializer(!negative),
-    //   R9: r9Serialized
+      R9: stringToSerialized(JSON.stringify(data))
     })
 
     outputs.push(new_proof_output)

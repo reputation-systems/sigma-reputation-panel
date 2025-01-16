@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ObjectType, RPBox, ReputationProof } from '$lib/ReputationProof';
 	import { generate_reputation_proof } from '$lib/generate_reputation_proof';
+    import JsonInput from './JsonInput.svelte';
   
 	export let showModal: boolean;
 
@@ -14,6 +15,7 @@
 	export let object_to_assign: string;
 	export let object_type_to_assign: ObjectType;
 	let negative: boolean = false;
+	let data: object = {};
 
 	let submited: string | null = null;
   
@@ -33,7 +35,8 @@
 			const _tx = await generate_reputation_proof(
 				(reputationTokenAmount / 100) * proof.total_amount, 
 				input_proof_box, object_to_assign, object_type_to_assign,
-				negative
+				negative,
+				data
 				);
 			if (_tx) {
 				submited = _tx;
@@ -72,6 +75,11 @@
                 <label for="polarCheckbox" class="form-check-label">Negative</label>
                 <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
             </div>
+
+			<div class="mb-3">
+				<label for="data" class="form-label">Data</label>
+				<JsonInput bind:value={data} style="max-width: 97%;" />
+			</div>
 
 		{/if}
 	  </form>

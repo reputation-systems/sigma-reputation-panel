@@ -4,6 +4,7 @@ import { generate_reputation_proof } from '$lib/generate_reputation_proof';
 import { explorer_uri, ergo_tree_hash } from '$lib/envs';
 import { type LinkedHash } from '$lib/LinkedObject';
 import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
+    import JsonInput from './JsonInput.svelte';
 
 export let showModal: boolean; // boolean
 let dialog: any; // HTMLDialogElement
@@ -15,6 +16,7 @@ let object_to_assign: string;
 let object_type_to_assign: ObjectType | undefined;
 let tags: string;
 let negative: boolean = false;
+let data: object = {};
 
 let unspend_reputation_proofs: ReputationProof[] = [];
 
@@ -67,7 +69,8 @@ function generateReputationProof() {
 		object_to_assign, 
 		object_type_to_assign, 
 		negative, 
-		tags
+		tags,
+		data
 	);
 }
 
@@ -183,6 +186,11 @@ async function fetchReputationProofs(all: boolean = true) {
                 <label for="polarCheckbox" class="form-check-label">Negative</label>
                 <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
             </div>
+
+			<div class="mb-3">
+				<label for="data" class="form-label">Data</label>
+				<JsonInput bind:value={data} style="max-width: 97%;" />
+			</div>
 			
 		{/if}
 		</form>

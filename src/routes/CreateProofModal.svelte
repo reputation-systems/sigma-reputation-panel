@@ -8,6 +8,7 @@
         type RPBox,
         type ReputationProof,
     } from "$lib/ReputationProof";
+    import JsonInput from "./JsonInput.svelte";
 
     export let showModal: boolean;
     let dialog: any;
@@ -20,6 +21,7 @@
     let object_to_assign: string;
     let object_type_to_assign: ObjectType | undefined;
     let tags: string = "reputation-proof-token";
+    let data: object = {};
 
     let unspend_reputation_proofs: ReputationProof[] = [];
 
@@ -73,6 +75,7 @@
             object_type_to_assign,
             negative,
             tags,
+            data
         );
     }
 
@@ -242,6 +245,10 @@
                         bind:value={tags}
                         style="max-width: 97%;"
                     />
+                </div>
+                <div class="mb-3">
+                    <label for="data" class="form-label">Data</label>
+                    <JsonInput bind:value={data} style="max-width: 97%;" />
                 </div>
             {/if}
         </form>
