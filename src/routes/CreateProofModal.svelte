@@ -247,7 +247,7 @@
                     />
                 </div>
                 <div class="mb-3">
-                    <label for="data" class="form-label">Data</label>
+                    <label for="data" class="form-label">Opinion about it</label>
                     <JsonInput bind:value={data} style="max-width: 97%;" />
                 </div>
             {/if}
