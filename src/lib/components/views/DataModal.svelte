@@ -97,7 +97,7 @@
         padding: 1.5rem;
         border-radius: 8px;
         width: 90%;
-        max-width: 900px;
+        max-width: 1800px;
         border: 1px solid #444;
         color: #f0f0f0;
     }
