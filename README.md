@@ -1,6 +1,6 @@
 # **Sigma Reputation System**  
 
-[![Ergo Platform Badge](https://img.shields.io/badge/Built_on-Ergo-EF8220)](https://ergoplatform.org)  
+[![Ergo Platform Badge](https://img.shields.io/badge/Built_on-Ergo-FBBF24)](https://ergoplatform.org)  
 [![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)](https://unlicense.org)
 
 > "In the blockchain ecosystem, trust is not given - it's earned."

@@ -83,71 +83,83 @@
 	</div>
   </dialog>
   
-  <style>
-	dialog {
-	  max-width: 32em;
-	  border-radius: 0.05em;
-	  padding: 1em;
-	  border-radius: 1em;
-	  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-  
-	dialog::backdrop {
-	  background: rgba(0, 0, 0, 0.5);
-	}
-  
-	h2.modal-title {
-	  font-size: 1.5rem;
-	  margin: 0;
-	}
-  
-	hr {
-	  border: none;
-	  border-top: 1px solid #ccc;
-	  margin: 1em 0;
-	}
-  
-	.mb-3 {
-	  margin-bottom: 1.5em;
-	}
-  
-	.form-label {
-	  font-weight: bold;
-	}
-  
-	.form-select, .form-control {
-	  width: 100%;
-	  padding: 0.5em;
-	  font-size: 1rem;
-	  border: 0.025px solid #ccc;
-	  border-radius: 0.25em;
-	}
-  
-	.form-select {
-	  height: 2.5em;
-	}
-  
-	.required {
-	  color: red;
-	}
-  
-	.row {
-	  display: flex;
-	  justify-content: flex-end;
-	}
-  
-	button {
-	  padding: 0.5em 1em;
-	  font-size: 1rem;
-	  background-color: rgb(17, 17, 17);
-	  color: #fff;
-	  border: none;
-	  cursor: pointer;
-	  border-radius: 0.25em;
-	}
-  
-	button:hover {
-	  background-color: rgb(17, 17, 17);
-	}
-  </style>
-  
+<style>
+  dialog {
+    max-width: 32em;
+    padding: 1.5em;
+    border-radius: 1em;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background-color: #2a2a2a;
+    color: #f0f0f0;
+    border: 1px solid #444;
+  }
+
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  h2.modal-title {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #FBBF24;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #444;
+    margin: 1em 0;
+  }
+
+  .mb-3 {
+    margin-bottom: 1.5em;
+  }
+
+  .form-label {
+    font-weight: bold;
+    color: #ccc;
+    display: block;
+    margin-bottom: 0.5em;
+  }
+
+  .form-select, .form-control {
+    width: 100%;
+    padding: 0.75em;
+    font-size: 1rem;
+    border: 1px solid #666;
+    border-radius: 6px;
+    background-color: #333;
+    color: #f0f0f0;
+    box-sizing: border-box;
+  }
+
+  .form-select {
+    height: 3em;
+  }
+
+  .required {
+    color: #ff8a8a; /* Un rojo más claro y legible en fondos oscuros */
+    margin-left: 4px;
+  }
+
+  .row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5em;
+  }
+
+  button {
+    padding: 0.75em 1.5em;
+    font-size: 1rem;
+    background-color: #FBBF24;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+  }
+
+  button:hover {
+    background-color: #d87112;
+  }
+</style>

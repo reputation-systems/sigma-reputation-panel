@@ -1,0 +1,63 @@
+/*
+  =============================================================
+  == Arreglos de Estilo para Svelte Flow en Tema Oscuro ==
+  =============================================================
+  Este archivo soluciona los problemas de visibilidad de los
+  controles, textos y otros elementos de Svelte Flow cuando
+  se usa un fondo oscuro.
+*/
+
+/*
+  Arreglo #1: Controles de Navegación (Zoom, Bloqueo, FitView)
+  -------------------------------------------------------------
+  Los iconos SVG por defecto son negros. Los cambiamos a un color claro.
+*/
+.svelte-flow__controls-button svg {
+  fill: #f0f0f0 !important; /* Usamos !important para asegurar la anulación */
+}
+
+
+/*
+  Arreglo #2: Texto de las Aristas (Edge Labels)
+  -----------------------------------------------
+  El texto que aparece sobre las líneas (aristas) también es negro.
+*/
+.svelte-flow__edge-text {
+  fill: #e0e0e0;
+  font-weight: bold;
+}
+
+
+/*
+  Arreglo #3: Nodos del Minimapa
+  --------------------------------
+  Los nodos en el minimapa son oscuros y apenas se ven.
+  Los pintamos con el color de acento de la aplicación.
+*/
+.svelte-flow__minimap-node {
+  fill: #FBBF24;
+  stroke: none;
+}
+
+
+/*
+  Arreglo #4: Atribución de Svelte Flow
+  ---------------------------------------
+  El enlace de atribución "Svelte Flow" en la esquina inferior derecha es negro.
+*/
+.svelte-flow__attribution a {
+  color: #888; /* Hacemos que sea un gris legible */
+  background: rgba(26, 25, 35, 0.5); /* Le damos un fondo sutil */
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/*
+  Arreglo #5: Color de texto por defecto dentro de los nodos
+  -----------------------------------------------------------
+  Aseguramos que cualquier texto dentro de un nodo personalizado,
+  si no tiene un color definido, sea claro por defecto.
+*/
+.svelte-flow__node {
+    color: #f0f0f0;
+}

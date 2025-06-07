@@ -10,6 +10,5 @@ export const network = writable<string|null>(null);
 export const compute_deep_level = writable<number>(5);
 export const searchStore = writable<string|null>(null);
 export const connected = writable<boolean>(false);
-export const show_app = writable<boolean>(false);
 export const data_store = writable<any | null>(null);
 export const building_graph = writable<boolean | null>(null);  // null for the init.

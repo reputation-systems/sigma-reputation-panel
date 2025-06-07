@@ -1,10 +1,10 @@
-<script lang="ts">
-
-    import FormModal from "./CreateProofModal.svelte";
-    import SettingModal from "./Settings.svelte";
-    import Search from "./Search.svelte";
-    import { connected, show_app } from "$lib/store";
-    
+<script lang="ts">  
+    export let onClick: () => void;
+    export let box_id: string|null;
+  
+  
+    let local_id: string = box_id ?? ""; 
+  
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
     // menu is dimension (height and width) of context menu
@@ -12,11 +12,8 @@
     // browser/window dimension (height and width)
     let browser = { h: 0, y: 0 }
     let showMenu = false;
-    let showSearch = false;
-    let showForm = false;
-    let showSetting = false;
-
-
+  
+  
     function rightClickContextMenu(e){
         showMenu = true
         browser = {
@@ -42,6 +39,7 @@
         // To make context menu disappear when
         // mouse is clicked outside context menu
         showMenu = false;
+        onClick()
     }
     function getContextMenuDimension(node){
         // This function will get context menu dimension
@@ -53,59 +51,35 @@
             w: width
         }
     }
-    function addItem(){
-        showForm = true
-    }
-    function search(){
-        showSearch = true;
-    }
-    function setting(){
-        showSetting = true;
-    }
-    function back_to_main(){
-        show_app.set(false);
-    }
+    
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(local_id).then(() => {
+                console.log('Text copied to clipboard:', local_id);
+            }).catch((error) => {
+                console.error('Error copying text to clipboard:', error);
+            });
+    };
 
     let menuItems = [
-        {
-            'name': 'addItem',
-            'onClick': addItem,
-            'displayText': "New",
-            'class': 'fa-solid fa-bullhorn'
-        },
-        {
-            'name': 'search',
-            'onClick': search,
-            'displayText': "Search",
-            'class': 'fa-solid fa-magnifying-glass'
-        },
-        {
-            'name': 'hr',
-        },
-        {
-            'name': 'settings',
-            'onClick': setting,
-            'displayText': "Settings",
-            'class': 'fa-solid fa-gear'
-        },
-        {
-            'name': 'main',
-            'onClick': back_to_main,
-            'displayText': "Back to init",
-            'class': 'fa-solid fa-home'
-        }
-    ].filter(item => $connected || item.name !== 'addItem');
-
-</script>
-<svelte:head>
+            {
+              'name': 'copy',
+              'onClick': copyToClipboard,
+              'displayText': "Copy",
+              'class': 'fa-solid fa-pencil-alt'
+            }
+        ];
+  
+  
+  </script>
+  <svelte:head>
     <!-- You can change icon sets according to your taste. Change `class` value in `menuItems` above to represent your icons. -->
     <!-- <link rel="stylesheet" href="/icon/css/mfglabs_iconset.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</svelte:head>
-
-{#if showMenu}
-<nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
-    <div class="navbar" id="navbar">
+  </svelte:head>
+  
+  {#if showMenu}
+  <nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
+    <div class="navbar" id="navbar">  
         <ul>
             {#each menuItems as item}
                 {#if item.name == "hr"}
@@ -116,71 +90,84 @@
             {/each}
         </ul>
     </div>
-</nav>
-{/if}
-
-<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
-
-<FormModal bind:showModal={showForm} />
-<Search bind:showSearch />
-<SettingModal bind:showModal={showSetting} />
-
+  </nav>
+  {/if}
+  
+  /* /<svelte:window 
+    on:contextmenu|preventDefault={showMenu ? onPageClick : rightClickContextMenu}
+    on:wheel|preventDefault={onPageClick}
+    on:dblclick|preventDefault={onPageClick}  
+  /> 
+  
 
 <style>
     * {
         padding: 0;
         margin: 0;
     }
-    .navbar{
+
+    .navbar {
         display: inline-flex;
-        border: 1px #999 solid;
-        width: 170px;
-        background-color: #fff;
+        border: 1px #555 solid; /* Borde sutil para tema oscuro */
+        width: 250px;
+        background-color: #2a2a2a; /* Fondo oscuro */
         border-radius: 10px;
         overflow: hidden;
         flex-direction: column;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
-    .navbar ul{
+
+    .navbar ul {
         margin: 6px;
+        padding: 0;
     }
-    ul li{
+
+    ul li {
         display: block;
         list-style-type: none;
-        width: 1fr;
     }
-    ul li button{
+
+    ul li button {
         font-size: 1rem;
-        color: #222;
+        color: #f0f0f0; /* Texto claro */
         width: 100%;
-        height: 30px;
+        height: 32px;
         text-align: left;
-        border: 0px;
-        background-color: #fff;
-    }
-    ul li button:hover{
-        color: #000;
-        text-align: left;
+        border: 0;
+        background-color: transparent; /* Fondo transparente */
         border-radius: 5px;
-        background-color: #eee;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s, color 0.2s;
     }
-    ul li button i{
-        padding: 0px 15px 0px 10px;
-    }
-    ul li button i.fa-square{
+
+    ul li button:hover {
         color: #fff;
+        background-color: #FBBF24; /* Color de acento al pasar el ratón */
     }
-    ul li button:hover > i.fa-square{
-        color: #eee;
+
+    ul li button i {
+        padding: 0 15px 0 10px;
+        width: 18px; /* Ancho fijo para alinear iconos */
+        text-align: center;
     }
-    ul li button:hover > i.warning{
-        color: crimson;
+
+    /* Estos estilos ya no son necesarios con el nuevo tema */
+    /* ul li button i.fa-square { ... } */
+    /* ul li button:hover > i.fa-square { ... } */
+
+    ul li button:hover > i.warning {
+        color: #ffcdd2; /* Un rojo más claro para el hover */
     }
-    :global(ul li button.info:hover){
-        color: navy;
+    
+    :global(ul li button.info:hover) {
+        color: #e3f2fd; /* Un azul más claro */
     }
-    hr{
+
+    hr {
         border: none;
-        border-bottom: 1px solid #ccc;
-        margin: 5px 0px;
+        border-bottom: 1px solid #444; /* Borde más oscuro para el separador */
+        margin: 5px 0;
     }
 </style>

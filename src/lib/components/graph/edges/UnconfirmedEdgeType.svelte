@@ -47,13 +47,15 @@
     </div>
   </EdgeLabelRenderer>
   
-  <style>
-    .edge-label {
-      pointer-events: all;
-      position: absolute;
-      padding: 5px;
-      border-radius: 5px;
-      font-size: 8px;
-      font-weight: 700;
-    }
-  </style>
+<style>
+  .edge-label {
+    pointer-events: all;
+    position: absolute;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 8px;
+    font-weight: 700;
+
+    color: #111;
+  }
+</style>

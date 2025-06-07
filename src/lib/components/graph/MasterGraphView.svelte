@@ -9,24 +9,25 @@
   import { ObjectType, token_rendered, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   import dagre from '@dagrejs/dagre';
 
-  import Header from './Header.svelte';
-  import EdgeType from './EdgeType.svelte';
-  import NodeCircleType from './NodeCircleType.svelte';
-  import PanelContextMenu from './PanelContextMenu.svelte';
-  import EdgeContextMenu from './EdgeContextMenu.svelte';
   import { hexToUtf8 } from '$lib/utils';
-  import NodeContextMenu from './NodeContextMenu.svelte';
-  import NodeProofType from './NodeProofType.svelte';
-  import UnconfirmedEdgeType from './UnconfirmedEdgeType.svelte';
   import { advance_mode, building_graph, connected, fetch_all, proofs, searchStore } from '$lib/store';
   import { onMount } from 'svelte';
-    import DataModal from './DataModal.svelte';
-    import EdgeTypeBoth from './EdgeTypeBoth.svelte';
-    import NodeLinkObjectType from './NodeLinkObjectType.svelte';
 
-    import { v4 as uuidv4 } from 'uuid';
-    import { type LinkedObject, type LinkedHash } from '$lib/LinkedObject';
-    import NodeObjectContextMenu from './NodeObjectContextMenu.svelte';
+  import { v4 as uuidv4 } from 'uuid';
+  import { type LinkedObject, type LinkedHash } from '$lib/LinkedObject';
+
+  import Header from './ui/Header.svelte';
+  import EdgeType from './edges/EdgeType.svelte';
+  import NodeCircleType from './nodes/NodeCircleType.svelte';
+  import PanelContextMenu from './ui/PanelContextMenu.svelte';
+  import EdgeContextMenu from './ui/EdgeContextMenu.svelte';
+  import NodeContextMenu from './ui/NodeContextMenu.svelte';
+  import NodeProofType from './nodes/NodeProofType.svelte';
+  import UnconfirmedEdgeType from './edges/UnconfirmedEdgeType.svelte';
+  import DataModal from '../views/DataModal.svelte';
+  import EdgeTypeBoth from './edges/EdgeTypeBoth.svelte';
+  import NodeLinkObjectType from './nodes/NodeLinkObjectType.svelte';
+  import NodeObjectContextMenu from './ui/NodeObjectContextMenu.svelte';
 
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightNodeForObjectMenu: { id: string, linked_object?: LinkedObject, top?: number; left?: number; right?: number; bottom?: number  } | null;

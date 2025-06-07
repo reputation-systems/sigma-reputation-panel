@@ -1,10 +1,9 @@
-<script lang="ts">  
-    export let onClick: () => void;
-    export let box_id: string|null;
-  
-  
-    let local_id: string = box_id ?? ""; 
-  
+<script lang="ts">
+
+    import SettingModal from "./Settings.svelte";
+    import Search from "./Search.svelte";
+    import { connected } from "$lib/store";
+    
     // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
     // menu is dimension (height and width) of context menu
@@ -12,8 +11,10 @@
     // browser/window dimension (height and width)
     let browser = { h: 0, y: 0 }
     let showMenu = false;
-  
-  
+    let showSearch = false;
+    let showSetting = false;
+
+
     function rightClickContextMenu(e){
         showMenu = true
         browser = {
@@ -39,7 +40,6 @@
         // To make context menu disappear when
         // mouse is clicked outside context menu
         showMenu = false;
-        onClick()
     }
     function getContextMenuDimension(node){
         // This function will get context menu dimension
@@ -51,35 +51,41 @@
             w: width
         }
     }
-    
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(local_id).then(() => {
-                console.log('Text copied to clipboard:', local_id);
-            }).catch((error) => {
-                console.error('Error copying text to clipboard:', error);
-            });
-    };
+    function search(){
+        showSearch = true;
+    }
+    function setting(){
+        showSetting = true;
+    }
 
     let menuItems = [
-            {
-              'name': 'copy',
-              'onClick': copyToClipboard,
-              'displayText': "Copy",
-              'class': 'fa-solid fa-pencil-alt'
-            }
-        ];
-  
-  
-  </script>
-  <svelte:head>
+        {
+            'name': 'search',
+            'onClick': search,
+            'displayText': "Search",
+            'class': 'fa-solid fa-magnifying-glass'
+        },
+        {
+            'name': 'hr',
+        },
+        {
+            'name': 'settings',
+            'onClick': setting,
+            'displayText': "Settings",
+            'class': 'fa-solid fa-gear'
+        }
+    ].filter(item => $connected || item.name !== 'addItem');
+
+</script>
+<svelte:head>
     <!-- You can change icon sets according to your taste. Change `class` value in `menuItems` above to represent your icons. -->
     <!-- <link rel="stylesheet" href="/icon/css/mfglabs_iconset.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  </svelte:head>
-  
-  {#if showMenu}
-  <nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
-    <div class="navbar" id="navbar">  
+</svelte:head>
+
+{#if showMenu}
+<nav use:getContextMenuDimension style="position: absolute; top:{pos.y}px; left:{pos.x}px">
+    <div class="navbar" id="navbar">
         <ul>
             {#each menuItems as item}
                 {#if item.name == "hr"}
@@ -90,72 +96,98 @@
             {/each}
         </ul>
     </div>
-  </nav>
-  {/if}
-  
-  /* /<svelte:window 
-    on:contextmenu|preventDefault={showMenu ? onPageClick : rightClickContextMenu}
-    on:wheel|preventDefault={onPageClick}
-    on:dblclick|preventDefault={onPageClick}  
-  /> 
-  
-  <style>
+</nav>
+{/if}
 
+<svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
+
+<Search bind:showSearch />
+<SettingModal bind:showModal={showSetting} />
+
+
+<style>
     * {
         padding: 0;
         margin: 0;
     }
-    .navbar{
+    
+    .navbar {
         display: inline-flex;
-        border: 1px #999 solid;
+        border: 1px #555 solid;
         width: 250px;
-        background-color: #fff;
+        background-color: #2a2a2a;
         border-radius: 10px;
         overflow: hidden;
         flex-direction: column;
+        color: #f0f0f0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
-    .navbar ul{
+
+    .info-block {
+        padding: 10px;
         margin: 6px;
+        margin-bottom: 10px;
+        background-color: #333;
+        border: 1px solid #444;
+        border-radius: 5px;
     }
-    ul li{
+
+    .info-block p {
+        margin: 0;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .label {
+        font-weight: bold;
+        color: #aaa;
+    }
+
+    .navbar ul {
+        margin: 6px;
+        padding: 0;
+    }
+
+    ul li {
         display: block;
         list-style-type: none;
-        width: 1fr;
     }
-    ul li button{
+
+    ul li button {
         font-size: 1rem;
-        color: #222;
+        color: #f0f0f0;
         width: 100%;
         height: 30px;
         text-align: left;
-        border: 0px;
-        background-color: #fff;
-    }
-    ul li button:hover{
-        color: #000;
-        text-align: left;
+        border: 0;
+        background-color: transparent;
         border-radius: 5px;
-        background-color: #eee;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        transition: background-color 0.2s;
     }
-    ul li button i{
+
+    ul li button:hover {
+        color: white;
+        background-color: #FBBF24;
+    }
+
+    ul li button i {
         padding: 0px 15px 0px 10px;
     }
-    ul li button i.fa-square{
-        color: #fff;
+
+    ul li button:hover > i.warning {
+        color: #ffcdd2;
     }
-    ul li button:hover > i.fa-square{
-        color: #eee;
+
+    :global(ul li button.info:hover) {
+        color: #e3f2fd;
     }
-    ul li button:hover > i.warning{
-        color: crimson;
-    }
-    :global(ul li button.info:hover){
-        color: navy;
-    }
-    hr{
+    
+    hr {
         border: none;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid #444;
         margin: 5px 0px;
     }
-  </style>
-  
+</style>

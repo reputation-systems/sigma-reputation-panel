@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow, type Connection } from '@xyflow/svelte';
-  import PointOneToAnother from './PointOneToAnother.svelte';
+  import PointOneToAnother from './point_to/PointOneToAnother.svelte';
   import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
   import { hexToUtf8 } from '$lib/utils';
   import { building_graph, data_store } from '$lib/store';
-  import PointOneToAnObject from './PointOneToAnObject.svelte';
+  import PointOneToAnObject from './point_to/PointOneToAnObject.svelte';
   import { get } from 'svelte/store';
 
   type $$Props = NodeProps;
@@ -117,51 +117,53 @@
 {/if}
 
 <style>
+  .customNode, .customExternalNode {
+    background: #3a3a3a; /* Fondo oscuro para el nodo */
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #555; /* Borde sutil */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 200px; /* Ancho fijo para consistencia */
+    color: #f0f0f0; /* Texto claro por defecto */
+  }
+
+  /* Borde distintivo para nodos propios */
+  .customNode {
+    border-left: 4px solid #0074D9;
+  }
+
+  /* Borde distintivo para nodos externos */
   .customExternalNode {
     border-left: 4px solid #ff4500;
-    background: #ffffff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
-  .customNode {
-    border-right: 4px solid #0074D9;
-    border-left: 4px solid #0074D9;
-    background: #ffffff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  .customNode:hover, .customExternalNode:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   }
 
-  .customNode:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  .node-content {
+    font-size: 0.9rem;
   }
 
-  .customExternalNode:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  .node-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .tags-container {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
   }
 
   .tag {
-    padding: 4px 8px;
-    color: black;
-    font-size: 8px;
-  }
-
-  pre {
-    background: #f4f4f4;
-    padding: 5px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    background-color: #555; /* Fondo para la etiqueta */
+    color: #ddd; /* Texto de la etiqueta */
     border-radius: 4px;
-    overflow-x: auto;
-    font-size: 8px;
-  }
-
-  code {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 8px;
   }
 </style>

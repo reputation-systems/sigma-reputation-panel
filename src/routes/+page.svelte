@@ -1,11 +1,199 @@
 <script lang="ts">
-    import { show_app } from "$lib/store";
-    import App from "./App.svelte";
-    import Main from "./Main.svelte";
+    import '../app.css';
+    import { connected, show_header } from '$lib/store';
+    import { connectNautilus } from '$lib/connect';
+    
+    // Importing the two main views from their locations
+    import MasterGraphView from '$lib/components/graph/MasterGraphView.svelte';
+    import CreateProofWizard from '$lib/components/views/CreateProofWizard.svelte';
 
+    // State to manage the current view
+    let currentPage: 'graph' | 'create' = 'graph';
 </script>
-{#if $show_app}
-    <App />
-{:else}
-    <Main />
-{/if}
+
+<svelte:head>
+    <!-- FIX: Load Font Awesome stylesheet to make GitHub icon visible -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" xintegrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preload" href="/frame_52.svg" as="image">
+</svelte:head>
+
+<main>
+    {#if $connected}
+        {#if $show_header}
+            <div class="view-switcher">
+                <span class="app-title">Sigma Reputation</span>
+                <div class="nav-buttons">
+                    <button on:click={() => currentPage = 'graph'} class:active={currentPage === 'graph'}>
+                        <i class="fas fa-project-diagram"></i> Graph
+                    </button>
+                    <button on:click={() => currentPage = 'create'} class:active={currentPage === 'create'}>
+                        <i class="fas fa-plus-circle"></i> Submit
+                    </button>
+                </div>
+            </div>
+        {/if}
+
+        <div class="view-content" class:no-header={!$show_header}>
+            {#if currentPage === 'graph'}
+                <MasterGraphView />
+            {:else if currentPage === 'create'}
+                <div class="wizard-wrapper">
+                    <CreateProofWizard />
+                </div>
+            {/if}
+        </div>
+
+    {:else}
+        <!-- Welcome Screen -->
+        <div class="welcome-container">
+            <!-- GitHub Link now only appears here -->
+            <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank" title="View on GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+
+            <h1>Welcome to Sigma Reputation</h1>
+            <p>Connect your Nautilus wallet to explore and build the web of trust on Ergo.</p>
+            <button on:click={connectNautilus}>Connect Wallet</button>
+        </div>
+    {/if}
+</main>
+
+<style>
+    :global(body) {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    main {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+        min-height: 100vh;
+    }
+    
+    /* --- Welcome Screen Styles --- */
+    .welcome-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        text-align: center;
+        padding: 2rem;
+        box-sizing: border-box;
+        overflow: hidden; 
+    }
+
+    .welcome-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/frame_52.svg'); 
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: contain;
+        z-index: 0;
+		filter: saturate(200%) brightness(1.25);
+		 opacity: 0.8;
+    }
+
+    .welcome-container > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-container h1 { font-size: 3rem; color: #FBBF24; }
+    .welcome-container button { padding: 1rem 2rem; font-size: 1.2rem; }
+
+
+    /* --- MINIMALIST HEADER STYLES --- */
+    .view-switcher {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(26, 25, 35, 0.7);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1.5rem;
+        z-index: 1000;
+        border-bottom: 1px solid #333;
+        box-sizing: border-box;
+    }
+
+    .app-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #FBBF24;
+    }
+
+    .nav-buttons button {
+        padding: 0.5rem 1rem;
+        background: transparent;
+        color: #ccc;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        cursor: pointer;
+        margin-left: 0.5rem;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    
+    .nav-buttons button i {
+        margin-right: 0.5rem;
+    }
+
+    .nav-buttons button:hover {
+        background-color: #3a3a3a;
+        color: white;
+    }
+
+    .nav-buttons button.active {
+        background-color: #FBBF24;
+        color: #000;
+    }
+
+    /* --- GITHUB BUTTON STYLES --- */
+    .github-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 999;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(51, 51, 51, 0.5);
+        color: #ccc;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+    }
+    .github-button:hover {
+        background-color: #333;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    /* --- CONTENT ADJUSTMENT --- */
+    .view-content {
+        padding-top: 53px; /* Space for the header */
+    }
+    .view-content.no-header {
+        padding-top: 0;
+    }
+
+    .wizard-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+</style>

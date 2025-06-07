@@ -35,23 +35,24 @@
 	</div>
 </dialog>
   
-
-  <style>
-	dialog {
-		border-radius: 1em;
-	  	max-width: 32em;
-	  	padding: 1em;
-	  	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
+<style>
+    dialog {
+        max-width: 32em;
+        padding: 1.5em;
+        border-radius: 1em;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        border: 1px solid #444;
+    }
   
-	dialog::backdrop {
-	  	background: rgba(0, 0, 0, 0.5);
-	}
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.7);
+    }
   
-	h2.modal-title {
-	  	font-size: 1.5rem;
-	  	margin: 0;
-	}
-
-  </style>
-  
+    h2.modal-title {
+        font-size: 1.5rem;
+        margin: 0;
+        color: #FBBF24;
+    }
+</style>

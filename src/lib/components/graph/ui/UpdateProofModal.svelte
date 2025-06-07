@@ -205,86 +205,99 @@ async function fetchReputationProofs(all: boolean = true) {
 	</div>
 </dialog>
   
-
 <style>
-dialog {
-	max-width: 100rem;;
-	border-radius: 1em;
-	padding: 1em;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+    dialog {
+        max-width: 100rem;
+        border-radius: 1em;
+        padding: 1.5em;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        border: 1px solid #444;
+    }
 
-dialog::backdrop {
-	background: rgba(0, 0, 0, 0.5);
-}
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.7);
+    }
 
-h2.modal-title {
-	font-size: 1.5rem;
-	margin: 0;
-}
+    h2.modal-title {
+        font-size: 1.5rem;
+        margin: 0;
+        color: #FBBF24;
+    }
 
-hr {
-	border: none;
-	border-top: 1px solid #ccc;
-	margin: 1em 0;
-}
+    hr {
+        border: none;
+        border-top: 1px solid #444;
+        margin: 1em 0;
+    }
 
-.mb-3 {
-	margin-bottom: 1.5em;
-}
+    .mb-3 {
+        margin-bottom: 1.5em;
+    }
 
-.form-label {
-	font-weight: bold;
-}
+    .form-label {
+        font-weight: bold;
+        color: #ccc;
+        display: block;
+        margin-bottom: 0.5em;
+    }
 
-.form-select, .form-control {
-	width: 100%;
-	padding: 0.5em;
-	font-size: 1rem;
-	border: 0.025px solid #ccc;
-	border-radius: 0.25em;
-	margin-bottom: 0.5rem;
-}
+    .form-select,
+    .form-control {
+        width: 100%;
+        padding: 0.75em;
+        font-size: 1rem;
+        border: 1px solid #666;
+        border-radius: 6px;
+        background-color: #333;
+        color: #f0f0f0;
+        box-sizing: border-box;
+    }
 
-.modal-content {
-	width: 90%;
-	max-width: 900px;
-	margin: auto;
-}
-.hash-pair {
-	display: flex;
-	gap: 10px;
-	align-items: center;
-}
+    .modal-content {
+        width: 90%;
+        max-width: 900px;
+        margin: auto;
+    }
 
-.tag {
-    color: #666;
-}
+    .hash-pair {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
 
-.form-select {
-	height: 2.5em;
-}
+    .tag {
+        color: #aaa;
+    }
 
-.required {
-	color: red;
-}
+    .form-select {
+        height: 3em;
+    }
 
-.row {
-	display: flex;
-	justify-content: flex-end;
-}
+    .required {
+        color: #ff8a8a;
+    }
 
-button {
-	padding: 0.5em 1em;
-	font-size: 1rem;
-	background-color: rgb(17, 17, 17);
-	color: #fff;
-	border: none;
-	cursor: pointer;
-	border-radius: 0.25em;
-}
+    .row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+    }
 
-button:hover {
-	background-color: rgb(17, 17, 17);
-}
+    button {
+        padding: 0.75em 1.5em;
+        font-size: 1rem;
+        background-color: #FBBF24;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: background-color 0.2s;
+    }
+
+    button:hover {
+        background-color: #d87112;
+    }
 </style>

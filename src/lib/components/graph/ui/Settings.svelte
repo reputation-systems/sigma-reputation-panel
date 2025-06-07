@@ -62,26 +62,30 @@
 </dialog>
 
 <style>
-	dialog {
-    width: 600px;
-	  border-radius: 1em;
-	  padding: 1em;
-	  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-	}
-  
-	dialog::backdrop {
-	  background: rgba(0, 0, 0, 0.5);
-	}
-  
-	h2.modal-title {
-	  font-size: 1.5rem;
-	  margin: 0;
-	}
-  
-	hr {
-	  border: none;
-	  border-top: 1px solid #ccc;
-	  margin: 1em 0;
-	}
+    dialog {
+        width: 600px;
+        max-width: 90vw;
+        padding: 1.5em;
+        border-radius: 1em;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        background-color: #2a2a2a;
+        color: #f0f0f0;
+        border: 1px solid #444;
+    }
+
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.7);
+    }
+
+    h2.modal-title {
+        font-size: 1.5rem;
+        margin: 0;
+        color: #FBBF24;
+    }
+    
+    hr {
+        border: none;
+        border-top: 1px solid #444;
+        margin: 1em 0;
+    }
 </style>
-  

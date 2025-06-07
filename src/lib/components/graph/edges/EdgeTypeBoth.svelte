@@ -83,14 +83,14 @@
     </div>
   </EdgeLabelRenderer>
   
-  <style>
+<style>
     .edge-label-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
         pointer-events: all;
         position: absolute;
-        width: 120px; /* Adjust width if needed */
+        width: 120px;
     }
   
     .edge-label {
@@ -101,8 +101,9 @@
         position: relative;
         pointer-events: all;
         display: flex;
-        flex-direction: column; /* Stack percentage and box ID */
+        flex-direction: column;
         align-items: center;
+        color: #111;
     }
   
     .edge-label-left {
@@ -115,11 +116,9 @@
         position: relative;
     }
   
-    /* Box ID styles */
     .box-id {
         font-size: 7px;
-        color: #333333; /* Optional: change to fit your theme */
+        color: #333333;
         margin-top: 2px;
     }
-  </style>
-  
+</style>

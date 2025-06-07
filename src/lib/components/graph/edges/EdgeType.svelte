@@ -64,11 +64,15 @@
 
 <style>
   .edge-label {
-      pointer-events: all;
-      position: absolute;
-      padding: 5px;
-      border-radius: 5px;
-      font-size: 8px;
-      font-weight: 700;
+    pointer-events: all;
+    position: absolute;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 8px;
+    font-weight: 700;
+
+    color: #111;
+
+    text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.2);
   }
 </style>

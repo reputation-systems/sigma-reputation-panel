@@ -52,15 +52,22 @@
 
 <style>
   .customNode {
-    background: white;
+    background: #3a3a3a;
+    
     padding: 12px;
     border-radius: 20px;
-    border: 1px solid black;
+    
+    border: 1px solid #666;
+    
+    color: #f0f0f0;
     font-size: smaller;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .customNode:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
   }
 </style>
