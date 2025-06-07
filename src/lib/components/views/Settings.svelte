@@ -80,177 +80,46 @@
 </div>
 
 <style>
-    .settings-container {
-		display: flex;
-		justify-content: center;
-		padding: 4rem 1rem;
-        background: #1a1a1a;
-	}
+    .settings-container { display: flex; justify-content: center; padding: 2rem 1rem; }
+    .settings-box { width: 100%; max-width: 700px; padding: 2rem; border-radius: 12px; background-color: #2a2a2a; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); }
+    .header { text-align: center; margin-bottom: 2rem; border-bottom: 1px solid #444; padding-bottom: 1.5rem; }
+    .settings-title { font-size: 2rem; margin: 0 0 0.5rem 0; color: #FBBF24; font-weight: 600; }
+    .settings-description { margin: 0; color: #b0b0b0; font-size: 1rem; }
+    .settings-section { margin-bottom: 2.5rem; }
+    .settings-section:last-child { margin-bottom: 0; }
+    .setting-item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1.5rem; padding: 1rem 0; border-bottom: 1px solid #444; }
+    .settings-section .setting-item:last-child { border-bottom: none; }
+    .setting-item input[type="text"], .setting-item select { padding: 0.75rem; font-size: 0.9rem; border: 1px solid #666; background-color: #333; color: #f0f0f0; width: 100%; }
 
-	.settings-box {
-		width: 100%;
-		max-width: 42em; /* Slightly wider for better spacing */
-		padding: 2.5em;
-		border-radius: 1em;
-		background-color: #252525; /* Slightly lighter than page background */
-		border: 1px solid #444;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-	}
-
-    .header {
-        text-align: center;
-        margin-bottom: 2.5rem;
-        border-bottom: 1px solid #444;
-        padding-bottom: 1.5rem;
+    .copy-button { 
+        padding: 0.75rem 1rem; 
+        border: 1px solid #FBBF24;
+        border-left: none; 
+        background-color: #FBBF24;
+        color: #2a2a2a;
+        border-top-right-radius: 6px; 
+        border-bottom-right-radius: 6px; 
+        cursor: pointer; 
+        font-weight: bold; 
+        transition: background-color 0.2s, border-color 0.2s; 
+    }
+    .copy-button:hover { 
+        background-color: #fde047;
+        border-color: #fde047;
     }
 
-    .settings-title {
-		font-size: 2rem;
-		margin: 0 0 0.5rem 0;
-		color: #fbbbf24;
-        font-weight: 600;
-	}
-
-    .settings-description {
-		margin: 0;
-		color: #b0b0b0;
-		font-size: 1rem;
-	}
-
-    .settings-section {
-        margin-bottom: 2.5rem;
-    }
-    .settings-section:last-child {
-        margin-bottom: 0;
-    }
-
-    .section-title {
-        font-size: 1.25rem;
-        color: #e0e0e0;
-        margin-bottom: 1.5rem;
-        font-weight: 500;
-    }
-
-    .setting-item {
-        display: grid;
-        /* CHANGE: The second column now takes only the space it needs */
-        grid-template-columns: 1fr auto;
-        align-items: center;
-        gap: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .setting-item label {
-        color: #d0d0d0;
-        font-size: 0.95rem;
-    }
-
-    /* Input styling */
     .input-group {
         display: flex;
         width: 100%;
     }
 
-    .setting-item input[type="text"],
-    .setting-item select {
-        font-family: monospace;
-        padding: 0.75rem;
-        font-size: 0.9rem;
-        border: 1px solid #555;
-        background-color: #1e1e1e;
-        color: #f0f0f0;
-        width: 100%;
-    }
+    .setting-item select { border-radius: 6px; }
 
-    .setting-item input[type="text"] {
-        border-top-left-radius: 6px;
-        border-bottom-left-radius: 6px;
-        border-right: none;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        /* CHANGE: Prevent cursor and selection inside the address field */
-        pointer-events: none;
-    }
-    
-    .copy-button {
-        padding: 0.75rem 1rem;
-        border: 1px solid #555;
-        background-color: #3a3a3a;
-        color: #fbbbf24;
-        border-top-right-radius: 6px;
-        border-bottom-right-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.2s;
-    }
-    .copy-button:hover {
-        background-color: #4a4a4a;
-    }
-
-    .setting-item select {
-        border-radius: 6px;
-    }
-    
-    .setting-item select:disabled {
-        color: #888;
-        background-color: #333;
-    }
-
-    .number-input {
-        padding: 0.75rem;
-        font-size: 0.9rem;
-        border-radius: 6px;
-        border: 1px solid #555;
-        background-color: #1e1e1e;
-        color: #f0f0f0;
-        width: 80px; /* Fixed width for number input */
-        text-align: center;
-        /* Align to the right of the grid cell */
-        justify-self: end;
-    }
-
-    /* Custom Toggle Switch */
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 48px;
-        height: 26px;
-    }
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #555;
-        transition: .3s;
-        border-radius: 26px;
-    }
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .3s;
-        border-radius: 50%;
-    }
-    input:checked + .slider {
-        background-color: #fbbbf24;
-    }
-    input:focus + .slider {
-        box-shadow: 0 0 1px #fbbbf24;
-    }
-    input:checked + .slider:before {
-        transform: translateX(22px);
-    }
+    .switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .3s; border-radius: 26px; }
+    .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    input:checked + .slider { background-color: #FBBF24; }
+    input:focus + .slider { box-shadow: 0 0 2px #FBBF24; }
+    input:checked + .slider:before { transform: translateX(22px); }
 </style>

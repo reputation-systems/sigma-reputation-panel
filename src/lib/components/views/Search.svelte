@@ -118,203 +118,32 @@
 </div>
 
 <style>
-	.search-container {
-		display: flex;
-        flex-direction: column; /* Stack the search box and results */
-		align-items: center;
-		padding: 4rem 1rem;
-        gap: 2rem; /* Space between search and results */
-	}
 
-	.search-box {
-		width: 100%;
-		max-width: 36em;
-		padding: 2em;
-		border-radius: 1em;
-		background-color: #2a2a2a;
-		border: 1px solid #444;
-		box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-	}
+.search-container { display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; gap: 2rem; }
+.search-box { width: 100%; max-width: 1400px; padding: 2rem; border-radius: 12px; background-color: #2a2a2a; border: 1px solid #444; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+.search-title { font-size: 1.75rem; margin: 0 0 0.5rem 0; text-align: center; color: #FBBF24; }
+.search-description { margin: 0 0 1.5rem 0; color: #ccc; font-size: 0.95rem; text-align: center; }
 
-	.search-title {
-		font-size: 1.75rem;
-		margin: 0 0 0.5rem 0;
-		color: #fbbbf24;
-	}
+.search-form {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+}
 
-	.search-description {
-		margin: 0 0 1.5rem 0;
-		color: #ccc;
-		font-size: 0.95rem;
-	}
+.search-input { flex-grow: 1; padding: 0.75rem; font-size: 1rem; border-radius: 6px; border: 1px solid #666; background-color: #333; color: #f0f0f0; transition: border-color 0.2s; }
+.search-input:disabled { background-color: #444; cursor: not-allowed; }
+.search-button { padding: 0.75rem 1.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background-color 0.2s; background-color: #FBBF24; color: white; }
+.search-button:hover:not(:disabled) { background-color: #fde047; }
+.search-button:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
+.results-area { width: 100%; max-width: 1400px; text-align: center; }
+.loader { margin: 1rem auto; border: 4px solid #555; border-top: 4px solid #FBBF24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.results-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1rem; }
+.result-item { display: flex; justify-content: space-between; align-items: center; background-color: #333; padding: 1rem; border-radius: 8px; border: 1px solid #444; text-align: left; }
+.result-type { font-size: 0.8rem; font-weight: bold; color: #FBBF24; background-color: rgba(251, 191, 36, 0.15); padding: 2px 6px; border-radius: 4px; align-self: flex-start; }
+.view-graph-button { padding: 0.5rem 1rem; background-color: transparent; color: #FBBF24; border: 1px solid #FBBF24; border-radius: 6px; cursor: pointer; transition: all 0.2s; white-space: nowrap; margin-left: 1rem; }
+.view-graph-button:hover { background-color: #FBBF24; color: #2a2a2a; }
 
-	.search-form {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.search-input {
-		flex-grow: 1;
-		padding: 0.75rem;
-		font-size: 1rem;
-		border-radius: 6px;
-		border: 1px solid #555;
-		background-color: #1a1a1a;
-		color: #f0f0f0;
-        transition: border-color 0.2s;
-	}
-    .search-input:disabled {
-        background-color: #333;
-        cursor: not-allowed;
-    }
-
-	.search-button,
-	.clear-button {
-		padding: 0 1.5rem;
-		border: none;
-		border-radius: 6px;
-		font-weight: bold;
-		cursor: pointer;
-		transition: background-color 0.2s;
-	}
-
-	.search-button {
-		background-color: #fbbbf24;
-		color: #1a1a1a;
-	}
-	.search-button:hover:not(:disabled) {
-		background-color: #fde047;
-	}
-    .search-button:disabled {
-        background-color: #555;
-        cursor: not-allowed;
-    }
-
-	.clear-button {
-		background-color: transparent;
-		font-size: 1rem;
-	}
-
-	/* --- DYNAMIC RESULTS SECTION STYLES --- */
-
-	.results-area {
-		width: 100%;
-		max-width: 36em;
-        text-align: center;
-	}
-    
-    .loader {
-        margin: 1rem auto;
-        border: 4px solid #555;
-        border-top: 4px solid #fbbbf24;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .error-message {
-        color: #ef4444; /* Red for errors */
-        background-color: #ef444420;
-        padding: 1rem;
-        border-radius: 8px;
-    }
-
-    .results-title {
-        margin-bottom: 1rem;
-        color: #f0f0f0;
-        border-bottom: 1px solid #444;
-        padding-bottom: 0.5rem;
-        text-align: left;
-    }
-
-    .results-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .result-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #333;
-        padding: 1rem;
-        border-radius: 8px;
-        border: 1px solid #444;
-        text-align: left;
-    }
-
-    .result-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        overflow: hidden; /* Prevent long text from overflowing */
-    }
-    
-    .result-type {
-        font-size: 0.8rem;
-        font-weight: bold;
-        color: #fbbbf24;
-        background-color: #fbbbf2420;
-        padding: 2px 6px;
-        border-radius: 4px;
-        align-self: flex-start;
-    }
-
-    .result-id {
-        font-family: monospace;
-        color: #f0f0f0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis; /* Add ... if the ID is too long */
-    }
-
-    .result-snippet {
-        font-size: 0.9rem;
-        color: #aaa;
-    }
-
-    .view-graph-button {
-        padding: 0.5rem 1rem;
-        background-color: transparent;
-        color: #fbbbf24;
-        border: 1px solid #fbbbf24;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
-        white-space: nowrap; /* Prevents the text from wrapping */
-        margin-left: 1rem; /* Space between info and button */
-    }
-
-    .view-graph-button:hover {
-        background-color: #fbbbf24;
-        color: #1a1a1a;
-    }
-
-    .no-results-box {
-        background-color: #33333350;
-        padding: 2rem;
-        border-radius: 8px;
-        border: 1px dashed #555;
-    }
-
-    .no-results-box p {
-        margin: 0;
-        font-size: 1.1rem;
-        color: #f0f0f0;
-    }
-
-    .no-results-hint {
-        color: #888;
-        font-size: 0.9rem;
-    }
 </style>
