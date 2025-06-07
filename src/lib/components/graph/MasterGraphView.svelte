@@ -22,7 +22,6 @@
   import NodeContextMenu from './ui/NodeContextMenu.svelte';
   import NodeProofType from './nodes/NodeProofType.svelte';
   import UnconfirmedEdgeType from './edges/UnconfirmedEdgeType.svelte';
-  import DataModal from '../views/DataModal.svelte';
   import EdgeTypeBoth from './edges/EdgeTypeBoth.svelte';
   import NodeLinkObjectType from './nodes/NodeLinkObjectType.svelte';
   import NodeObjectContextMenu from './ui/NodeObjectContextMenu.svelte';
@@ -491,7 +490,5 @@
   {:else}
     <PanelContextMenu />
   {/if}
-
-  <DataModal />
 
 </div>
