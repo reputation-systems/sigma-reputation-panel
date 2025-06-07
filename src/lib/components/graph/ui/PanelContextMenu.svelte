@@ -1,19 +1,9 @@
 <script lang="ts">
-
-    import SettingModal from "./Settings.svelte";
-    import Search from "./Search.svelte";
-    import { connected } from "$lib/store";
     
-    // pos is cursor position when right click occur
     let pos = { x: 0, y: 0 }
-    // menu is dimension (height and width) of context menu
-    let menu = { h: 0, y: 0 }
-    // browser/window dimension (height and width)
-    let browser = { h: 0, y: 0 }
+    let menu = { h: 0, w: 0 }
+    let browser = { h: 0, w: 0 }
     let showMenu = false;
-    let showSearch = false;
-    let showSetting = false;
-
 
     function rightClickContextMenu(e){
         showMenu = true
@@ -25,25 +15,18 @@
             x: e.clientX,
             y: e.clientY
         };
-        // If bottom part of context menu will be displayed
-        // after right-click, then change the position of the
-        // context menu. This position is controlled by `top` and `left`
-        // at inline style. 
-        // Instead of context menu is displayed from top left of cursor position
-        // when right-click occur, it will be displayed from bottom left.
+        
         if (browser.h -  pos.y < menu.h)
             pos.y = pos.y - menu.h
         if (browser.w -  pos.x < menu.w)
             pos.x = pos.x - menu.w
     }
+
     function onPageClick(e){
-        // To make context menu disappear when
-        // mouse is clicked outside context menu
         showMenu = false;
     }
+
     function getContextMenuDimension(node){
-        // This function will get context menu dimension
-        // when navigation is shown => showMenu = true
         let height = node.offsetHeight
         let width = node.offsetWidth
         menu = {
@@ -51,13 +34,10 @@
             w: width
         }
     }
-    function search(){
-        showSearch = true;
-    }
-    function setting(){
-        showSetting = true;
-    }
 
+    let menuItems = [];
+
+    /*
     let menuItems = [
         {
             'name': 'search',
@@ -75,11 +55,10 @@
             'class': 'fa-solid fa-gear'
         }
     ].filter(item => $connected || item.name !== 'addItem');
+    */
 
 </script>
 <svelte:head>
-    <!-- You can change icon sets according to your taste. Change `class` value in `menuItems` above to represent your icons. -->
-    <!-- <link rel="stylesheet" href="/icon/css/mfglabs_iconset.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </svelte:head>
 
@@ -93,6 +72,8 @@
                 {:else}
                     <li><button on:click={item.onClick}><i class={item.class}></i>{item.displayText}</button></li>
                 {/if}
+            {:else}
+                <li class="no-options-item">No options available</li>
             {/each}
         </ul>
     </div>
@@ -100,10 +81,6 @@
 {/if}
 
 <svelte:window on:contextmenu|preventDefault={rightClickContextMenu} on:click={onPageClick} />
-
-<Search bind:showSearch />
-<SettingModal bind:showModal={showSetting} />
-
 
 <style>
     * {
@@ -189,5 +166,13 @@
         border: none;
         border-bottom: 1px solid #444;
         margin: 5px 0px;
+    }
+
+    .no-options-item {
+        padding: 10px 15px;
+        text-align: center;
+        color: #888; 
+        font-style: italic;
+        cursor: default;
     }
 </style>

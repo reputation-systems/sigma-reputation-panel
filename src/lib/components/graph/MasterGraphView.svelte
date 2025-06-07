@@ -16,10 +16,8 @@
   import { v4 as uuidv4 } from 'uuid';
   import { type LinkedObject, type LinkedHash } from '$lib/LinkedObject';
 
-  import Header from './ui/Header.svelte';
   import EdgeType from './edges/EdgeType.svelte';
   import NodeCircleType from './nodes/NodeCircleType.svelte';
-  import PanelContextMenu from './ui/PanelContextMenu.svelte';
   import EdgeContextMenu from './ui/EdgeContextMenu.svelte';
   import NodeContextMenu from './ui/NodeContextMenu.svelte';
   import NodeProofType from './nodes/NodeProofType.svelte';
@@ -28,6 +26,7 @@
   import EdgeTypeBoth from './edges/EdgeTypeBoth.svelte';
   import NodeLinkObjectType from './nodes/NodeLinkObjectType.svelte';
   import NodeObjectContextMenu from './ui/NodeObjectContextMenu.svelte';
+    import PanelContextMenu from './ui/PanelContextMenu.svelte';
 
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightNodeForObjectMenu: { id: string, linked_object?: LinkedObject, top?: number; left?: number; right?: number; bottom?: number  } | null;
@@ -459,7 +458,6 @@
     style="background: #1a192bbe" fitView
   >
     <Background />
-    <Header/>
     <Controls
       showLock={$advance_mode}
       showZoom={$advance_mode}

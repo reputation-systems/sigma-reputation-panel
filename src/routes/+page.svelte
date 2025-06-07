@@ -6,9 +6,10 @@
     // Importing the two main views from their locations
     import MasterGraphView from '$lib/components/graph/MasterGraphView.svelte';
     import CreateProofWizard from '$lib/components/views/CreateProofWizard.svelte';
+    import Search from '$lib/components/views/Search.svelte';
 
     // State to manage the current view
-    let currentPage: 'intro' | 'graph' | 'create' = 'intro';
+    let currentPage: 'intro' | 'graph' | 'create' | 'search' = 'intro';
 </script>
 
 <svelte:head>
@@ -24,6 +25,9 @@
             <div class="nav-buttons">
                 <button on:click={() => currentPage = 'graph'} class:active={currentPage === 'graph'}>
                     <i class="fas fa-project-diagram"></i> Graph
+                </button>
+                <button on:click={() => currentPage = 'search'} class:active={currentPage === 'search'}>
+                    <i class="fas fa-search"></i> Search
                 </button>
                 <button on:click={() => currentPage = 'create'} class:active={currentPage === 'create'}>
                     <i class="fas fa-plus-circle"></i> Submit
@@ -52,6 +56,8 @@
         <div class="view-content">
             {#if currentPage === 'graph'}
                 <MasterGraphView />
+            {:else if currentPage === 'search'}
+                <Search on:searchGraph={() => currentPage = 'graph'} />
             {:else if currentPage === 'create'}
                 <div class="wizard-wrapper">
                     <CreateProofWizard />
