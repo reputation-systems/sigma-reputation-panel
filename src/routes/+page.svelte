@@ -8,7 +8,7 @@
     import CreateProofWizard from '$lib/components/views/CreateProofWizard.svelte';
 
     // State to manage the current view
-    let currentPage: 'graph' | 'create' = 'graph';
+    let currentPage: 'intro' | 'graph' | 'create' = 'intro';
 </script>
 
 <svelte:head>
@@ -18,22 +18,38 @@
 </svelte:head>
 
 <main>
-    {#if $connected}
-        {#if $show_header}
-            <div class="view-switcher">
-                <span class="app-title">Sigma Reputation</span>
-                <div class="nav-buttons">
-                    <button on:click={() => currentPage = 'graph'} class:active={currentPage === 'graph'}>
-                        <i class="fas fa-project-diagram"></i> Graph
-                    </button>
-                    <button on:click={() => currentPage = 'create'} class:active={currentPage === 'create'}>
-                        <i class="fas fa-plus-circle"></i> Submit
-                    </button>
-                </div>
+    {#if $connected && currentPage !== 'intro'}
+        <div class="view-switcher">
+            <span class="app-title" on:click={() => currentPage = 'intro'}>Sigma Reputation</span>
+            <div class="nav-buttons">
+                <button on:click={() => currentPage = 'graph'} class:active={currentPage === 'graph'}>
+                    <i class="fas fa-project-diagram"></i> Graph
+                </button>
+                <button on:click={() => currentPage = 'create'} class:active={currentPage === 'create'}>
+                    <i class="fas fa-plus-circle"></i> Submit
+                </button>
             </div>
-        {/if}
+        </div>
+    {/if}
 
-        <div class="view-content" class:no-header={!$show_header}>
+    {#if currentPage === 'intro'}
+        <div class="welcome-container">
+            <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank" title="View on GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+            <h1>Welcome to Sigma Reputation</h1>
+            
+            {#if $connected}
+                <p>You are connected. Explore the graph or submit a new proof.</p>
+                <button on:click={() => currentPage = 'graph'}>Explore the Graph</button>
+            {:else}
+                <p>Connect your Nautilus wallet to explore and build the web of trust on Ergo.</p>
+                <button on:click={connectNautilus}>Connect Wallet</button>
+            {/if}
+        </div>
+
+    {:else}
+        <div class="view-content">
             {#if currentPage === 'graph'}
                 <MasterGraphView />
             {:else if currentPage === 'create'}
@@ -41,19 +57,6 @@
                     <CreateProofWizard />
                 </div>
             {/if}
-        </div>
-
-    {:else}
-        <!-- Welcome Screen -->
-        <div class="welcome-container">
-            <!-- GitHub Link now only appears here -->
-            <a class="github-button" href="https://github.com/reputation-systems/sigma-reputation-panel" target="_blank" title="View on GitHub">
-                <i class="fab fa-github"></i>
-            </a>
-
-            <h1>Welcome to Sigma Reputation</h1>
-            <p>Connect your Nautilus wallet to explore and build the web of trust on Ergo.</p>
-            <button on:click={connectNautilus}>Connect Wallet</button>
         </div>
     {/if}
 </main>
@@ -107,7 +110,6 @@
 
     .welcome-container h1 { font-size: 3rem; color: #FBBF24; }
     .welcome-container button { padding: 1rem 2rem; font-size: 1.2rem; }
-
 
     /* --- MINIMALIST HEADER STYLES --- */
     .view-switcher {
@@ -164,7 +166,7 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        z-index: 999;
+        z-index: 1001;
         width: 40px;
         height: 40px;
         display: flex;
