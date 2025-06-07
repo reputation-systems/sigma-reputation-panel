@@ -1,54 +1,54 @@
 <script lang="ts">
   import type { ReputationProof } from "$lib/ReputationProof";
-  import { data_store, network } from "$lib/store";
+  // The global data_store is no longer needed. We only need the network for the info display.
+  import { network } from "$lib/store";
   
-  // Asumimos que estos componentes existen y están disponibles para ser importados
+  // --- CHANGE 1: Import all necessary local modals ---
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import ComputeSearchModal from "./ComputeSearchModal.svelte";
+  // Import the refactored DataModal, which now accepts props
+  import DataModal from "../../views/DataModal.svelte";
 
   export let onClick: () => void;
   export let proof: ReputationProof | null;
 
   let local_id: string = proof ? proof.token_id.slice(0, 10) : "";
 
-  // Variables para la lógica de posicionamiento del menú
+  // Positioning logic (remains the same)
   let pos = { x: 0, y: 0 };
   let menu = { h: 0, w: 0 };
   let browser = { w: 0, h: 0 };
   
-  // Estado para controlar la visibilidad del menú y los modales
+  // --- CHANGE 2: Local state for ALL modals this component can open ---
   let showMenu = false;
-  let showForm = false;
-  let showComputeSearch = false;
+  let showUpdateModal = false;
+  let showComputeModal = false;
+  let showDetailsModal = false; // New local state for the details modal
 
-  // Muestra y posiciona el menú contextual en la posición del clic
+  // Positioning functions (remain the same)
   function rightClickContextMenu(e: MouseEvent) {
     showMenu = true;
     browser = { w: window.innerWidth, h: window.innerHeight };
     pos = { x: e.clientX, y: e.clientY };
 
-    // Ajusta la posición si el menú se saldría de la pantalla
     if (browser.h - pos.y < menu.h) pos.y = pos.y - menu.h;
     if (browser.w - pos.x < menu.w) pos.x = pos.x - menu.w;
   }
 
-  // Oculta el menú y llama a la función onClick del padre
   function onPageClick() {
     showMenu = false;
     onClick();
   }
 
-  // Captura las dimensiones del menú una vez que se renderiza
   function getContextMenuDimension(node: HTMLElement) {
     menu = { h: node.offsetHeight, w: node.offsetWidth };
   }
 
-  // Funciones para los ítems del menú
-  function updateItem() { showForm = true; }
-  function computeItem() { showComputeSearch = true; }
-  function handleDblClick() { data_store.set(proof); }
+  // --- CHANGE 3: Updated menu item actions to use local state variables ---
+  function updateItem() { showUpdateModal = true; }
+  function computeItem() { showComputeModal = true; }
+  function showDetails() { showDetailsModal = true; } // This now controls the local DataModal
 
-  // CORRECCIÓN: Se ha añadido una comprobación para evitar errores si no hay cajas
   function linkExplorer() {
     if (!proof || proof.current_boxes.length === 0) return;
     const tx_id = proof.current_boxes[0].box.transactionId;
@@ -56,14 +56,13 @@
     window.open(explorer_tx_id, "_blank");
   }
 
-  // Definición de los ítems del menú
+  // Menu items definition with updated onClick handlers
   let menuItems = [
-    { name: "openInfo", onClick: handleDblClick, displayText: "Details", class: "fa-solid fa-info" },
+    { name: "openInfo", onClick: showDetails, displayText: "Details", class: "fa-solid fa-info" },
     { name: "explorerLink", onClick: linkExplorer, displayText: "Check on explorer", class: "fa-solid fa-search" },
     { name: 'computeItem', onClick: computeItem, displayText: "Calculate", class: 'fa-solid fa-calculator' }
   ];
 
-  // Añade dinámicamente el botón "Update" si el proof se puede gastar
   if (proof?.can_be_spend) {
     menuItems.push({ name: 'updateItem', onClick: updateItem, displayText: "Update", class: 'fa-solid fa-pencil-alt' });
   }
@@ -73,7 +72,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" xintegrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </svelte:head>
 
-<!-- CORRECCIÓN: El bloque <svelte:window> ha sido descomentado para restaurar la funcionalidad del menú -->
+<!-- This remains the same -->
 <svelte:window 
   on:contextmenu|preventDefault={showMenu ? onPageClick : rightClickContextMenu}
   on:click|self={onPageClick}
@@ -93,22 +92,29 @@
     </div>  
     <ul>
       {#each menuItems as item}
-        <li><button on:click={item.onClick}><i class={item.class}></i>{item.displayText}</button></li>
+        <li>
+            <!-- --- CHANGE 4: The robust click handler that closes the menu --- -->
+            <button on:click={() => { item.onClick(); showMenu = false; }}>
+                <i class={item.class}></i>{item.displayText}
+            </button>
+        </li>
       {/each}
     </ul>
   </div>
 </nav>
 {/if}
 
-{#if proof && proof.can_be_spend}
-  <UpdateProofModal bind:showModal={showForm} bind:proof={proof} />
-{/if}
-
+<!-- --- CHANGE 5: Instantiate ALL modals locally with their respective states --- -->
 {#if proof}
-    <ComputeSearchModal bind:showModal={showComputeSearch} bind:proof={proof} />
+  {#if proof.can_be_spend}
+    <UpdateProofModal bind:showModal={showUpdateModal} bind:proof={proof} />
+  {/if}
+  <ComputeSearchModal bind:showModal={showComputeModal} bind:proof={proof} />
+  <DataModal bind:showModal={showDetailsModal} data={proof} />
 {/if}
 
 <style>
+    /* Styles are unchanged */
     .navbar {
         display: inline-flex;
         border: 1px #555 solid;
