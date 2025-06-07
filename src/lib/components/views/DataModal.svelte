@@ -1,18 +1,15 @@
 <script lang="ts">
-    // DataModal no longer uses the store. It receives data and visibility state as props.
     import { renderedToString } from '$lib/utils';
 
     export let showModal: boolean;
-    export let data: any; // The proof or linked_object will be passed here.
+    export let data: any; 
 
     let dialog: HTMLDialogElement;
 
-    // When showModal changes to true, we show the dialog.
     $: if (dialog && showModal) {
         dialog.showModal();
     }
 
-    // Function to close the modal. This will update the bind:showModal in the parent.
     function close() {
         showModal = false;
     }
@@ -25,9 +22,8 @@
   
 </script>
 
-<!-- The component is now a native <dialog>, just like ComputeSearchModal -->
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialog} on:close={close} on:click|self={close}>
+<dialog bind:this={dialog} on:close={close} on:click|self={() => dialog.close()}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="modal-content" on:click|stopPropagation>
         {#if data}
@@ -42,16 +38,18 @@
                     {/each}
 
                     <h3>Opinions</h3>
-                    {#each data.opinions as {proof_id, content}}
-                    {#if Object.keys(content).length > 0}
-                    <div>
-                        <strong>From {proof_id.slice(0, 10) ?? 'Unknown'}:</strong> {JSON.stringify(content)}
+                    <div class="opinions-list">
+                        {#each data.opinions as {proof_id, content}}
+                            {#if content && typeof content === 'object' && Object.keys(content).length > 0}
+                                <div class="opinion-item">
+                                    <strong>From {proof_id.slice(0, 10) ?? 'Unknown'}:</strong>
+                                    <pre><code>{JSON.stringify(content, null, 2)}</code></pre>
+                                </div>
+                            {/if}
+                        {/each}
                     </div>
-                    {/if}
-                    {/each}
                 </div>
             {:else if "token_id" in data}
-                <!-- Render for ReputationProof -->
                 <div class="proof-type">
                     <h2>Details for Proof { data.token_id.slice(0, 15) }...</h2>
             
@@ -94,7 +92,6 @@
 </dialog>
 
 <style>
-    /* Modal styles are now applied to the dialog element */
     dialog {
         background: #2a2a2a;
         padding: 1.5rem;
@@ -108,10 +105,28 @@
         background: rgba(0, 0, 0, 0.7);
     }
     .modal-content {
+        position: relative; 
         word-wrap: break-word;
         max-height: 85vh; 
         overflow: auto;
     }
+
+    .close-button {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        line-height: 1;
+        color: #aaa;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    .close-button:hover {
+        color: #fff;
+    }
+
     .table-container {
         overflow: auto;
         max-height: 60vh; 
@@ -125,4 +140,15 @@
     tr:hover { background-color: #3a3a3a; }
     h2, h3 { color: #FBBF24; margin-bottom: 1rem; }
     pre { background-color: #222; padding: 0.5rem; border-radius: 4px; white-space: pre-wrap; }
+
+    .opinions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .opinion-item strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
 </style>
