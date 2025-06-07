@@ -1,15 +1,16 @@
 <script lang="ts">
     import '../app.css';
-    import { connected, show_header } from '$lib/store';
+    import { connected } from '$lib/store';
     import { connectNautilus } from '$lib/connect';
     
     // Importing the two main views from their locations
     import MasterGraphView from '$lib/components/graph/MasterGraphView.svelte';
     import CreateProofWizard from '$lib/components/views/CreateProofWizard.svelte';
     import Search from '$lib/components/views/Search.svelte';
+    import Settings from '$lib/components/views/Settings.svelte';
 
     // State to manage the current view
-    let currentPage: 'intro' | 'graph' | 'create' | 'search' = 'intro';
+    let currentPage: 'intro' | 'graph' | 'create' | 'search' | 'settings' = 'intro';
 </script>
 
 <svelte:head>
@@ -31,6 +32,9 @@
                 </button>
                 <button on:click={() => currentPage = 'create'} class:active={currentPage === 'create'}>
                     <i class="fas fa-plus-circle"></i> Submit
+                </button>
+                <button on:click={() => currentPage = 'settings'} class:active={currentPage === 'settings'}>
+                    <i class="fas fa-cog"></i> Settings
                 </button>
             </div>
         </div>
@@ -62,6 +66,8 @@
                 <div class="wizard-wrapper">
                     <CreateProofWizard />
                 </div>
+            {:else if currentPage === 'settings'}
+                <Settings />
             {/if}
         </div>
     {/if}
