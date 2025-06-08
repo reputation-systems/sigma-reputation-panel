@@ -1,4 +1,4 @@
-import { type RPBox, type ReputationProof, Network, type TypeNftMetadata } from "$lib/ReputationProof";
+import { type RPBox, type ReputationProof, type TypeNftMetadata } from "$lib/ReputationProof";
 import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
 import { get } from "svelte/store";
 import { connected } from "./store";
@@ -110,7 +110,8 @@ export async function updateReputationProofList(
                             owner_address: serializedToRendered(r7_value),
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
                             current_boxes: [], number_of_boxes: 0,
-                            network: Network.ErgoMainnet, data: {}
+                            network: "ergo", 
+                            data: {}
                         };
                     }
 

@@ -85,3 +85,5 @@ const ergoTreeHash = hex.encode(sha256(ergoTree.template.toBytes()));
 
 export const ergo_tree_hash = ergoTreeHash;
 export const ergo_tree_address = ergoTreeAddress;
+
+export const proof_by_token_type_nft_id = "";

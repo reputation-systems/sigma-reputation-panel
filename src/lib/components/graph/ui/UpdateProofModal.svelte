@@ -1,216 +1,156 @@
 <script lang="ts">
-import { updateReputationProofList } from '$lib/unspent_proofs';
-import { generate_reputation_proof } from '$lib/generate_reputation_proof';
-import { explorer_uri, ergo_tree_hash } from '$lib/envs';
-import { type LinkedHash } from '$lib/LinkedObject';
-import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
+    import { generate_reputation_proof } from '$lib/generate_reputation_proof';
+    import { type RPBox, type ReputationProof } from '$lib/ReputationProof';
     import JsonInput from './JsonInput.svelte';
 
-export let showModal: boolean; // boolean
-let dialog: any; // HTMLDialogElement
+    // --- Component Props ---
+    export let showModal: boolean;
+    // The proof from which a box will be spent.
+    export let proof: ReputationProof;
 
-export let proof: ReputationProof;
-let input_proof_box: null|RPBox;
-let reputationTokenAmount: number;
-let object_to_assign: string;
-let object_type_to_assign: ObjectType | undefined;
-let tags: string;
-let negative: boolean = false;
-let data: object = {};
+    // --- Component State ---
+    let dialog: HTMLDialogElement;
+    // The specific box to spend from.
+    let input_proof_box: RPBox | null = null;
+    // The target this new proof box will point to.
+    let object_to_assign: string = '';
+    // The absolute amount of tokens for the new box.
+    let token_amount: number = 0;
+    // State for the new box's registers.
+    let negative: boolean = false;
+    let is_locked: boolean = false;
+    let data: object = {};
 
-let unspend_reputation_proofs: ReputationProof[] = [];
+    // --- Lifecycle and Event Handlers ---
+    $: if (dialog && showModal) {
+        dialog.showModal();
+    }
 
-let linkedHashes: LinkedHash[] = [
-    { algorithm: null, value: '' }
-];
+    /**
+     * Resets form fields when a new input box is selected.
+     */
+    function handleInputProofChange() {
+        token_amount = 0;
+        object_to_assign = "";
+        negative = false;
+        is_locked = false;
+        data = {};
+    }
 
-const baseHashes = {
-    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'SHA2 256',
-    'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a': 'SHA3 256',
-    '46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f': 'SHAKE 256'
-};
+    /**
+     * Closes the modal.
+     */
+    function close() {
+        showModal = false;
+    }
 
-function handleInputProofChange(event: any) {
-	reputationTokenAmount = 0;
-	object_to_assign = "";
-	handleObjectToAssignChange(event);
-}
+    /**
+     * Gathers data from the form and calls the transaction generation function.
+     */
+    async function generateReputationProof() {
+        if (token_amount > 0 && input_proof_box && object_to_assign) {
+            // Call the updated transaction generation function with the correct parameters.
+            const txId = await generate_reputation_proof(
+                token_amount,
+                proof.total_amount,
+                proof.type_nft_id,
+                object_to_assign,
+                !negative, // Convert checkbox state to 'polarization' parameter
+                data,
+                is_locked,
+                input_proof_box
+            );
 
-function addNewHash() {
-    linkedHashes = [...linkedHashes, { algorithm: null, value: '' }];
-}
-
-function removeHash(index: number) {
-    linkedHashes = linkedHashes.filter((_, i) => i !== index);
-}
-
-function handleObjectToAssignChange(event: any) {
-	object_to_assign = "";
-}
-
-$: {
-		if (dialog && showModal) {
-			(async () => {
-				await fetchReputationProofs(true);
-				dialog.showModal();
-			})();
-		}
-	}
-
-function generateReputationProof() {
-
-	if (object_type_to_assign === ObjectType.LinkedObject) {
-		object_to_assign = JSON.stringify(linkedHashes.filter(item => typeof(item.algorithm) === "string" && item.algorithm.length >= 64));
-	}
-
-	generate_reputation_proof(
-		(reputationTokenAmount / 100) * proof.total_amount,
-		input_proof_box ?? undefined, 
-		object_to_assign, 
-		object_type_to_assign, 
-		negative, 
-		tags,
-		data
-	);
-}
-
-async function fetchReputationProofs(all: boolean = true) {
-	try {
-		const data = await updateReputationProofList(explorer_uri, ergo_tree_hash, ergo, all, null);
-		unspend_reputation_proofs = Array.from(data.values());
-	} catch (error) {
-		console.error(error);
-	}
-}
-
+            if (txId) {
+                alert(`Transaction submitted: ${txId}`);
+                close();
+            }
+        } else {
+            alert("Please fill all required fields.");
+        }
+    }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialog} on:close={() => (showModal = false)} on:click|self={() => dialog.close()}>
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation class="modal-content">
-		<h2 class="modal-title" id="generateReputationLabel">Update reputation proof</h2>
-		<hr />
-		<form id="reputationForm">
-		<div class="mb-3">
-			<!-- svelte-ignore a11y-label-has-associated-control -->
-			<label class="form-label">Proof box</label>
-			<select class="form-select" bind:value={input_proof_box} on:change={handleInputProofChange}>
-				{#each proof.current_boxes as option (option.box_id)}
-					<option value={option}>{option.box_id.slice(0, 10)} - ({option.token_amount / proof.total_amount * 100}%)</option>
-				{/each}
-			</select>
-		</div>
-		{#if input_proof_box}
-			<div class="mb-3">
-				<label for="object_to_assign" class="form-label">Object to assign reputation</label>
-				<select class="form-select" bind:value={object_type_to_assign}  on:change={handleInputProofChange}>
-					<option value={ObjectType.PlainText}>Plain text</option>
-					<option value={ObjectType.ProofByToken}>Reputation proof</option>
-					<option value={ObjectType.LinkedObject}>Linked Object</option>
-				</select>
-				{#if object_type_to_assign == ObjectType.PlainText}
-					<input type="text" class="form-control" bind:value={object_to_assign} style="max-width: 97%;"/>
-				{/if}
-				{#if object_type_to_assign == ObjectType.ProofByToken}
-					<select class="form-select" bind:value={object_to_assign}>
-						{#each unspend_reputation_proofs as option (option.token_id)}
-							{#if proof.token_id !== option.token_id}
-								<option value={option.token_id}>
-									{option.token_id.slice(0, 10)}
-									{#if option.tag}<span class="tag">● {option.tag}</span>{/if}
-									{#if option.can_be_spend}● yours{/if}
-								</option>
-							{/if}
-						{/each}
-					</select>
-				{/if}
-				{#if object_type_to_assign === ObjectType.LinkedObject}
-					<div class="linked-hashes mt-2">
-						{#each linkedHashes as hash, i}
-						<div class="hash-pair mb-2">
-							{#if hash.algorithm === null}
-								<select class="form-select mb-1" bind:value={hash.algorithm}>
-									<option value="">Select Algorithm</option>
-									{#each Object.entries(baseHashes) as [hashValue, name]}
-										{#if !linkedHashes.some(linked => linked.algorithm === hashValue)}
-											<option value={hashValue}>{name}</option>
-										{/if}
-									{/each}
-									<option value="">Other</option>
-								</select>
-							{:else if hash.algorithm.length < 64}
-								<input
-									type="text"
-									class="form-control mb-1"
-									placeholder="Enter hash identifier"
-									bind:value={hash.algorithm}
-								/>
-							{:else if hash.algorithm !== null && hash.algorithm in baseHashes}
-								<!-- svelte-ignore a11y-missing-attribute -->
-								<input
-									type="text"
-									disabled
-									class="form-control mb-1"
-									placeholder="Enter hash identifier"
-									bind:value={baseHashes[String(hash.algorithm)]}
-								>
-							{/if}
-							<input 
-								type="text" 
-								class="form-control"
-								placeholder="Hash value"
-								bind:value={hash.value}
-							/>
-							<button
-								type="button"
-								class="btn btn-danger btn-sm"
-								on:click={() => removeHash(i)}
-							>
-								Delete
-							</button>
-						</div>
-						{/each}
-						<button class="btn btn-primary" type="button" on:click={addNewHash}>Add Hash</button>
-					</div>
-				{/if}
-			</div>
-			<div class="mb-3">
-				<!-- svelte-ignore a11y-label-has-associated-control -->
-				<label class="form-label">Token amount<span class="required">*</span></label>
-				<span style="align-self: flex-end;">Up to: {(input_proof_box.token_amount / proof.total_amount)*100}%</span>
-				<input type="number" min="0" class="form-control" bind:value={reputationTokenAmount} max="{(input_proof_box.token_amount / proof.total_amount)*100}" style="max-width: 97%;"/>
-			</div>
-
-			<div class="mb-3">
-                <label for="polarCheckbox" class="form-check-label">Negative</label>
-                <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
+<dialog bind:this={dialog} on:close={close} on:click|self={close}>
+    <div on:click|stopPropagation class="modal-content">
+        <h2 class="modal-title">Create New Pointer</h2>
+        <p class="modal-subtitle">From Proof: {proof.type_metadata.name} ({proof.token_id.slice(0, 15)}...)</p>
+        <hr />
+        
+        <form id="reputationForm" on:submit|preventDefault={generateReputationProof}>
+            <div class="mb-3">
+                <label for="proof-box-select" class="form-label">Spend from Proof Box</label>
+                <select id="proof-box-select" class="form-select" bind:value={input_proof_box} on:change={handleInputProofChange}>
+                    <option disabled selected value={null}>-- Select a box to spend from --</option>
+                    {#each proof.current_boxes as option (option.box_id)}
+                        <option value={option}>
+                            Box ({option.token_amount} tokens) - ID: {option.box_id.slice(0, 10)}...
+                        </option>
+                    {/each}
+                </select>
             </div>
 
-			<div class="mb-3">
-				<label for="data" class="form-label">Opinion about it</label>
-				<JsonInput bind:value={data} style="max-width: 97%;" />
-			</div>
-			
-		{/if}
-		</form>
-		<hr />
-		<!-- svelte-ignore a11y-autofocus -->
-		<div class="row">
-			<button on:click={generateReputationProof} 
-				disabled={!reputationTokenAmount || !input_proof_box}>
-				Generate proof
-			</button>
-		</div>
-	</div>
+            {#if input_proof_box}
+                <div class="form-grid">
+                    <div class="mb-3">
+                        <label for="object-pointer-input" class="form-label">Object Pointer<span class="required">*</span></label>
+                        <input 
+                            type="text" 
+                            id="object-pointer-input" 
+                            class="form-control" 
+                            bind:value={object_to_assign}
+                            placeholder="URL, token ID, text, etc."
+                        />
+                    </div>
+                    <div class="mb-3">
+                        <label for="reputationToken" class="form-label">Token Amount to Assign<span class="required">*</span></label>
+                        <input 
+                            type="number" 
+                            id="reputationToken"
+                            min="1"
+                            max={input_proof_box.token_amount}
+                            class="form-control" 
+                            bind:value={token_amount}
+                        />
+                        <small>Max available: {input_proof_box.token_amount}</small>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="polarCheckbox" bind:checked={negative} />
+                        <label for="polarCheckbox" class="form-check-label">Negative Proof</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="lockCheckbox" bind:checked={is_locked} />
+                        <label for="lockCheckbox" class="form-check-label">Lock (Immutable)</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="data" class="form-label">Opinion/Content (JSON)</label>
+                    <JsonInput bind:value={data} />
+                </div>
+            {/if}
+        </form>
+        
+        <hr />
+        <div class="modal-actions">
+            <button class="button-secondary" type="button" on:click={close}>Cancel</button>
+            <button class="button-primary" type="button" on:click={generateReputationProof} disabled={!input_proof_box || !object_to_assign || token_amount <= 0}>
+                Generate Proof
+            </button>
+        </div>
+    </div>
 </dialog>
   
 <style>
     dialog {
-        max-width: 100rem;
-        border-radius: 1em;
-        padding: 1.5em;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        width: 90%;
+        max-width: 50rem;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         background-color: #2a2a2a;
         color: #f0f0f0;
         border: 1px solid #444;
@@ -218,86 +158,126 @@ async function fetchReputationProofs(all: boolean = true) {
 
     dialog::backdrop {
         background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(3px);
+    }
+
+    .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
     }
 
     h2.modal-title {
         font-size: 1.5rem;
-        margin: 0;
+        margin-top: 0;
+        margin-bottom: 0.25rem;
         color: #FBBF24;
+    }
+
+    .modal-subtitle {
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #999;
+        margin-top: 0;
+        word-break: break-all;
     }
 
     hr {
         border: none;
         border-top: 1px solid #444;
-        margin: 1em 0;
+        margin: 1.5rem 0;
     }
 
     .mb-3 {
-        margin-bottom: 1.5em;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
     }
 
     .form-label {
         font-weight: bold;
         color: #ccc;
         display: block;
-        margin-bottom: 0.5em;
+        margin-bottom: 0.5rem;
     }
 
-    .form-select,
-    .form-control {
+    .form-select, .form-control {
         width: 100%;
-        padding: 0.75em;
+        padding: 0.75rem;
         font-size: 1rem;
         border: 1px solid #666;
         border-radius: 6px;
-        background-color: #333;
+        background-color: #1e1e1e;
         color: #f0f0f0;
         box-sizing: border-box;
     }
 
-    .modal-content {
-        width: 90%;
-        max-width: 900px;
-        margin: auto;
+    .form-control + small {
+        display: block;
+        margin-top: 0.25rem;
+        font-size: 0.8rem;
+        color: #888;
     }
 
-    .hash-pair {
+    .checkbox-group {
         display: flex;
-        gap: 10px;
+        gap: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-check {
+        display: flex;
         align-items: center;
+        gap: 0.5rem;
     }
 
-    .tag {
-        color: #aaa;
-    }
-
-    .form-select {
-        height: 3em;
+    .form-check-input {
+        width: 1.25em;
+        height: 1.25em;
     }
 
     .required {
         color: #ff8a8a;
+        margin-left: 4px;
     }
 
-    .row {
+    .modal-actions {
         display: flex;
         justify-content: flex-end;
+        gap: 1rem;
         margin-top: 1.5rem;
     }
 
     button {
-        padding: 0.75em 1.5em;
+        padding: 0.75rem 1.5rem;
         font-size: 1rem;
-        background-color: #FBBF24;
-        color: #fff;
         border: none;
         cursor: pointer;
         border-radius: 6px;
         font-weight: bold;
-        transition: background-color 0.2s;
+        transition: background-color 0.2s, opacity 0.2s;
     }
 
-    button:hover {
-        background-color: #d87112;
+    .button-primary {
+        background-color: #FBBF24;
+        color: #1a1a1a;
+    }
+    .button-primary:hover {
+        background-color: #fca510;
+    }
+    .button-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .button-secondary {
+        background-color: #444;
+        color: #f0f0f0;
+    }
+    .button-secondary:hover {
+        background-color: #555;
     }
 </style>

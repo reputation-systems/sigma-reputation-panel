@@ -78,7 +78,7 @@ export async function check_if_r7_is_local_addr(r7Value: string): Promise<boolea
 
 /**
  * A utility function to convert a serialized value to its "rendered" format (for debugging/display).
- * Note: This is a simplification and may not cover all Ergo types.
+ * This is a simplification and may not cover all Ergo types.
  * @param serializedValue The full serialized hex string.
  * @returns A simplified hex string.
  */
@@ -89,4 +89,24 @@ export function serializedToRendered(serializedValue: string): string {
         return serializedValue.substring(2);
     }
     return serializedValue;
+}
+
+/**
+ * Converts a JavaScript string directly to its "rendered" hex format.
+ * This is a convenience function that combines stringToSerialized and serializedToRendered.
+ * @param value The string to convert.
+ * @returns The simplified, rendered hex string.
+ */
+export function stringToRendered(value: string): string {
+    return serializedToRendered(stringToSerialized(value));
+}
+
+/**
+ * Converts a rendered hex string back to a UTF-8 string.
+ * For simple text, the "rendered" value is just its hex representation.
+ * @param renderedValue The rendered hex string.
+ * @returns A UTF-8 string or null on error.
+ */
+export function renderedToString(renderedValue: string): string | null {
+    return hexToUtf8(renderedValue);
 }

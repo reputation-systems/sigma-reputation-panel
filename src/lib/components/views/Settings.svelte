@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Network } from "$lib/ReputationProof";
     // Removed unused store imports: show_header, advance_mode
     import { address, network, fetch_all, compute_deep_level } from "$lib/store";
 
@@ -51,7 +50,7 @@
                 <label for="network-select">Current Network</label>
                  <div class="input-group">
                     <select id="network-select" disabled bind:value={$network}>
-                        <option value={Network.ErgoMainnet}>Ergo Mainnet</option>
+                        <option value={"ergo"}>Ergo Mainnet</option>
                     </select>
                 </div>
             </div>

@@ -1,169 +1,131 @@
 <script lang="ts">
-  import { Position, type NodeProps, Handle, useHandleConnections, useSvelteFlow, type Connection } from '@xyflow/svelte';
-  import PointOneToAnother from './point_to/PointOneToAnother.svelte';
-  import { ObjectType, type RPBox, type ReputationProof } from '$lib/ReputationProof';
-  import { hexToUtf8 } from '$lib/utils';
+  import { Position, type NodeProps, Handle, useSvelteFlow, type Connection } from '@xyflow/svelte';
+  import { type ReputationProof } from '$lib/ReputationProof';
   import { building_graph, data_store } from '$lib/store';
-  import PointOneToAnObject from './point_to/PointOneToAnObject.svelte';
+  import PointOneToAnother from './point_to/PointOneToAnother.svelte';
   import { get } from 'svelte/store';
 
+  // --- Component Props and SvelteFlow hooks ---
   type $$Props = NodeProps;
-
   export let id: $$Props['id'];
-  export let data: $$Props['data']; data;
-  export let dragHandle: $$Props['dragHandle'] = undefined; dragHandle;
-  export let type: $$Props['type'] = undefined; type;
-  export let selected: $$Props['selected'] = undefined; selected;
-  export let isConnectable: $$Props['isConnectable'] = undefined; isConnectable;
-  export let zIndex: $$Props['zIndex'] = undefined; zIndex;
-  export let width: $$Props['width'] = undefined; width;
-  export let height: $$Props['height'] = undefined; height;
-  export let dragging: $$Props['dragging']; dragging;
-  export let targetPosition: $$Props['targetPosition'] = undefined; targetPosition;
-  export let sourcePosition: $$Props['sourcePosition'] = undefined; sourcePosition;
-
-  const connections = useHandleConnections({ nodeId: id, type: 'target' });
-
-  let showModal = false;
-  let proof: ReputationProof = data.proof;
-  let connection: any | null;
-  let object_to_assign: string | null = null;
-  let object_type_to_assign: ObjectType | null = null;
-  let delete_edge_function = data.delete_edge_function;
-
-  $: isConnectable = true; // $connections.length === 0;
+  export let data: $$Props['data'];
+  export let selected: $$Props['selected'] = undefined;
+  export let isConnectable: $$Props['isConnectable'] = undefined;
+  // ... other props are available but not used directly in this logic
+  export let targetPosition: $$Props['targetPosition'] = undefined;
+  export let sourcePosition: $$Props['sourcePosition'] = undefined;
 
   const { viewport } = useSvelteFlow();
 
+  // --- Component State ---
+  let showModal = false;
+  // The proof data is passed in via the 'data' prop from the main graph component.
+  let proof: ReputationProof = data.proof;
+  // This will hold the information about the connection being made.
+  let activeConnection: Connection | null = null;
+  // This will be the ID of the object the new proof box will point to.
+  let targetPointer: string | null = null;
+  
+  // --- Computed State ---
+  // Determines if the content inside the node should be visible based on zoom level.
   let showContent = false;
-  $: {
-    if ($viewport.zoom > 1.8) {
-      showContent = true;
-    } else {
-      showContent = false;
-    }
-  }
+  $: showContent = $viewport.zoom > 1.2;
 
+  // --- Event Handlers ---
+
+  /**
+   * Opens the data panel when the node is double-clicked.
+   */
   function handleDblClick() {
     data_store.set(proof);
   }
 
-  const isBuildingGraph = get(building_graph);
+  /**
+   * Triggered when a user completes a drag-connection from this node to a target handle.
+   * It extracts the target information and opens a modal to create a new proof pointer.
+   */
+  function handleConnection(connections: Connection[]) {
+    // A connection event can sometimes fire with an empty array, so we check.
+    if (!connections || connections.length === 0) return;
 
-  function handleConnection(connections: any[]) {  // <-- type HandleConnection[]
-    connection = connections[0];
-    if (connection && isBuildingGraph === false) {
-      showModal = true;
-
-      let __target_node_id = connection.target.split("::");
-      object_to_assign = hexToUtf8(__target_node_id[1]);
-      console.log("Object to asssign "+__target_node_id[0]+ " And "+isBuildingGraph)
-      switch (__target_node_id[0]) {
-        case "proof": {
-          object_type_to_assign = ObjectType.ProofByToken
-          break;
-        }
-        case "plain-node": {
-          object_type_to_assign = ObjectType.PlainText
-          break;
-        }
-        case "object-node": {
-          object_type_to_assign = ObjectType.LinkedObject
-          break;
-        }
-        default: {
-          object_type_to_assign = null;
-          break;
-        }
+    activeConnection = connections[0];
+    
+    // Do not allow creating new connections while the graph is being built.
+    if (activeConnection && !get(building_graph)) {
+      // The target node's ID is expected in the format "type::id" (e.g., "proof::abc..." or "object::xyz...").
+      // We only need the ID part for the object pointer.
+      const [targetType, targetId] = activeConnection.target.split("::");
+      
+      if (targetId) {
+        targetPointer = targetId;
+        showModal = true;
+      } else {
+        console.warn("Could not determine target ID from connection:", activeConnection);
       }
     }
   }
-
 </script>
 
 <div class={proof.can_be_spend ? "customNode" : "customExternalNode"}>
-  <Handle type="target" position={Position.Left} {isConnectable} />
+  <Handle type="target" position={Position.Left} isConnectable />
   <Handle
     type="source"
     position={Position.Right} 
-    onconnect={handleConnection}
+    on:connect={handleConnection}
     isConnectable={proof.can_be_spend}
   />
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div style="font-size: small;" on:dblclick={handleDblClick}>
-      {data.label}
+  
+  <div class="node-content" on:dblclick={handleDblClick}>
+      <div class="node-title">{data.proof.type_metadata.name}</div>
     {#if showContent}
-      <br/>
-      {#if proof && proof.tag}
-        {#each proof.tag.split(';') as tag}
-          <span class="tag">
-            { tag.toLowerCase().replace(/\s+/g, '-') }
-          </span>
-        {/each}
-        <br/>
-      {/if}
+      <div class="token-id">ID: {proof.token_id.substring(0, 10)}...</div>
     {/if}
   </div>
 </div>
 
-{#if proof && connection && delete_edge_function && object_to_assign && object_type_to_assign}
-  {#if object_type_to_assign === ObjectType.ProofByToken}
-    <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
-  {:else if object_type_to_assign === ObjectType.PlainText}
-    <PointOneToAnother bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
-  {:else if object_type_to_assign === ObjectType.LinkedObject}
-    <PointOneToAnObject bind:delete_edge_function bind:connection bind:showModal bind:proof bind:object_to_assign bind:object_type_to_assign/>
-  {/if}
+{#if showModal && activeConnection && targetPointer}
+  <PointOneToAnother 
+    bind:showModal
+    bind:connection={activeConnection}
+    source_proof={proof}
+    object_to_assign={targetPointer}
+  />
 {/if}
 
 <style>
   .customNode, .customExternalNode {
-    background: #3a3a3a; /* Fondo oscuro para el nodo */
-    padding: 12px;
+    background: #2D2D2D;
+    padding: 10px 15px;
     border-radius: 8px;
-    border: 1px solid #555; /* Borde sutil */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 200px; /* Ancho fijo para consistencia */
-    color: #f0f0f0; /* Texto claro por defecto */
+    border: 1px solid #444;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    width: 220px;
+    color: #e0e0e0;
+    font-family: monospace;
+    text-align: center;
   }
 
-  /* Borde distintivo para nodos propios */
   .customNode {
-    border-left: 4px solid #0074D9;
+    border-left: 4px solid #007bff; /* Blue for spendable nodes */
   }
 
-  /* Borde distintivo para nodos externos */
   .customExternalNode {
-    border-left: 4px solid #ff4500;
-  }
-
-  .customNode:hover, .customExternalNode:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-left: 4px solid #ff6347; /* Red/Tomato for external nodes */
   }
 
   .node-content {
-    font-size: 0.9rem;
+    cursor: pointer;
   }
 
   .node-title {
     font-weight: bold;
-    margin-bottom: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #ffffff;
   }
 
-  .tags-container {
-      margin-top: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-  }
-
-  .tag {
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    background-color: #555; /* Fondo para la etiqueta */
-    color: #ddd; /* Texto de la etiqueta */
-    border-radius: 4px;
+  .token-id {
+    font-size: 0.75rem;
+    color: #888;
   }
 </style>

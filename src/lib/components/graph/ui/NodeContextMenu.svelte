@@ -82,7 +82,9 @@
 <nav use:getContextMenuDimension style="position: fixed; top:{pos.y}px; left:{pos.x}px; z-index: 2000;">
   <div class="navbar">
     <div class="info-block">
+      <!-- svelte-ignore a11y-missing-attribute -->
       <p>
+          <!-- svelte-ignore a11y-missing-attribute -->
           <span class="label">Proof:</span> <a>{local_id}</a><br>
           <span class="label">Network:</span> <a>{$network}</a><br>
           {#if proof}

@@ -1,6 +1,7 @@
-import type { Amount, type Box } from "@fleet-sdk/core";
+import { type Amount, type Box } from "@fleet-sdk/core";
 import { get } from 'svelte/store';
 import { proofs, compute_deep_level } from "./store";
+import { stringToRendered } from "./utils";
 
 // --- CORE TYPES ---
 
@@ -47,6 +48,15 @@ export interface RPBox {
 }
 
 // --- ENUMS & UTILITIES ---
+
+/**
+ * Creates a rendered version of a proof's token ID.
+ * @param proof The ReputationProof object.
+ * @returns A simplified string representation of the token ID.
+ */
+export function token_rendered(proof: ReputationProof): string {
+    return stringToRendered(proof.token_id);
+};
 
 export enum Network {
     ErgoTestnet = "ergo-testnet",
