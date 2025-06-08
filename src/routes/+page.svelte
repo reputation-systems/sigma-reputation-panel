@@ -3,25 +3,26 @@
     import { connected } from '$lib/store';
     import { connectNautilus } from '$lib/connect';
     
-    // Importing the two main views from their locations
+    // Importing the main views
     import MasterGraphView from '$lib/components/graph/MasterGraphView.svelte';
     import CreateProofWizard from '$lib/components/views/CreateProofWizard.svelte';
     import Search from '$lib/components/views/Search.svelte';
     import Settings from '$lib/components/views/Settings.svelte';
+    import ManageTypes from '$lib/components/views/ManageTypes.svelte';
 
-    // State to manage the current view
-    let currentPage: 'intro' | 'graph' | 'create' | 'search' | 'settings' = 'intro';
+    let currentPage: 'intro' | 'graph' | 'create' | 'search' | 'types' | 'settings' = 'intro';
 </script>
 
 <svelte:head>
-    <!-- FIX: Load Font Awesome stylesheet to make GitHub icon visible -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" xintegrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preload" href="/frame_52.svg" as="image">
 </svelte:head>
 
 <main>
     {#if $connected && currentPage !== 'intro'}
         <div class="view-switcher">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <span class="app-title" on:click={() => currentPage = 'intro'}>Sigma Reputation</span>
             <div class="nav-buttons">
                 <button on:click={() => currentPage = 'graph'} class:active={currentPage === 'graph'}>
@@ -32,6 +33,9 @@
                 </button>
                 <button on:click={() => currentPage = 'create'} class:active={currentPage === 'create'}>
                     <i class="fas fa-plus-circle"></i> Submit
+                </button>
+                <button on:click={() => currentPage = 'types'} class:active={currentPage === 'types'}>
+                    <i class="fas fa-tags"></i> Types
                 </button>
                 <button on:click={() => currentPage = 'settings'} class:active={currentPage === 'settings'}>
                     <i class="fas fa-cog"></i> Settings
@@ -65,6 +69,10 @@
             {:else if currentPage === 'create'}
                 <div class="wizard-wrapper">
                     <CreateProofWizard />
+                </div>
+            {:else if currentPage === 'types'}
+                 <div class="wizard-wrapper">
+                    <ManageTypes />
                 </div>
             {:else if currentPage === 'settings'}
                 <Settings />
@@ -111,8 +119,8 @@
         background-position: right center;
         background-size: contain;
         z-index: 0;
-		filter: saturate(200%) brightness(1.25);
-		 opacity: 0.8;
+        filter: saturate(200%) brightness(1.25);
+        opacity: 0.8;
     }
 
     .welcome-container > * {
@@ -144,6 +152,7 @@
         font-size: 1.1rem;
         font-weight: bold;
         color: #FBBF24;
+        cursor: pointer;
     }
 
     .nav-buttons button {
@@ -173,7 +182,7 @@
         color: #000;
     }
 
-    /* --- GITHUB BUTTON STYLES --- */
+  
     .github-button {
         position: fixed;
         top: 20px;
@@ -197,17 +206,13 @@
         transform: scale(1.1);
     }
 
-    /* --- CONTENT ADJUSTMENT --- */
     .view-content {
-        padding-top: 53px; /* Space for the header */
+        padding-top: 53px; 
     }
-    .view-content.no-header {
-        padding-top: 0;
-    }
-
+ 
     .wizard-wrapper {
         display: flex;
         justify-content: center;
-        padding: 2rem 0;
+        padding: 2rem;
     }
 </style>
