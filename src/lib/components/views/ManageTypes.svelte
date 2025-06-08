@@ -7,10 +7,7 @@
     } from '$lib/envs';
     import { hexToUtf8, stringToSerialized } from '$lib/utils';
 
-    import {  
-        SConstant, 
-        SColl, 
-        SByte, 
+    import {
         TransactionBuilder,
         OutputBuilder,
         SAFE_MIN_BOX_VALUE,
@@ -96,17 +93,15 @@
             // Mint the new NFT. The first input (inputs[0]) will be its token ID.
             newTypeOutput.mintToken({
                 amount: "1", // Quantity must be 1 for an NFT
-                name: newTypeName,
-                decimals: "0",
-                description: newTypeDescription
+                decimals: 0
             });
 
             // Set registers according to the agreed-upon structure
             newTypeOutput.setAdditionalRegisters({
-                R4: SConstant(SColl(SByte, stringToSerialized(newTypeName))),
-                R5: SConstant(SColl(SByte, stringToSerialized(newTypeDescription))),
-                R6: SConstant(SColl(SByte, stringToSerialized(newTypeSchema))),
-                R7: SConstant(SColl(SByte, stringToSerialized(newTypeVersion))),
+                R4: stringToSerialized(newTypeName),
+                R5: stringToSerialized(newTypeDescription),
+                R6: stringToSerialized(newTypeSchema),
+                R7: stringToSerialized(newTypeVersion),
             });
             
             // Build the transaction using the new, robust pattern

@@ -46,13 +46,23 @@
     val successor = successorOutputs(0)
 
     // Defines the immutability conditions.
+    // Each register from R4 to R9 must be checked individually.
+    val registersAreImmutable = (
+      successor.R4[Coll[Byte]] == SELF.R4[Coll[Byte]] &&
+      successor.R5[Coll[Byte]] == SELF.R5[Coll[Byte]] &&
+      successor.R6[Coll[Byte]] == SELF.R6[Coll[Byte]] &&
+      successor.R7[Coll[Byte]] == SELF.R7[Coll[Byte]] &&
+      successor.R8[Coll[Byte]] == SELF.R8[Coll[Byte]] &&
+      successor.R9[Coll[Byte]] == SELF.R9[Coll[Byte]]
+    )
+
     val dataIsImmutable = (
       // The protection script cannot change.
       successor.propositionBytes == SELF.propositionBytes &&
       // The NFT token must be preserved identically.
       successor.tokens(0) == SELF.tokens(0) &&
       // Registers R4-R9 must be identical.
-      successor.registers == SELF.registers
+      registersAreImmutable
     )
 
     // The ERG value of the output must be greater than or equal to the input's.
