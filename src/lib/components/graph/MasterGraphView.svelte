@@ -224,8 +224,8 @@
     on:nodecontextmenu={handleNodeContextMenu} 
     on:edgecontextmenu={handleEdgeContextMenu}
     on:paneclick={handlePaneClick}
-    nodes={$nodes} 
-    edges={$edges} 
+    nodes={nodes} 
+    edges={edges} 
     {nodeTypes} 
     {edgeTypes} 
     style="background: #1a192bbe" 
