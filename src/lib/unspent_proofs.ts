@@ -1,223 +1,144 @@
-import { type RPBox, type ReputationProof, object_type_by_rendered_value, Network, ObjectType } from "$lib/ReputationProof";
-import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, stringToRendered, stringToSerialized } from "$lib/utils";
+import { type RPBox, type ReputationProof, Network, type TypeNftMetadata } from "$lib/ReputationProof";
+import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
 import { get } from "svelte/store";
 import { connected } from "./store";
 
-/**
-    https://api.ergoplatform.com/api/v1/docs/#operation/postApiV1BoxesUnspentSearch
-*/
+// Cache to avoid re-fetching Type NFT metadata from the explorer.
+const typeNftCache = new Map<string, Promise<TypeNftMetadata>>();
 
-type RegisterValue = {
-    renderedValue: string;
-    serializedValue: string;
-  };
-
+// --- API TYPE DEFINITIONS ---
+type RegisterValue = { renderedValue: string; serializedValue: string; };
 type ApiBox = {
-    boxId: string;
-    value: string | bigint;
-    assets: { tokenId: string; amount: string | bigint }[];
-    ergoTree: string;
-    creationHeight: number;
+    boxId: string; value: string | bigint; assets: { tokenId: string; amount: string | bigint }[]; ergoTree: string; creationHeight: number;
     additionalRegisters: {
-        R4?: RegisterValue;
-        R5?: RegisterValue;
-        R6?: RegisterValue;
-        R7?: RegisterValue;
-        R8?: RegisterValue;
-        R9?: RegisterValue;
+        R4?: RegisterValue; R5?: RegisterValue; R6?: RegisterValue; R7?: RegisterValue; R8?: RegisterValue; R9?: RegisterValue;
     };
-    index: number;
-    transactionId: string;
+    index: number; transactionId: string;
 };
 
-export async function getUnconfirmed(explorer_uri: string, ergo: any)
-{
-    const wallet_pk = await ergo.get_change_address();
+// --- HELPER FUNCTIONS ---
 
+/**
+ * Parses the rendered value of R6 (a tuple string) into an object.
+ * e.g., "(false, 1000)" -> { isLocked: false, totalSupply: 1000 }
+ */
+function parseR6(r6RenderedValue: string): { isLocked: boolean; totalSupply: number } {
     try {
-        const response = await fetch(explorer_uri+'/api/v1/boxes/unspent/unconfirmed/byAddress/'+wallet_pk, {
-            method: 'GET'
-        });
-
-        if (response.ok) {
-            const apiData = await response.json();
-            console.log(apiData)
-        }        
-        else {
-            console.error('Error fetching unconfirmed boxes');
-        }
-    } catch (error) {
-        console.error('Error processing unconfirmed boxes request:', error);
-    }
-}
-
-export async function get_token_total_amount(explorer_uri: string, token_id: string): Promise<number> {
-    try {
-        const response = await fetch(`${explorer_uri}/api/v1/tokens/${token_id}`, {
-            method: 'GET'
-        });
-
-        if (response.ok) {
-            const tokenInfo = await response.json();
-            return tokenInfo.emissionAmount;
-        } else {
-            console.error('Error fetching token info');
-            return 0;
-        }
-    } catch (error) {
-        console.error('Error processing token info request:', error);
-        return 0;
+        const [lockedStr, supplyStr] = r6RenderedValue.replace(/[()]/g, '').split(',');
+        return { isLocked: lockedStr.trim() === 'true', totalSupply: Number(supplyStr.trim()) };
+    } catch (e) {
+        console.warn("Could not parse R6 tuple, returning defaults:", r6RenderedValue, e);
+        return { isLocked: true, totalSupply: 0 };
     }
 }
 
 /**
- * Fetches and updates the list of reputation proofs based on various search strategies.
- * This function can search by token ID, plain text, address, or proof-by-token links.
- * @param explorer_uri The base URI of the Ergo explorer API.
- * @param ergo_tree_template_hash The template hash of the reputation proof contract.
- * @param ergo The ergo provider object for wallet interactions.
- * @param all If true, fetches all proofs; otherwise, only those related to the connected wallet.
- * @param search The search term. Can be anything from a token ID to plain text.
- * @returns A Map of token IDs to ReputationProof objects.
+ * Fetches the metadata for a Type NFT from the explorer, using a cache to prevent redundant requests.
  */
-export async function updateReputationProofList(explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string|null): Promise<Map<string, ReputationProof>> 
-{
+async function getTypeNftMetadata(explorer_uri: string, typeNftId: string): Promise<TypeNftMetadata> {
+    if (typeNftCache.has(typeNftId)) return typeNftCache.get(typeNftId)!;
+
+    const fetchPromise = (async () => {
+        try {
+            const response = await fetch(`${explorer_uri}/api/v1/boxes/byTokenId/${typeNftId}`);
+            if (!response.ok) throw new Error(`Type NFT box not found for token ID: ${typeNftId}`);
+            const box: ApiBox = (await response.json()).items[0];
+            return {
+                name: hexToUtf8(box.additionalRegisters.R4?.serializedValue ?? ""),
+                description: hexToUtf8(box.additionalRegisters.R5?.serializedValue ?? ""),
+                schemaURI: hexToUtf8(box.additionalRegisters.R6?.serializedValue ?? ""),
+                version: hexToUtf8(box.additionalRegisters.R7?.serializedValue ?? ""),
+            };
+        } catch (error) {
+            console.error(`Failed to fetch Type NFT metadata for ${typeNftId}:`, error);
+            return { name: "Error: Unknown Type", description: "", schemaURI: "", version: "0.0.0" };
+        }
+    })();
+    typeNftCache.set(typeNftId, fetchPromise);
+    return fetchPromise;
+}
+
+/**
+ * Fetches and updates the list of reputation proofs from the explorer.
+ */
+export async function updateReputationProofList(
+    explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string | null
+): Promise<Map<string, ReputationProof>> {
     if (!get(connected)) all = true;
 
     const proofs = new Map<string, ReputationProof>();
     const search_bodies = [];
-
-    // --- FIX: Get change address once to build the R7 filter ---
     const change_address = get(connected) && ergo ? await ergo.get_change_address() : null;
-    const r7_filter = !all && change_address
-        ? { "R7": generate_pk_proposition(change_address) }
-        : {};
+    const r7_filter = !all && change_address ? { "R7": generate_pk_proposition(change_address) } : {};
 
     if (search) {
-        // --- POWERFUL SEARCH STRATEGIES ---
-        search_bodies.push({ assets: [search] });
-        search_bodies.push({ registers: { "R5": stringToSerialized(ObjectType.PlainText), "R6": stringToSerialized(search) }});
-        search_bodies.push({ registers: { "R5": stringToSerialized(ObjectType.ProofByToken), "R6": stringToSerialized(search) }});
-        try {
-            search_bodies.push({ registers: { "R7": generate_pk_proposition(search) } });
-        } catch (e) {
-            console.log("Search term is not a valid address, skipping R7 search.");
-        }
+        search_bodies.push({ assets: [search] }); // Search by reputation token ID
+        search_bodies.push({ registers: { "R5": hexToUtf8(search) } }); // Search by object pointer in R5
+        search_bodies.push({ registers: { "R4": hexToUtf8(search) } }); // Search by Type NFT ID in R4
+        try { search_bodies.push({ registers: { "R7": generate_pk_proposition(search) } }); }
+        catch (e) { console.log("Search term is not a valid address, skipping R7 search."); }
     } else {
         search_bodies.push({});
     }
 
     try {
         for (const body_part of search_bodies) {
-            let params = { offset: 0, limit: 500 };
-            let moreDataAvailable = true;
-
+            let offset = 0, limit = 100, moreDataAvailable = true;
             while (moreDataAvailable) {
-                const url = `${explorer_uri}/api/v1/boxes/unspent/search?offset=${params.offset}&limit=${params.limit}`;
-                
-                const final_body = {
-                    "ergoTreeTemplateHash": ergo_tree_template_hash,
-                    "registers": { ...(body_part.registers || {}), ...r7_filter },
-                    "assets": body_part.assets || []
-                };
+                const url = `${explorer_uri}/api/v1/boxes/unspent/search?offset=${offset}&limit=${limit}`;
+                const final_body = { "ergoTreeTemplateHash": ergo_tree_template_hash, "registers": { ...(body_part.registers || {}), ...r7_filter }, "assets": body_part.assets || [] };
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(final_body) });
 
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(final_body),
-                });
+                if (!response.ok) { moreDataAvailable = false; continue; }
+                const json_data = await response.json();
+                if (json_data.items.length === 0) { moreDataAvailable = false; continue; }
 
-                if (response.ok) {
-                    let json_data = await response.json();
-                    if (json_data.items.length === 0) {
-                        moreDataAvailable = false;
-                        break;
+                for (const box of json_data.items as ApiBox[]) {
+                    if (!box.assets?.length || !box.additionalRegisters.R4 || !box.additionalRegisters.R6) continue;
+
+                    const rep_token_id = box.assets[0].tokenId;
+                    let proof = proofs.get(rep_token_id);
+
+                    if (!proof) {
+                        const type_nft_id = box.additionalRegisters.R4.serializedValue;
+                        const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
+                        const r7_value = box.additionalRegisters.R7?.serializedValue ?? "";
+                        proof = {
+                            token_id: rep_token_id, type_nft_id,
+                            type_metadata: await getTypeNftMetadata(explorer_uri, type_nft_id),
+                            total_amount: r6_parsed.totalSupply,
+                            owner_address: serializedToRendered(r7_value),
+                            can_be_spend: await check_if_r7_is_local_addr(r7_value),
+                            current_boxes: [], number_of_boxes: 0,
+                            network: Network.ErgoMainnet, data: {}
+                        };
                     }
 
-                    // --- PARSING AND MERGING LOGIC (REFACTORED FOR PERFORMANCE AND SAFETY) ---
-                    for (const e of json_data.items) {
-                        // FIX: Safety check to ensure the box has assets before proceeding
-                        if (!e.assets || e.assets.length === 0) {
-                            continue;
-                        }
-                        const token_id = e.assets[0].tokenId;
-                        
-                        let _reputation_proof = proofs.get(token_id);
-
-                        // FIX: Only create a new proof and perform slow `await` calls if it's the first time we see this token
-                        if (!_reputation_proof) {
-                            const r7_value = e.additionalRegisters.R7?.renderedValue ?? "";
-                            const r4_value = e.additionalRegisters.R4?.renderedValue ?? "";
-                            _reputation_proof = {
-                                current_boxes: [], 
-                                token_id: token_id,
-                                number_of_boxes: 0,
-                                total_amount: await get_token_total_amount(explorer_uri, token_id),
-                                network: Network.ErgoMainnet,
-                                can_be_spend: await check_if_r7_is_local_addr(r7_value),
-                                tag: hexToUtf8(r4_value),
-                                data: {}
-                            };
-                        }
-
-                        // FIX: Safely parse JSON data from R9 register
-                        let box_data = {};
-                        try {
-                            box_data = e.additionalRegisters.R9 ? JSON.parse(hexToUtf8(e.additionalRegisters.R9.renderedValue) ?? '{}') : {};
-                        } catch (jsonError) {
-                            console.warn(`Failed to parse R9 JSON for box ${e.boxId}:`, jsonError);
-                        }
-                        
-                        const current_box: RPBox = {
-                            box_id: e.boxId,
-                            token_id: token_id,
-                            token_amount: Number(e.assets[0].amount),
-                            negative: e.additionalRegisters.R8?.renderedValue === "false",
-                            box: {
-                                boxId: e.boxId,
-                                value: e.value,
-                                assets: e.assets,
-                                ergoTree: e.ergoTree,
-                                creationHeight: e.creationHeight,
-                                additionalRegisters: Object.entries(e.additionalRegisters).reduce((acc, [key, value]) => {
-                                    acc[key] = value.serializedValue;
-                                    return acc;
-                                }, {} as { [key: string]: string; }),
-                                index: e.index,
-                                transactionId: e.transactionId
-                            },
-                            data: box_data
-                        };
+                    let box_content = {};
+                    try { box_content = box.additionalRegisters.R9 ? JSON.parse(hexToUtf8(box.additionalRegisters.R9.serializedValue)) : {}; }
+                    catch (jsonError) { console.warn(`Failed to parse R9 JSON for box ${box.boxId}:`, jsonError); }
                     
-                        if (e.additionalRegisters.R6 !== undefined && e.additionalRegisters.R5 !== undefined) {
-                            current_box.object_type = object_type_by_rendered_value(e.additionalRegisters.R5.renderedValue),
-                            current_box.object_value = e.additionalRegisters.R6.renderedValue;
-                        }
-
-                        _reputation_proof.current_boxes.push(current_box);
-                        _reputation_proof.number_of_boxes += 1;
-                        
-                        if (current_box.object_type === ObjectType.ProofByToken && stringToRendered(token_id) == current_box.object_value) {
-                            // Update the main proof data from a self-referential box, also safely
-                            try {
-                                _reputation_proof.data = JSON.parse(hexToUtf8(e.additionalRegisters.R9.renderedValue) ?? "{}");
-                            } catch (jsonError) {
-                                console.warn(`Failed to parse self-referential R9 JSON for box ${e.boxId}:`, jsonError);
-                            }
-                        }
-
-                        proofs.set(token_id, _reputation_proof);
-                    }                
-                    params.offset += params.limit;
-                } else {
-                    console.error('Error during POST request in search loop');
-                    moreDataAvailable = false; // Stop this loop on error
+                    const current_box: RPBox = {
+                        box_id: box.boxId, token_id: rep_token_id,
+                        token_amount: Number(box.assets[0].amount),
+                        object_pointer: hexToUtf8(box.additionalRegisters.R5?.serializedValue ?? ""),
+                        is_locked: parseR6(box.additionalRegisters.R6.renderedValue).isLocked,
+                        polarization: box.additionalRegisters.R8?.renderedValue === 'true',
+                        content: box_content,
+                        box: { boxId: box.boxId, value: box.value, assets: box.assets, ergoTree: box.ergoTree, creationHeight: box.creationHeight,
+                            additionalRegisters: Object.entries(box.additionalRegisters).reduce((acc, [key, value]) => { acc[key] = value.serializedValue; return acc; }, {} as { [key: string]: string; }),
+                            index: box.index, transactionId: box.transactionId }
+                    };
+                    proof.current_boxes.push(current_box);
+                    proof.number_of_boxes += 1;
+                    proofs.set(rep_token_id, proof);
                 }
+                offset += limit;
             }
         }
         return proofs;
     } catch (error) {
-        console.error('Error during powerful search execution:', error);
+        console.error('An error occurred during the reputation proof search:', error);
         return new Map();
     }
 }
