@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
+    import { writable, get } from 'svelte/store';
     import { SvelteFlow, Background, Controls, MiniMap, type Node, type Edge } from '@xyflow/svelte';
     import { proofs, compute_deep_level } from '$lib/store';
     import { type ReputationProof, compute } from '$lib/ReputationProof';
@@ -15,6 +15,7 @@
     let finalScore: number | null = null;
     let isLoading = false;
 
+
     function calculateAndBuildGraph() {
         isLoading = true;
         finalScore = null;
@@ -27,7 +28,6 @@
             if (!proof || deepLevel < 0 || visitedProofs.has(proof.token_id)) return;
             visitedProofs.add(proof.token_id);
 
-            // The node label now uses the descriptive name from the Type NFT's metadata.
             newNodes.push({
                 id: proof.token_id,
                 type: 'reputation',
@@ -35,19 +35,18 @@
                 data: { label: proof.type_metadata.name, tokenId: proof.token_id }
             });
 
-            // The recursion logic now checks if the proof's type matches the specific "Proof-by-Token" Type NFT.
-            if (proof.type_nft_id === proof_by_token_type_nft_id) {
+            if (proof.type_nft_id === proof_by_token_type_nft_id) { //
                 let childCount = 0;
-                for (const box of proof.current_boxes) {
-                    const targetProof = $proofs.get(box.object_pointer);
+                for (const box of proof.current_boxes) { //
+                    // CORRECTO: Usa get(store) para acceder al valor
+                    const targetProof = get(proofs).get(box.object_pointer);
                     if (targetProof) {
-                        const proportion = (box.token_amount / proof.total_amount);
-                        // Edge label and style now use 'polarization' instead of 'negative'.
+                        const proportion = (box.token_amount / proof.total_amount); //
                         newEdges.push({
                             id: `e-${proof.token_id}-${box.object_pointer}`,
                             source: proof.token_id,
                             target: box.object_pointer,
-                            label: `${(proportion * 100).toFixed(1)}% ${box.polarization ? '(+)' : '(-)'}`,
+                            label: `${(proportion * 100).toFixed(1)}% ${box.polarization ? '(+)' : '(-)'}`, //
                             animated: true,
                             style: `stroke: ${!box.polarization ? '#f44336' : '#4caf50'}; stroke-width: ${1 + proportion * 8};`
                         });
@@ -64,10 +63,9 @@
         newNodes.push({ id: 'target-object', type: 'output', position: { x: 0, y: -150 }, data: { label: `Objeto: ${objectToCalculate.substring(0, 20)}...` } });
 
         let totalScore = 0;
-        // The main loop now iterates through all proofs to find ones that give a score to the target.
-        for (const proof of $proofs.values()) {
-            // The call to 'compute' is simplified, as the object type is no longer needed.
-            const score = compute(proof, objectToCalculate);
+        // CORRECTO: Usa get(store) para iterar sobre los valores
+        for (const proof of get(proofs).values()) {
+            const score = compute(proof, objectToCalculate); //
             if (score !== 0) {
                 totalScore += score;
                 newEdges.push({
@@ -77,13 +75,14 @@
                     label: `Aporta ${score.toFixed(3)}`,
                     style: `stroke: ${score < 0 ? '#f44336' : '#4caf50'};`
                 });
-                buildGraphRecursive(proof, $compute_deep_level);
+                // CORRECTO: Usa get() para pasar el valor
+                buildGraphRecursive(proof, get(compute_deep_level));
                 layoutY = 0;
             }
         }
         
-        $nodes = newNodes;
-        $edges = newEdges;
+        nodes.set(newNodes);
+        edges.set(newEdges);
         finalScore = totalScore;
         isLoading = false;
     }

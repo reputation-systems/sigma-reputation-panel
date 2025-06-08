@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Position, type NodeProps, Handle, useSvelteFlow } from '@xyflow/svelte';
-  import { data_store } from '$lib/store';
   import { type LinkedHash } from '$lib/LinkedObject';
 
   type $$Props = NodeProps;

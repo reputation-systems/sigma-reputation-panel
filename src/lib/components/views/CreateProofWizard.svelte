@@ -1,9 +1,6 @@
 <script lang="ts">
-    import { proofs } from '$lib/store';
     import { generate_reputation_proof } from '$lib/generate_reputation_proof';
-    // The obsolete 'ObjectType' has been removed.
-    import { type ReputationProof } from '$lib/ReputationProof';
-    
+        
     // --- WIZARD STATE ---
     let currentStep = 1;
     const totalSteps = 5;
