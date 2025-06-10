@@ -1,42 +1,39 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { generate_reputation_proof } from '$lib/generate_reputation_proof';
+    import { types } from '$lib/store';
+    import { fetchTypeNfts } from '$lib/unspent_proofs';
         
-    // --- WIZARD STATE ---
     let currentStep = 1;
     const totalSteps = 5;
 
-    // --- STATE VARIABLES FOR MINTING A NEW PROOF ---
-    // Step 1: The user must provide the ID of the Type NFT that will define this new proof.
-    let type_nft_id: string = '';
-    
-    // Step 2: The first object this proof will point to.
+    let type_nft_id: string = ''; 
     let object_to_assign: string = '';
-
-    // Step 3: Initial token amount and opinion. For minting, tokenAmount is also the total_supply.
     let token_amount: number = 100;
     let is_negative: boolean = false;
-    
-    // Step 4: Additional data for R9 and lock status for R6.
     let data: object = {};
     let is_locked: boolean = false;
-    let jsonDataString: string = '{}'; // Intermediate variable for textarea binding
+    let jsonDataString: string = '{}';
 
-    // --- UI STATE ---
     let isLoading = false;
     let errorMessage = '';
     let successMessage = '';
+    let isTypesLoading = true;
+
+    onMount(async () => {
+        isTypesLoading = true;
+        await fetchTypeNfts(); 
+        isTypesLoading = false;
+    });
     
-    // --- WIZARD NAVIGATION ---
     function nextStep() { if (currentStep < totalSteps) currentStep++; }
     function prevStep() { if (currentStep > 1) currentStep--; }
 
-    // --- SUBMIT LOGIC (Refactored for Minting) ---
     async function handleSubmit() {
         isLoading = true;
         errorMessage = '';
         successMessage = '';
         
-        // Basic validation
         if (!type_nft_id || !object_to_assign || token_amount <= 0) {
             errorMessage = "Please fill in all required fields: Type NFT ID, Object Pointer, and Token Amount.";
             isLoading = false;
@@ -44,21 +41,20 @@
         }
 
         try {
-            // The call to generate_reputation_proof is now correctly structured for minting a new proof.
+            
             const txId = await generate_reputation_proof(
                 token_amount,
-                token_amount,       // For a new proof, total_supply equals the initial token_amount.
+                token_amount,
                 type_nft_id,
                 object_to_assign,
-                !is_negative,       // Convert checkbox state to the 'polarization' parameter.
+                !is_negative,
                 data,
                 is_locked,
-                undefined           // No input_proof is provided when minting.
+                undefined
             );
 
             if (txId) {
                 successMessage = `New reputation proof minted! Transaction ID: ${txId}`;
-                // Optionally, trigger a data refresh here.
             } else {
                 errorMessage = 'Transaction was submitted, but no transaction ID was returned.';
             }
@@ -69,6 +65,9 @@
             isLoading = false;
         }
     }
+
+    $: selectedType = type_nft_id ? $types.get(type_nft_id) : null;
+
 </script>
 
 <div class="wizard-container">
@@ -80,9 +79,25 @@
     <div class="step-content">
         {#if currentStep === 1}
             <h4>Step 1: Choose Proof Standard</h4>
-            <label for="type-nft-id-input">Type NFT ID<span class="required">*</span></label>
-            <input id="type-nft-id-input" type="text" class="input" bind:value={type_nft_id} placeholder="Paste the token ID of the Type NFT" />
-            <p class="help-text">This NFT defines the rules and meaning for your new proof.</p>
+            <label for="type-nft-select">Type NFT Standard<span class="required">*</span></label>
+            <select id="type-nft-select" class="input" bind:value={type_nft_id} required disabled={isTypesLoading}>
+                <option value="" disabled selected>
+                    {#if isTypesLoading}Loading types...{:else}-- Please choose a standard --{/if}
+                </option>
+                {#if !isTypesLoading}
+                    {#each Array.from($types.values()) as type (type.tokenId)}
+                        <option value={type.tokenId}>
+                            {type.typeName} (v{type.version})
+                        </option>
+                    {/each}
+                {/if}
+            </select>
+            {#if !isTypesLoading && $types.size === 0}
+                <p class="help-text error-text">No types found. Please go to "Manage Types" to create one first.</p>
+            {/if}
+            {#if selectedType}
+                 <p class="help-text">{selectedType.description}</p>
+            {/if}
         {/if}
 
         {#if currentStep === 2}
@@ -120,7 +135,7 @@
         {#if currentStep === 5}
             <h4>Step 5: Summary and Submit</h4>
             <div class="summary">
-                <p><strong>Standard (Type NFT):</strong> <span>{type_nft_id.slice(0, 25)}...</span></p>
+                <p><strong>Standard (Type NFT):</strong> <span>{selectedType?.typeName ?? 'Unknown Type'}</span></p>
                 <p><strong>Initial Pointer:</strong> <span>{object_to_assign}</span></p>
                 <p><strong>Opinion:</strong> {is_negative ? 'Negative' : 'Positive'} ({token_amount.toLocaleString()} tokens to mint)</p>
                 <p><strong>Will be locked:</strong> {is_locked ? 'Yes' : 'No'}</p>
@@ -140,30 +155,34 @@
 
     <div class="wizard-nav">
         <button on:click={prevStep} disabled={currentStep === 1}>&larr; Previous</button>
-        <button on:click={nextStep} disabled={currentStep === 5}>Next &rarr;</button>
+        <button on:click={nextStep} disabled={currentStep === 5 || !type_nft_id}>Next &rarr;</button>
     </div>
 </div>
 
 <style>
+    .error-text {
+        color: #ff8a8a !important;
+    }
     .wizard-container { max-width: 700px; margin: 2rem auto; background: #2a2a2a; padding: 2rem; border-radius: 12px; border: 1px solid #444; }
     h2, h4 { text-align: center; color: #FBBF24; margin-bottom: 1rem; }
     .progress-bar { width: 100%; background-color: #555; border-radius: 5px; height: 10px; margin-bottom: 2rem; }
     .progress-bar-fill { height: 100%; background-color: #FBBF24; border-radius: 5px; transition: width 0.3s; }
     .step-content { min-height: 250px; display: flex; flex-direction: column; gap: 1rem; }
-    .input, label { display: block; width: 100%; box-sizing: border-box; }
+    .input, select, label { display: block; width: 100%; box-sizing: border-box; }
     label { margin-bottom: 0.25rem; font-weight: bold; color: #ccc; }
-    .input { padding: 0.75rem; background: #333; border: 1px solid #666; border-radius: 6px; color: #f0f0f0; }
-    .help-text { font-size: 0.8rem; color: #888; margin-top: 0.5rem; }
+    .input, select { padding: 0.75rem; background: #333; border: 1px solid #666; border-radius: 6px; color: #f0f0f0; font-family: inherit; font-size: 1rem; }
+    select:disabled { background-color: #444; cursor: not-allowed; }
+    .help-text { font-size: 0.9rem; color: #aaa; margin-top: 0.75rem; border-left: 3px solid #FBBF24; padding-left: 1rem; }
     .polarity-buttons { display: flex; gap: 1rem; margin: 1rem 0; }
     .polarity-buttons button { flex-grow: 1; padding: 1rem; background: #444; border: 2px solid #666; color: white; border-radius: 6px; cursor: pointer; transition: border-color 0.2s; }
     .polarity-buttons button.selected { border-color: #FBBF24; }
     .summary { background: #333; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; word-break: break-all; }
-    .summary p { margin: 0.5rem 0; }
+    .summary p { margin: 0.5rem 0; color: #ccc;}
     .summary span { color: #f0f0f0; font-family: monospace; }
-    .feedback { padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center; }
-    .feedback.loading { background-color: #3b5998; }
-    .feedback.success { background-color: #4caf50; }
-    .feedback.error { background-color: #f44336; }
+    .feedback { padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center; color: white; }
+    .feedback.loading { background-color: rgba(59, 89, 152, 0.8); }
+    .feedback.success { background-color: rgba(76, 175, 80, 0.8); }
+    .feedback.error { background-color: rgba(244, 67, 54, 0.8); }
     .wizard-nav { display: flex; justify-content: space-between; margin-top: 2rem; border-top: 1px solid #444; padding-top: 1rem; }
     .wizard-nav button, .submit-button { padding: 0.75rem 1.5rem; border: none; color: #1a1a1a; background: #FBBF24; border-radius: 6px; cursor: pointer; font-weight: bold; }
     .wizard-nav button:disabled, .submit-button:disabled { background-color: #555; color: #888; cursor: not-allowed; }

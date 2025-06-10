@@ -28,8 +28,6 @@
 			// --- REAL API CALL ---
 			// This function returns a Map, which is now correctly handled.
 			results = await updateReputationProofList(
-				explorer_uri,
-				ergo_tree_hash,
 				null, // No wallet connection needed for public search
 				true, // Fetch all data related to the query
 				input // The user's search term

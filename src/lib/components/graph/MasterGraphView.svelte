@@ -70,7 +70,7 @@
     console.log("Fetching data...");
     try {
       if (!get(connected)) fetch_all.set(true);
-      proofs.set(await updateReputationProofList(explorer_uri, ergo_tree_hash, (typeof ergo !== "undefined") ? ergo : null, get(fetch_all), get(searchStore)));
+      proofs.set(await updateReputationProofList((typeof ergo !== "undefined") ? ergo : null, get(fetch_all), get(searchStore)));
       build_graph(Array.from(get(proofs).values()));
     } catch (error) {
       console.error("Failed to fetch proofs:", error);

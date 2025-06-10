@@ -1,10 +1,9 @@
-import { type RPBox, type ReputationProof, type TypeNftMetadata } from "$lib/ReputationProof";
+import { type RPBox, type ReputationProof, type TypeNFT } from "$lib/ReputationProof";
 import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
 import { get } from "svelte/store";
-import { connected } from "./store";
-
-// Cache to avoid re-fetching Type NFT metadata from the explorer.
-const typeNftCache = new Map<string, Promise<TypeNftMetadata>>();
+// <-- CORREGIDO: Importar el store 'types' y 'connected'
+import { connected, types } from "./store";
+import { digital_public_good_contract_hash, ergo_tree_hash, explorer_uri } from "./envs";
 
 // --- API TYPE DEFINITIONS ---
 type RegisterValue = { renderedValue: string; serializedValue: string; };
@@ -18,10 +17,6 @@ type ApiBox = {
 
 // --- HELPER FUNCTIONS ---
 
-/**
- * Parses the rendered value of R6 (a tuple string) into an object.
- * e.g., "(false, 1000)" -> { isLocked: false, totalSupply: 1000 }
- */
 function parseR6(r6RenderedValue: string): { isLocked: boolean; totalSupply: number } {
     try {
         const [lockedStr, supplyStr] = r6RenderedValue.replace(/[()]/g, '').split(',');
@@ -33,37 +28,55 @@ function parseR6(r6RenderedValue: string): { isLocked: boolean; totalSupply: num
 }
 
 /**
- * Fetches the metadata for a Type NFT from the explorer, using a cache to prevent redundant requests.
+ * Fetches all Type NFTs and populates the global 'types' store.
  */
-async function getTypeNftMetadata(explorer_uri: string, typeNftId: string): Promise<TypeNftMetadata> {
-    if (typeNftCache.has(typeNftId)) return typeNftCache.get(typeNftId)!;
-
-    const fetchPromise = (async () => {
-        try {
-            const response = await fetch(`${explorer_uri}/api/v1/boxes/byTokenId/${typeNftId}`);
-            if (!response.ok) throw new Error(`Type NFT box not found for token ID: ${typeNftId}`);
-            const box: ApiBox = (await response.json()).items[0];
+export async function fetchTypeNfts() {
+    try {
+        const url = `${explorer_uri}/api/v1/boxes/unspent/search`;
+        const body = { "ergoTreeTemplateHash": digital_public_good_contract_hash };
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) throw new Error("Failed to fetch type boxes from the explorer.");
+        
+        const data = await response.json();
+        const fetchedTypesArray = data.items.map((box: any): TypeNFT | null => {
+            if (!box.assets || box.assets.length === 0) return null;
             return {
-                name: hexToUtf8(box.additionalRegisters.R4?.serializedValue ?? ""),
-                description: hexToUtf8(box.additionalRegisters.R5?.serializedValue ?? ""),
-                schemaURI: hexToUtf8(box.additionalRegisters.R6?.serializedValue ?? ""),
-                version: hexToUtf8(box.additionalRegisters.R7?.serializedValue ?? ""),
+                tokenId: box.assets[0].tokenId,
+                boxId: box.boxId,
+                typeName: hexToUtf8(box.additionalRegisters.R4?.renderedValue || '') ?? "",
+                description: hexToUtf8(box.additionalRegisters.R5?.renderedValue || '') ?? "",
+                schemaURI: hexToUtf8(box.additionalRegisters.R6?.renderedValue || '') ?? "",
+                version: hexToUtf8(box.additionalRegisters.R7?.renderedValue || '') ?? "",
             };
-        } catch (error) {
-            console.error(`Failed to fetch Type NFT metadata for ${typeNftId}:`, error);
-            return { name: "Error: Unknown Type", description: "", schemaURI: "", version: "0.0.0" };
-        }
-    })();
-    typeNftCache.set(typeNftId, fetchPromise);
-    return fetchPromise;
+        }).filter((t: TypeNFT | null): t is TypeNFT => t !== null);
+        
+        // <-- NUEVA LÓGICA: Convertir el array a un Map y guardarlo en el store
+        const typesMap = new Map(fetchedTypesArray.map(type => [type.tokenId, type]));
+        types.set(typesMap);
+        console.log(`Successfully fetched and stored ${typesMap.size} Type NFTs.`);
+
+    } catch (e: any) {
+        console.error("Failed to fetch and store types:", e);
+        types.set(new Map()); // En caso de error, asegurar que el store esté vacío
+    }
 }
 
 /**
  * Fetches and updates the list of reputation proofs from the explorer.
  */
 export async function updateReputationProofList(
-    explorer_uri: string, ergo_tree_template_hash: string, ergo: any, all: boolean, search: string | null
+    ergo: any, 
+    all: boolean, 
+    search: string | null
 ): Promise<Map<string, ReputationProof>> {
+
+    await fetchTypeNfts();
+    const availableTypes = get(types);
+
     if (!get(connected)) all = true;
 
     const proofs = new Map<string, ReputationProof>();
@@ -72,9 +85,9 @@ export async function updateReputationProofList(
     const r7_filter = !all && change_address ? { "R7": generate_pk_proposition(change_address) } : {};
 
     if (search) {
-        search_bodies.push({ assets: [search] }); // Search by reputation token ID
-        search_bodies.push({ registers: { "R5": hexToUtf8(search) } }); // Search by object pointer in R5
-        search_bodies.push({ registers: { "R4": hexToUtf8(search) } }); // Search by Type NFT ID in R4
+        search_bodies.push({ assets: [search] });
+        search_bodies.push({ registers: { "R5": hexToUtf8(search) } }); 
+        search_bodies.push({ registers: { "R4": hexToUtf8(search) } }); 
         try { search_bodies.push({ registers: { "R7": generate_pk_proposition(search) } }); }
         catch (e) { console.log("Search term is not a valid address, skipping R7 search."); }
     } else {
@@ -86,7 +99,7 @@ export async function updateReputationProofList(
             let offset = 0, limit = 100, moreDataAvailable = true;
             while (moreDataAvailable) {
                 const url = `${explorer_uri}/api/v1/boxes/unspent/search?offset=${offset}&limit=${limit}`;
-                const final_body = { "ergoTreeTemplateHash": ergo_tree_template_hash, "registers": { ...(body_part.registers || {}), ...r7_filter }, "assets": body_part.assets || [] };
+                const final_body = { "ergoTreeTemplateHash": ergo_tree_hash, "registers": { ...(body_part.registers || {}), ...r7_filter }, "assets": body_part.assets || [] };
                 const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(final_body) });
 
                 if (!response.ok) { moreDataAvailable = false; continue; }
@@ -103,9 +116,17 @@ export async function updateReputationProofList(
                         const type_nft_id = box.additionalRegisters.R4.serializedValue;
                         const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
                         const r7_value = box.additionalRegisters.R7?.serializedValue ?? "";
+
+                        // <-- LÓGICA REFACTORIZADA: Obtener TypeNFT desde el store
+                        let typeNft = availableTypes.get(type_nft_id);
+                        if (!typeNft) {
+                            console.warn(`TypeNFT with ID ${type_nft_id} not found in store. Creating a default.`);
+                            typeNft = { tokenId: type_nft_id, boxId: '', typeName: "Unknown Type", description: "Metadata not found", schemaURI: "", version: "0.0" };
+                        }
+
                         proof = {
-                            token_id: rep_token_id, type_nft_id,
-                            type_metadata: await getTypeNftMetadata(explorer_uri, type_nft_id),
+                            token_id: rep_token_id,
+                            type: typeNft, // <-- CORREGIDO: Asignar el objeto TypeNFT completo
                             total_amount: r6_parsed.totalSupply,
                             owner_address: serializedToRendered(r7_value),
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
