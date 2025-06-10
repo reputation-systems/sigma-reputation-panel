@@ -1,5 +1,5 @@
-import { ErgoAddress, SSigmaProp, SGroupElement } from "@fleet-sdk/core";
-import { SBool, SByte, SColl, SConstant, SPair, SLong } from "@fleet-sdk/serializer";
+import { ErgoAddress, SSigmaProp, SGroupElement, SConstant } from "@fleet-sdk/core";
+import { SBool, SByte, SColl, SPair, SLong } from "@fleet-sdk/serializer";
 import { stringToBytes } from "@scure/base";
 import { connected } from "./store";
 import { get } from "svelte/store";

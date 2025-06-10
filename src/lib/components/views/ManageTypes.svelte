@@ -6,12 +6,16 @@
         digital_public_good_ergo_tree 
     } from '$lib/envs';
     import { hexToUtf8, SString } from '$lib/utils';
+    import { SColl, SLong, SInt, SByte } from '@fleet-sdk/serializer';
+    import { stringToBytes } from "@scure/base";
 
+    
     import {
         TransactionBuilder,
         OutputBuilder,
         SAFE_MIN_BOX_VALUE,
-        RECOMMENDED_MIN_FEE_VALUE
+        RECOMMENDED_MIN_FEE_VALUE,
+        SConstant
     } from '@fleet-sdk/core';
 
     // --- Type Definition for a Type NFT ---
@@ -92,7 +96,7 @@
 
             // Mint the new NFT. The first input (inputs[0]) will be its token ID.
             newTypeOutput.mintToken({
-                amount: "1", // Quantity must be 1 for an NFT
+                amount: 1n, // Quantity must be 1 for an NFT
                 decimals: 0
             });
 
@@ -105,15 +109,17 @@
             });
             
             // Build the transaction using the new, robust pattern
-            const unsignedTransaction = new TransactionBuilder(height)
+            const unsignedTransactionBuilder = new TransactionBuilder(height)
                 .from(inputs)
                 .to(newTypeOutput) // Add the constructed output
                 .sendChangeTo(change_address)
-                .payFee(RECOMMENDED_MIN_FEE_VALUE) // Use the recommended fee
-                .build()
-                .toEIP12Object();
+                .payFee(RECOMMENDED_MIN_FEE_VALUE); // Use the recommended fee
             
-            const signedTransaction = await ergo.sign_tx(unsignedTransaction);
+            const unsignedTransaction = await unsignedTransactionBuilder.build();
+            const eip12UnsignedTransaction = await unsignedTransaction.toEIP12Object();
+
+            console.log("Requesting transaction signing for type creation...");
+            const signedTransaction = await ergo.sign_tx(eip12UnsignedTransaction);
             const txId = await ergo.submit_tx(signedTransaction);
 
             alert(`Type NFT created successfully! Tx ID: ${txId}`);
