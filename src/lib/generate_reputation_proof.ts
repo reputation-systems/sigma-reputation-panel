@@ -8,7 +8,7 @@ import {
 } from '@fleet-sdk/core';
 import { type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address, explorer_uri } from './envs';
-import { booleanToSerializer, generate_pk_proposition, stringToSerialized, tupleToSerialized } from './utils';
+import { booleanToSerializer, generate_pk_proposition, SString, tupleToSerialized } from './utils';
 
 /**
  * Generates or modifies a reputation proof by building and submitting a transaction.
@@ -86,12 +86,12 @@ export async function generate_reputation_proof(
     
     // --- Set registers according to the new contract specification ---
     new_proof_output.setAdditionalRegisters({
-        R4: stringToSerialized(type_nft_id),
-        R5: stringToSerialized(object_pointer),
+        R4: SString(type_nft_id),
+        R5: SString(object_pointer),
         R6: tupleToSerialized(is_locked, total_supply),
         R7: generate_pk_proposition(wallet_pk),
         R8: booleanToSerializer(polarization),
-        R9: stringToSerialized(JSON.stringify(content))
+        R9: SString(JSON.stringify(content))
     });
 
     outputs.push(new_proof_output);

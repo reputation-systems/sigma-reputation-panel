@@ -40,7 +40,7 @@ export function generate_pk_proposition(wallet_pk: string): string {
  * @param value The string to serialize.
  * @returns The serialized hex string.
  */
-export function stringToSerialized(value: string): string {
+export function SString(value: string): string {
     return SConstant(SColl(SByte, stringToBytes('utf8', value)));
 }
 
@@ -98,7 +98,7 @@ export function serializedToRendered(serializedValue: string): string {
  * @returns The simplified, rendered hex string.
  */
 export function stringToRendered(value: string): string {
-    return serializedToRendered(stringToSerialized(value));
+    return serializedToRendered(SString(value));
 }
 
 /**

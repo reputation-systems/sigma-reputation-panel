@@ -5,7 +5,7 @@
         digital_public_good_contract_hash, 
         digital_public_good_ergo_tree 
     } from '$lib/envs';
-    import { hexToUtf8, stringToSerialized } from '$lib/utils';
+    import { hexToUtf8, SString } from '$lib/utils';
 
     import {
         TransactionBuilder,
@@ -58,10 +58,10 @@
                 return {
                     tokenId: box.assets[0].tokenId,
                     boxId: box.boxId,
-                    typeName: hexToUtf8(box.additionalRegisters.R4?.renderedValue || ''),
-                    description: hexToUtf8(box.additionalRegisters.R5?.renderedValue || ''),
-                    schemaURI: hexToUtf8(box.additionalRegisters.R6?.renderedValue || ''),
-                    version: hexToUtf8(box.additionalRegisters.R7?.renderedValue || ''),
+                    typeName: hexToUtf8(box.additionalRegisters.R4?.renderedValue || '') ?? "",
+                    description: hexToUtf8(box.additionalRegisters.R5?.renderedValue || '') ?? "",
+                    schemaURI: hexToUtf8(box.additionalRegisters.R6?.renderedValue || '') ?? "",
+                    version: hexToUtf8(box.additionalRegisters.R7?.renderedValue || '') ?? "",
                 };
             }).filter((t: TypeNFT | null): t is TypeNFT => t !== null);
         } catch (e: any) {
@@ -98,10 +98,10 @@
 
             // Set registers according to the agreed-upon structure
             newTypeOutput.setAdditionalRegisters({
-                R4: stringToSerialized(newTypeName),
-                R5: stringToSerialized(newTypeDescription),
-                R6: stringToSerialized(newTypeSchema),
-                R7: stringToSerialized(newTypeVersion),
+                R4: SString(newTypeName),
+                R5: SString(newTypeDescription),
+                R6: SString(newTypeSchema),
+                R7: SString(newTypeVersion),
             });
             
             // Build the transaction using the new, robust pattern
