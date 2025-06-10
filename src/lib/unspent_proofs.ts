@@ -76,6 +76,7 @@ export async function updateReputationProofList(
 
     await fetchTypeNfts();
     const availableTypes = get(types);
+    console.log(availableTypes)
 
     if (!get(connected)) all = true;
 
@@ -113,15 +114,17 @@ export async function updateReputationProofList(
                     let proof = proofs.get(rep_token_id);
 
                     if (!proof) {
-                        const type_nft_id = box.additionalRegisters.R4.serializedValue;
+                        console.log(box)
+                        const type_nft_id = hexToUtf8(box.additionalRegisters.R4.renderedValue) ?? "";
                         const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
                         const r7_value = box.additionalRegisters.R7?.serializedValue ?? "";
 
                         let typeNft = availableTypes.get(type_nft_id);
                         if (!typeNft) {
-                            console.warn(`TypeNFT with ID ${type_nft_id} not found in store. Creating a default.`);
+                            console.log(`TypeNFT with ID ${type_nft_id} not found in store. Creating a default.`);
                             typeNft = { tokenId: type_nft_id, boxId: '', typeName: "Unknown Type", description: "Metadata not found", schemaURI: "", version: "0.0" };
                         }
+                        console.log(typeNft)
 
                         proof = {
                             token_id: rep_token_id,
@@ -136,13 +139,13 @@ export async function updateReputationProofList(
                     }
 
                     let box_content = {};
-                    try { box_content = box.additionalRegisters.R9 ? JSON.parse(hexToUtf8(box.additionalRegisters.R9.serializedValue)) : {}; }
+                    try { box_content = box.additionalRegisters.R9 ? JSON.parse(hexToUtf8(box.additionalRegisters.R9.serializedValue) ?? "") : {}; }
                     catch (jsonError) { console.warn(`Failed to parse R9 JSON for box ${box.boxId}:`, jsonError); }
                     
                     const current_box: RPBox = {
                         box_id: box.boxId, token_id: rep_token_id,
                         token_amount: Number(box.assets[0].amount),
-                        object_pointer: hexToUtf8(box.additionalRegisters.R5?.serializedValue ?? ""),
+                        object_pointer: hexToUtf8(box.additionalRegisters.R5?.renderedValue ?? "") ?? "",
                         is_locked: parseR6(box.additionalRegisters.R6.renderedValue).isLocked,
                         polarization: box.additionalRegisters.R8?.renderedValue === 'true',
                         content: box_content,
@@ -152,6 +155,8 @@ export async function updateReputationProofList(
                     };
                     proof.current_boxes.push(current_box);
                     proof.number_of_boxes += 1;
+
+                    console.log(proof)
                     proofs.set(rep_token_id, proof);
                 }
                 offset += limit;
