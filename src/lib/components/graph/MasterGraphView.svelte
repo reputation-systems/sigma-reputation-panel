@@ -136,7 +136,7 @@
         id: `proof::${p.token_id}`,
         sourcePosition: Position.Bottom,
         targetPosition: Position.Top,
-        data: { label: p.type_metadata.name, proof: p },
+        data: { label: p.type.typeName, proof: p },
         type: "proof_type",
         position: { x: 0, y: 0 }, // Position will be set by layout
       });

@@ -76,7 +76,7 @@
   />
   
   <div class="node-content" on:dblclick={handleDblClick}>
-      <div class="node-title">{data.proof.type_metadata.name}</div>
+      <div class="node-title">{data.proof.type.typeName}</div>
     {#if showContent}
       <div class="token-id">ID: {proof.token_id.substring(0, 10)}...</div>
     {/if}

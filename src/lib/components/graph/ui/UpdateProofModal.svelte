@@ -74,7 +74,7 @@
 <dialog bind:this={dialog} on:close={close} on:click|self={close}>
     <div on:click|stopPropagation class="modal-content">
         <h2 class="modal-title">Create New Pointer</h2>
-        <p class="modal-subtitle">From Proof: {proof.type_metadata.name} ({proof.token_id.slice(0, 15)}...)</p>
+        <p class="modal-subtitle">From Proof: {proof.type.typeName} ({proof.token_id.slice(0, 15)}...)</p>
         <hr />
         
         <form id="reputationForm" on:submit|preventDefault={generateReputationProof}>

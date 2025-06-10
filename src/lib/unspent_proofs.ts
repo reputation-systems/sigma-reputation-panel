@@ -1,4 +1,4 @@
-import { type RPBox, type ReputationProof, type TypeNFT } from "$lib/ReputationProof";
+import { Network, type RPBox, type ReputationProof, type TypeNFT } from "$lib/ReputationProof";
 import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
 import { get } from "svelte/store";
 // <-- CORREGIDO: Importar el store 'types' y 'connected'
@@ -117,7 +117,6 @@ export async function updateReputationProofList(
                         const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
                         const r7_value = box.additionalRegisters.R7?.serializedValue ?? "";
 
-                        // <-- LÓGICA REFACTORIZADA: Obtener TypeNFT desde el store
                         let typeNft = availableTypes.get(type_nft_id);
                         if (!typeNft) {
                             console.warn(`TypeNFT with ID ${type_nft_id} not found in store. Creating a default.`);
@@ -126,12 +125,12 @@ export async function updateReputationProofList(
 
                         proof = {
                             token_id: rep_token_id,
-                            type: typeNft, // <-- CORREGIDO: Asignar el objeto TypeNFT completo
+                            type: typeNft,
                             total_amount: r6_parsed.totalSupply,
                             owner_address: serializedToRendered(r7_value),
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
                             current_boxes: [], number_of_boxes: 0,
-                            network: "ergo", 
+                            network: Network.ErgoMainnet, 
                             data: {}
                         };
                     }

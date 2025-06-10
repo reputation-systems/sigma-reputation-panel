@@ -32,7 +32,7 @@
                 id: proof.token_id,
                 type: 'reputation',
                 position: { x: parentX + layoutX, y: layoutY },
-                data: { label: proof.type_metadata.name, tokenId: proof.token_id }
+                data: { label: proof.type.typeName, tokenId: proof.token_id }
             });
 
             if (proof.type_nft_id === proof_by_token_type_nft_id) { //

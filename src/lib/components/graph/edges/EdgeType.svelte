@@ -57,7 +57,7 @@
       <!-- class="edge-label nodrag nopan" For no drag over it. -->
       {data.negative === true ? '-' : ''}{data.proportion}%
       {#if showContent}
-          <EdgeLabel label={data.box.slice(0, 10)} />
+          <EdgeLabel label={data.box} />
       {/if}
   </div>
 </EdgeLabelRenderer>

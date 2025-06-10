@@ -103,7 +103,7 @@ export async function generate_reputation_proof(
             .to(outputs)
             .sendChangeTo(wallet_pk)
             .payFee(RECOMMENDED_MIN_FEE_VALUE)
-            .withDataInputs(dataInputs) // Add the required data inputs
+            .withDataFrom(dataInputs)
             .build()
             .toEIP12Object();
 

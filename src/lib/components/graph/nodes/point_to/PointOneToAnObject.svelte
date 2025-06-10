@@ -78,7 +78,7 @@
 <dialog bind:this={dialog} on:close={close} on:click|self={() => dialog.close()}>
   <div on:click|stopPropagation>
     <h2 class="modal-title" id="generateReputationLabel">
-      Point from {source_proof.type_metadata.name}
+      Point from {source_proof.type.typeName}
     </h2>
     <p class="modal-subtitle">To: {object_to_assign.substring(0, 30)}...</p>
     <hr />

@@ -40,7 +40,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div on:click|stopPropagation>
         <h2 class="modal-title" id="generateReputationLabel">
-            Compute score from: {proof.type_metadata.name}
+            Compute score from: {proof.type.typeName}
         </h2>
         <p class="modal-subtitle">
             Proof ID: {proof.token_id.slice(0, 20)}...
