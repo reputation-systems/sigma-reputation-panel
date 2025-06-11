@@ -1,12 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generate_reputation_proof } from '$lib/generate_reputation_proof';
-    import { types } from '$lib/store';
+    import { types, proofs, proof_by_token_type_nft_id } from '$lib/store';
     import { fetchTypeNfts } from '$lib/unspent_proofs';
         
+    // --- WIZARD STATE ---
     let currentStep = 1;
     const totalSteps = 5;
 
+    // --- FORM DATA ---
     let type_nft_id: string = ''; 
     let object_to_assign: string = '';
     let token_amount: number = 100;
@@ -15,6 +17,7 @@
     let is_locked: boolean = false;
     let jsonDataString: string = '{}';
 
+    // --- UI STATE ---
     let isLoading = false;
     let errorMessage = '';
     let successMessage = '';
@@ -35,13 +38,12 @@
         successMessage = '';
         
         if (!type_nft_id || !object_to_assign || token_amount <= 0) {
-            errorMessage = "Please fill in all required fields: Type NFT ID, Object Pointer, and Token Amount.";
+            errorMessage = "Please fill in all required fields: Type NFT Standard, Object Pointer, and Token Amount.";
             isLoading = false;
             return;
         }
 
         try {
-            
             const txId = await generate_reputation_proof(
                 token_amount,
                 token_amount,
@@ -67,6 +69,8 @@
     }
 
     $: selectedType = type_nft_id ? $types.get(type_nft_id) : null;
+    
+    $: isReputationProofType = selectedType?.tokenId === $proof_by_token_type_nft_id;
 
 </script>
 
@@ -102,8 +106,25 @@
 
         {#if currentStep === 2}
             <h4>Step 2: Define First Pointer</h4>
-            <label for="object-assign-input">Object to Evaluate<span class="required">*</span></label>
-            <input id="object-assign-input" type="text" class="input" bind:value={object_to_assign} placeholder="URL, another token ID, text, etc." />
+
+            {#if isReputationProofType}
+                <label for="proof-select">Select an Existing Proof to Point To<span class="required">*</span></label>
+                <select id="proof-select" class="input" bind:value={object_to_assign} required>
+                    <option value="" disabled>-- Choose one of your proofs --</option>
+                    {#each Array.from($proofs.values()) as proof (proof.token_id)}
+                        <option value={proof.token_id}>
+                            {proof.type.typeName} (ID: {proof.token_id.substring(0, 10)}...)
+                        </option>
+                    {/each}
+                </select>
+                {#if $proofs.size === 0}
+                    <p class="help-text error-text">You do not own any reputation proofs to point to.</p>
+                {/if}
+            {:else}
+                <label for="object-assign-input">Object to Evaluate<span class="required">*</span></label>
+                <input id="object-assign-input" type="text" class="input" bind:value={object_to_assign} placeholder="URL, another token ID, text, etc." required />
+            {/if}
+
         {/if}
 
         {#if currentStep === 3}
