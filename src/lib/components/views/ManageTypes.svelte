@@ -1,9 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import {
-        explorer_uri,
-        digital_public_good_contract_hash,
-        digital_public_good_ergo_tree
+        digital_public_good_ergo_tree,
+        proof_by_token_type_nft_id
     } from '$lib/envs';
     import { SString } from '$lib/utils';
     import {
@@ -13,9 +12,7 @@
         RECOMMENDED_MIN_FEE_VALUE
     } from '@fleet-sdk/core';
     
-    // --- Importar el store, la interfaz y la nueva función de carga ---
     import { types } from '$lib/store';
-    // Asumimos que la función está en un fichero como 'unspent_proofs.ts' o similar
     import { fetchTypeNfts } from '$lib/unspent_proofs'; 
 
     // --- Component State ---
@@ -32,7 +29,6 @@
     let creationSuccessMessage = '';
 
     /**
-     * <-- NUEVO: Wrapper para cargar los tipos usando la función centralizada.
      * Esto maneja el estado de carga y errores para este componente.
      */
     async function loadTypes() {
@@ -97,7 +93,6 @@
             newTypeName = newTypeDescription = newTypeSchema = '';
             newTypeVersion = '1.0.0';
             
-            // <-- ACTUALIZADO: Volver a cargar los tipos usando la nueva función
             await loadTypes();
 
         } catch (e: any) {
@@ -112,8 +107,19 @@
     }
     
     function copyToClipboard(text: string) {
-        navigator.clipboard.writeText(text);
-        alert("Token ID copied to clipboard!");
+        // Use a temporary textarea to perform the copy command
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            // Consider using a more modern notification system instead of alert
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
+        }
+        document.body.removeChild(textArea);
     }
 
     // <-- ACTUALIZADO: onMount ahora llama a nuestro nuevo wrapper
@@ -159,7 +165,12 @@
                     <li class="type-item">
                         <div class="type-header">
                             <span class="type-name">{type.typeName}</span>
-                            <span class="type-version">v{type.version}</span>
+                            <div class="version-wrapper">
+                                {#if type.tokenId === proof_by_token_type_nft_id}
+                                    <span class="proof-tag">Reputation Proof</span>
+                                {/if}
+                                <span class="type-version">v{type.version}</span>
+                            </div>
                         </div>
                         <p class="type-description">{type.description}</p>
                         {#if type.schemaURI}
@@ -219,9 +230,26 @@
     .type-schema a { color: #FBBF24; text-decoration: none; }
     .type-schema a:hover { text-decoration: underline; }
     .type-footer { display: flex; justify-content: space-between; align-items: center; background-color: #2a2a2a; padding: 0.5rem 1rem; margin: 1rem -1.5rem -1.5rem -1.5rem; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; border-top: 1px solid #444; }
-    .type-id { font-family: monospace; font-size: 0.85rem; color: #aaa; }
+    .type-id { font-family: monospace; font-size: 0.85rem; color: #aaa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 20ch; }
     .copy-button { background: none; border: none; color: #ccc; cursor: pointer; font-size: 1rem; }
     .copy-button:hover { color: #FBBF24; }
     .error-message { color: #ff6b6b; background-color: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; }
     .no-results-box { padding: 2rem; background-color: #2a2a2a; border-radius: 8px; }
+
+    .version-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .proof-tag {
+        background-color: #8a5cf6a8;
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        line-height: 1.2;
+    }
 </style>
