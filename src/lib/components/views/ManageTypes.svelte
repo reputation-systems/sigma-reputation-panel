@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { get } from 'svelte/store';
     import {
-        digital_public_good_ergo_tree,
-        proof_by_token_type_nft_id
+        digital_public_good_ergo_tree
     } from '$lib/envs';
     import { SString } from '$lib/utils';
     import {
@@ -12,7 +12,7 @@
         RECOMMENDED_MIN_FEE_VALUE
     } from '@fleet-sdk/core';
     
-    import { types } from '$lib/store';
+    import { proof_by_token_type_nft_id, types } from '$lib/store';
     import { fetchTypeNfts } from '$lib/unspent_proofs'; 
 
     // --- Component State ---
@@ -166,7 +166,7 @@
                         <div class="type-header">
                             <span class="type-name">{type.typeName}</span>
                             <div class="version-wrapper">
-                                {#if type.tokenId === proof_by_token_type_nft_id}
+                                {#if type.tokenId === get(proof_by_token_type_nft_id)}
                                     <span class="proof-tag">Reputation Proof</span>
                                 {/if}
                                 <span class="type-version">v{type.version}</span>

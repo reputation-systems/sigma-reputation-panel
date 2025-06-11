@@ -5,11 +5,10 @@
   
   import '@xyflow/svelte/dist/style.css';
   import { updateReputationProofList } from '$lib/unspent_proofs';
-  import { ergo_tree_hash, explorer_uri, proof_by_token_type_nft_id } from '$lib/envs'; // Import the specific type NFT
   import { type ReputationProof } from '$lib/ReputationProof';
   import dagre from '@dagrejs/dagre';
 
-  import { advance_mode, building_graph, connected, fetch_all, proofs, searchStore } from '$lib/store';
+  import { advance_mode, building_graph, connected, fetch_all, proof_by_token_type_nft_id, proofs, searchStore } from '$lib/store';
   import { onMount } from 'svelte';
 
   // UI Components
@@ -158,7 +157,7 @@
           let targetId: string;
           // The logic is now based on the *parent proof's type*, not the box's.
           // This checks if the proof is a recursive "Proof-by-Token" type.
-          if (p.type_nft_id === proof_by_token_type_nft_id) {
+          if (p.type.tokenId === get(proof_by_token_type_nft_id)) {
             targetId = `proof::${b.object_pointer}`;
           } else {
             // For all other proof types, the pointer refers to a generic object.

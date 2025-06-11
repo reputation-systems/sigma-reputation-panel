@@ -1,11 +1,10 @@
 <script lang="ts">
     import { writable, get } from 'svelte/store';
     import { SvelteFlow, Background, Controls, MiniMap, type Node, type Edge } from '@xyflow/svelte';
-    import { proofs, compute_deep_level } from '$lib/store';
+    import { proofs, compute_deep_level, proof_by_token_type_nft_id } from '$lib/store';
     import { type ReputationProof, compute } from '$lib/ReputationProof';
     import ReputationNode from './graph/ReputationNode.svelte';
     // Import the specific Type NFT ID from your environment variables.
-    import { proof_by_token_type_nft_id } from '$lib/envs';
 
     const nodeTypes = { reputation: ReputationNode };
     const nodes = writable<Node[]>([]);
@@ -35,7 +34,7 @@
                 data: { label: proof.type.typeName, tokenId: proof.token_id }
             });
 
-            if (proof.type_nft_id === proof_by_token_type_nft_id) { //
+            if (proof.type.tokenId === get(proof_by_token_type_nft_id)) {
                 let childCount = 0;
                 for (const box of proof.current_boxes) { //
                     // CORRECTO: Usa get(store) para acceder al valor

@@ -34,8 +34,3 @@ const digitalPublicGoodHash = hex.encode(sha256(digitalPublicGoodErgoTree.templa
 // Export the constant for the Type NFT contract
 export const digital_public_good_ergo_tree = digitalPublicGoodErgoTreeHex;
 export const digital_public_good_contract_hash = digitalPublicGoodHash;
-
-
-// --- Other Constants ---
-// Example Type NFT ID for "Proof-by-Token", can be populated after creation
-export const proof_by_token_type_nft_id = "00bd948e1bd4dc04f2237bcd7421f2367ec43032a2c8201fe1bad494f3e1a521";
