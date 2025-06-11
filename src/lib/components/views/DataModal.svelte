@@ -51,7 +51,7 @@
                 </div>
             {:else if "token_id" in data}
                 <div class="proof-type">
-                    <h2>Details for Proof { data.token_id.slice(0, 15) }...</h2>
+                    <h2>Details for Proof { data.token_id }</h2>
             
                     {#if data.data && Object.keys(data.data).length > 0}
                         <h3>Proof Data (R9)</h3>
@@ -74,7 +74,7 @@
                                 <tbody>
                                     {#each data.current_boxes as b}
                                         <tr>
-                                            <td title={b.box_id}>{b.box_id.slice(0, 10)}...</td>
+                                            <td title={b.box_id}>{b.box_id}</td>
                                             <td>{(parseFloat(Number(b.token_amount / data.total_amount * 100).toFixed(3)))}%</td>
                                             <td>{b.negative ? 'Yes' : 'No'}</td>
                                             <td>{b.object_type ?? 'N/A'}</td>

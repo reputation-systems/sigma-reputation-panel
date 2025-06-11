@@ -166,7 +166,7 @@
                             <p class="type-schema">Schema: <a href={type.schemaURI} target="_blank" rel="noopener noreferrer">{type.schemaURI}</a></p>
                         {/if}
                         <div class="type-footer">
-                            <span class="type-id" title={type.tokenId}>ID: {type.tokenId.slice(0, 15)}...</span>
+                            <span class="type-id" title={type.tokenId}>ID: {type.tokenId}</span>
                             <button class="copy-button" on:click={() => copyToClipboard(type.tokenId)} title="Copy Token ID">
                                 <i class="far fa-copy"></i>
                             </button>
@@ -205,7 +205,7 @@
     textarea.form-input { resize: vertical; }
     .form-button { width: 100%; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background-color: #FBBF24; color: #1a1a1a; font-size: 1.1rem; margin-top: 1rem; }
     .form-button:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
-    .list-area { width: 100%; max-width: 800px; text-align: center; }
+    .list-area { width: 100%; max-width: 1100px; text-align: center; }
     .list-title { font-size: 1.5rem; color: #f0f0f0; border-bottom: 1px solid #444; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
     .loader { margin: 1rem auto; border: 4px solid #555; border-top: 4px solid #FBBF24; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
