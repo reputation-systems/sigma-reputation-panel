@@ -19,7 +19,7 @@ type ApiBox = {
 
 function parseR6(r6RenderedValue: string): { isLocked: boolean; totalSupply: number } {
     try {
-        const [lockedStr, supplyStr] = r6RenderedValue.replace(/[()]/g, '').split(',');
+        const [lockedStr, supplyStr] = r6RenderedValue.replace(/[()\[\]]/g, '').split(',');
         return { isLocked: lockedStr.trim() === 'true', totalSupply: Number(supplyStr.trim()) };
     } catch (e) {
         console.warn("Could not parse R6 tuple, returning defaults:", r6RenderedValue, e);
@@ -54,7 +54,6 @@ export async function fetchTypeNfts() {
             };
         }).filter((t: TypeNFT | null): t is TypeNFT => t !== null);
         
-        // <-- NUEVA LÓGICA: Convertir el array a un Map y guardarlo en el store
         const typesMap = new Map(fetchedTypesArray.map(type => [type.tokenId, type]));
         types.set(typesMap);
         console.log(`Successfully fetched and stored ${typesMap.size} Type NFTs.`);
