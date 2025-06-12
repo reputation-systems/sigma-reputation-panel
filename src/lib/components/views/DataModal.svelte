@@ -12,14 +12,7 @@
 
     function close() {
         showModal = false;
-    }
-
-    const baseHashes = {
-      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855': 'SHA2 256',
-      'a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a': 'SHA3 256',
-      '46b9dd2b0ba88d13233b3feb743eeb243fcd52ea62b81b82b50c27646ed5762f': 'SHAKE 256'
-    };
-  
+    }  
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -27,66 +20,42 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="modal-content" on:click|stopPropagation>
         {#if data}
-            {#if "hashes" in data}
-                <!-- Render for LinkedObject -->
-                <div class="linked-object-type">
-                    <h2>Object Details</h2>
-                    {#each data.hashes as {algorithm, value}}
-                    <div>
-                        <strong>{baseHashes[algorithm] ?? algorithm ?? 'Unknown'}:</strong> {value}
-                    </div>
-                    {/each}
+            <div class="proof-type">
+                <h2>Details for Proof { data.token_id }</h2>
+        
+                {#if data.data && Object.keys(data.data).length > 0}
+                    <h3>Proof Data (R9)</h3>
+                    <pre><code>{JSON.stringify(data.data, null, 2)}</code></pre>
+                {/if}
 
-                    <h3>Opinions</h3>
-                    <div class="opinions-list">
-                        {#each data.opinions as {proof_id, content}}
-                            {#if content && typeof content === 'object' && Object.keys(content).length > 0}
-                                <div class="opinion-item">
-                                    <strong>From {proof_id.slice(0, 10) ?? 'Unknown'}:</strong>
-                                    <pre><code>{JSON.stringify(content, null, 2)}</code></pre>
-                                </div>
-                            {/if}
-                        {/each}
-                    </div>
-                </div>
-            {:else if "token_id" in data}
-                <div class="proof-type">
-                    <h2>Details for Proof { data.token_id }</h2>
-            
-                    {#if data.data && Object.keys(data.data).length > 0}
-                        <h3>Proof Data (R9)</h3>
-                        <pre><code>{JSON.stringify(data.data, null, 2)}</code></pre>
-                    {/if}
-
-                    {#if data.current_boxes && data.current_boxes.length > 0}
-                        <h3>Boxes</h3>
-                        <div class="table-container">
-                            <table>
-                                <thead>
+                {#if data.current_boxes && data.current_boxes.length > 0}
+                    <h3>Boxes</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Box ID</th>
+                                    <th>Proportion</th>
+                                    <th>Negative</th>
+                                    <th>Object Type</th>
+                                    <th>Object Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {#each data.current_boxes as b}
                                     <tr>
-                                        <th>Box ID</th>
-                                        <th>Proportion</th>
-                                        <th>Negative</th>
-                                        <th>Object Type</th>
-                                        <th>Object Value</th>
+                                        <td title={b.box_id}>{b.box_id}</td>
+                                        <td>{(parseFloat(Number(b.token_amount / data.total_amount * 100).toFixed(3)))}%</td>
+                                        <td>{b.negative ? 'Yes' : 'No'}</td>
+                                        <td>{b.object_type ?? 'N/A'}</td>
+                                        <td title={renderedToString(b.object_value)}>{(renderedToString(b.object_value) ?? "").slice(0, 20)}...</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {#each data.current_boxes as b}
-                                        <tr>
-                                            <td title={b.box_id}>{b.box_id}</td>
-                                            <td>{(parseFloat(Number(b.token_amount / data.total_amount * 100).toFixed(3)))}%</td>
-                                            <td>{b.negative ? 'Yes' : 'No'}</td>
-                                            <td>{b.object_type ?? 'N/A'}</td>
-                                            <td title={renderedToString(b.object_value)}>{(renderedToString(b.object_value) ?? "").slice(0, 20)}...</td>
-                                        </tr>
-                                    {/each}
-                                </tbody>
-                            </table>
-                        </div>
-                    {/if}
-                </div>
-            {/if}
+                                {/each}
+                            </tbody>
+                        </table>
+                    </div>
+                {/if}
+            </div>
         {/if}
     </div>
 </dialog>
