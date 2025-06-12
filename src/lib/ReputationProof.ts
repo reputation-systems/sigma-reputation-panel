@@ -29,6 +29,7 @@ export interface ReputationProof {
 export interface RPBox {
     box: Box<Amount>;
     box_id: string;
+    type: TypeNFT; 
     token_id: string;
     token_amount: number;
     object_pointer: string;
