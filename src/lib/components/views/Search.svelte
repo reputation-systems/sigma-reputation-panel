@@ -39,8 +39,32 @@
 
         try {
             if (searchMode === 'text') {
-                results = await updateReputationProofList(null, true, textInput);
-            } else { // searchMode === 'type'
+                if (searchMode === 'text') {
+                    const proofsFromApi = await updateReputationProofList(null, true, null);  // todo, should use the search parameter.
+                    const filteredResults = new Map<string, ReputationProof>();
+
+                    for (const [key, proof] of proofsFromApi.entries()) {
+                        const isMatch = proof.current_boxes.some(box => {
+                            if (box.object_pointer && box.object_pointer.includes(textInput)) {
+                                return true;
+                            }
+
+                            if (box.content) {
+                                const contentAsString = JSON.stringify(box.content);
+                                return contentAsString.includes(textInput);
+                            }
+
+                            return false;
+                        });
+
+                        if (isMatch) {
+                            filteredResults.set(key, proof);
+                        }
+                    }
+                    results = filteredResults;
+                }
+            } 
+            else { // searchMode === 'type'
                 const proofsFromApi = await updateReputationProofList(null, true, null);
                 
                 const filteredResults = new Map<string, ReputationProof>();

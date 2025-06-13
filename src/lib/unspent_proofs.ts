@@ -125,9 +125,30 @@ export async function updateReputationProofList(
                         };
                     }
 
-                    let box_content = {};
-                    try { box_content = box.additionalRegisters.R9 ? JSON.parse(hexToUtf8(box.additionalRegisters.R9.serializedValue) ?? "") : {}; }
-                    catch (jsonError) { console.warn(`Failed to parse R9 JSON for box ${box.boxId}:`, jsonError); }
+                    let box_content: string|object|null = {};
+
+                    try {
+                    const rawValue = box.additionalRegisters.R9?.serializedValue;
+
+                    if (rawValue) {
+                        let potentialString;
+
+                        try {
+                        potentialString = hexToUtf8(rawValue);
+                        } catch (hexError) {
+                        potentialString = rawValue;
+                        }
+
+                        try {
+                        box_content = JSON.parse(potentialString ?? "");
+                        } catch (jsonError) {
+                        box_content = potentialString;
+                        }
+                    }
+                    } catch (error) {
+                        console.warn(`Failed to process R9 for box ${box.boxId}:`, error);
+                        box_content = {};
+                    }
                     
                     const object_pointer_for_box = hexToUtf8(box.additionalRegisters.R5?.renderedValue ?? "") ?? "";
 

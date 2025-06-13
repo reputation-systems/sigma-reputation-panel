@@ -35,7 +35,7 @@ export interface RPBox {
     object_pointer: string;
     is_locked: boolean;
     polarization: boolean;
-    content: object;
+    content: object|string|null;
 }
 
 // --- ENUMS & UTILITIES ---
