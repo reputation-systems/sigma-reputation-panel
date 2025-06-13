@@ -3,7 +3,6 @@
     import { searchStore, types } from '$lib/store';
     import { updateReputationProofList, fetchTypeNfts } from '$lib/unspent_proofs';
     import { type ReputationProof } from '$lib/ReputationProof';
-    import { renderedToString } from '$lib/utils';
 
     const dispatch = createEventDispatcher();
 
