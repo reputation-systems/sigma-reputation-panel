@@ -75,10 +75,11 @@
     isConnectable={proof.can_be_spend}
   />
   
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div class="node-content" on:dblclick={handleDblClick}>
-      <div class="node-title">{data.proof.type.typeName}</div>
-    {#if showContent}
-      <div class="token-id">ID: {proof.token_id.substring(0, 10)}...</div>
+      <div class="node-title">{proof.token_id.substring(0, 10)}</div>
+    {#if showContent && proof.type}
+      <div class="token-id">Type: {proof.type.typeName}</div>
     {/if}
   </div>
 </div>

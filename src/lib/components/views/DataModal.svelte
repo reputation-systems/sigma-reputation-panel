@@ -116,7 +116,7 @@
         expandedDetails.clear();
     }
     
-    $: currentOpinion: OpinionDetail | undefined = opinions[currentOpinionIndex];
+    $: currentOpinion = opinions[currentOpinionIndex] as OpinionDetail | undefined;
     $: currentQuery = searchMode === 'text' || searchMode === 'target' ? textInput : $types.get(selectedTypeId)?.typeName;
     $: inputPlaceholder = searchMode === 'target' ? 'Object Pointer ID (e.g., a token ID)...' : 'Address, token ID, transaction hash...';
 

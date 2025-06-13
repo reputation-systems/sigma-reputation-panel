@@ -114,7 +114,7 @@ export async function updateReputationProofList(
 
                         proof = {
                             token_id: rep_token_id,
-                            type: { tokenId: "", boxId: '', typeName: "Loading...", description: "Looking for definition box", schemaURI: "", version: "" },
+                            type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", version: "" },
                             total_amount: r6_parsed.totalSupply,
                             owner_address: serializedToRendered(r7_value),
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),
@@ -155,6 +155,7 @@ export async function updateReputationProofList(
                     proof.number_of_boxes += 1;
                     
                     proofs.set(rep_token_id, proof);
+                    console.log(proof)
                 }
                 offset += limit;
             }

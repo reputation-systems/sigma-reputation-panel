@@ -155,9 +155,8 @@
 
         if (b.object_pointer) {
           let targetId: string;
-          // The logic is now based on the *parent proof's type*, not the box's.
           // This checks if the proof is a recursive "Proof-by-Token" type.
-          if (p.type.tokenId === get(proof_by_token_type_nft_id)) {
+          if (b.type.tokenId === get(proof_by_token_type_nft_id)) {
             targetId = `proof::${b.object_pointer}`;
           } else {
             // For all other proof types, the pointer refers to a generic object.
