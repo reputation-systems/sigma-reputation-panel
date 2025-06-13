@@ -1,5 +1,5 @@
 import { Network, type RPBox, type ReputationProof, type TypeNFT } from "$lib/ReputationProof";
-import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered } from "$lib/utils";
+import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, SString } from "$lib/utils";
 import { get } from "svelte/store";
 import { connected, types } from "./store";
 import { digital_public_good_contract_hash, ergo_tree_hash, explorer_uri } from "./envs";
@@ -75,8 +75,8 @@ export async function updateReputationProofList(
 
     if (search) {
         search_bodies.push({ assets: [search] });
-        search_bodies.push({ registers: { "R5": hexToUtf8(search) } }); 
-        search_bodies.push({ registers: { "R4": hexToUtf8(search) } }); 
+        search_bodies.push({ registers: { "R5": SString(search) } }); // TODO check
+        search_bodies.push({ registers: { "R4": SString(search) } });  // TODO check
         try { search_bodies.push({ registers: { "R7": generate_pk_proposition(search) } }); }
         catch (e) { console.log("Search term is not a valid address, skipping R7 search."); }
     } else {

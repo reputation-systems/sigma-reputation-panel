@@ -40,13 +40,18 @@
 
         try {
             if (searchMode === 'text') {
-                results = await updateReputationProofList(null, true, textInput, undefined);
+                results = await updateReputationProofList(null, true, textInput);
             } else { // searchMode === 'type'
-                const proofsFromApi = await updateReputationProofList(null, true, undefined, selectedTypeId);
+                const proofsFromApi = await updateReputationProofList(null, true, null);
                 
                 const filteredResults = new Map<string, ReputationProof>();
                 for (const [key, proof] of proofsFromApi.entries()) {
+
                     if (proof.type.tokenId === selectedTypeId) {
+                        filteredResults.set(key, proof);
+                    }
+
+                    if (proof.current_boxes.some(box => box.type.tokenId === selectedTypeId)) {
                         filteredResults.set(key, proof);
                     }
                 }
