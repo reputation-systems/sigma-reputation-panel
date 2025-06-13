@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-// <-- CORREGIDO: Importar la interfaz correcta 'TypeNFT'
 import type { ReputationProof, TypeNFT } from './ReputationProof';
 
 // Main store for holding fetched reputation proofs, keyed by token ID.

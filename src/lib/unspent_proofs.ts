@@ -128,7 +128,7 @@ export async function updateReputationProofList(
                     let box_content: string|object|null = {};
 
                     try {
-                    const rawValue = box.additionalRegisters.R9?.serializedValue;
+                    const rawValue = box.additionalRegisters.R9?.renderedValue;
 
                     if (rawValue) {
                         let potentialString;

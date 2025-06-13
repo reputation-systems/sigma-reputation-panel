@@ -1,352 +1,199 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from 'svelte';
-    import { searchStore, types } from '$lib/store';
-    import { updateReputationProofList, fetchTypeNfts } from '$lib/unspent_proofs';
-    import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { token_rendered, type ReputationProof, type RPBox, type TypeNFT } from '$lib/ReputationProof';
-    import { renderedToString } from '$lib/utils';
+    import type { ReputationProof, RPBox } from "$lib/ReputationProof";
+    import { createEventDispatcher } from 'svelte';
+    import { proofs } from "$lib/store";
+
+    export let proof: ReputationProof;
+    export let showModal: boolean;
 
     const dispatch = createEventDispatcher();
 
-    // --- INTERFAZ PARA EL CARRUSEL ---
-    interface OpinionDetail {
-        parentProof: ReputationProof;
-        box: RPBox;
-        proportion: number;
-    }
+    let activeView: 'boxes' | 'pointedBy' = 'boxes';
 
-    // --- Search State ---
-    let searchMode: 'text' | 'type' | 'target' = 'text';
-    let textInput: string = $searchStore ?? '';
-    let selectedTypeId: string = '';
-    
-    let results: Map<string, ReputationProof> = new Map();
-    let isLoading = false;
-    let isTypesLoading = true;
-    let error = '';
-    let hasSearched = false;
+    let referringBoxes: { parentProof: ReputationProof, box: RPBox }[] = [];
+    $: {
+        if (proof && $proofs) {
+            const currentProofId = proof.token_id;
+            const foundBoxes: { parentProof: ReputationProof, box: RPBox }[] = [];
 
-    // --- Carousel State ---
-    let opinions: OpinionDetail[] = [];
-    let currentOpinionIndex = 0;
+            for (const otherProof of $proofs.values()) {
+                if (otherProof.token_id === currentProofId) continue;
 
-    // --- UI State ---
-    let expandedDetails = new Set<string>();
-
-    onMount(async () => {
-        isTypesLoading = true;
-        await fetchTypeNfts();
-        isTypesLoading = false;
-    });
-
-    async function performSearch() {
-        if ((searchMode === 'text' || searchMode === 'target') && !textInput) return;
-        if (searchMode === 'type' && !selectedTypeId) return;
-
-        isLoading = true;
-        hasSearched = true;
-        error = '';
-        results.clear();
-        opinions = []; // Limpiar opiniones anteriores
-        currentOpinionIndex = 0;
-        expandedDetails.clear();
-
-        try {
-            if (searchMode === 'text') {
-                results = await updateReputationProofList(null, true, textInput, undefined);
-            } else if (searchMode === 'type') {
-                const proofsFromApi = await updateReputationProofList(null, true, undefined, selectedTypeId);
-                const filteredResults = new Map<string, ReputationProof>();
-                for (const [key, proof] of proofsFromApi.entries()) {
-                    if (proof.type.tokenId === selectedTypeId) {
-                        filteredResults.set(key, proof);
+                for (const box of otherProof.current_boxes) {
+                    if (box.object_pointer === currentProofId) {
+                        foundBoxes.push({ parentProof: otherProof, box: box });
                     }
                 }
-                results = filteredResults;
-            } else { // searchMode === 'target'
-                const allProofs = await updateReputationProofList(null, true, undefined, undefined);
-                const targetId = textInput.trim();
-                const relevantOpinions: OpinionDetail[] = [];
-
-                for (const proof of allProofs.values()) {
-                    for (const box of proof.current_boxes) {
-                        // Comprobamos si la caja apunta al objeto buscado
-                        if (box.object_pointer === targetId) {
-                            // Si apunta, creamos un objeto 'OpinionDetail'
-                            relevantOpinions.push({
-                                parentProof: proof,
-                                box: box,
-                                proportion: box.token_amount / proof.total_amount,
-                            });
-                        }
-                    }
-                }
-                opinions = relevantOpinions;
             }
-        } catch (e) {
-            console.error("Search failed:", e);
-            error = 'An error occurred during the search. Please try again.';
-        } finally {
-            isLoading = false;
+            referringBoxes = foundBoxes;
         }
     }
 
-    // --- Funciones del Carrusel ---
-    function showNextOpinion() {
-        if (opinions.length > 1) {
-            currentOpinionIndex = (currentOpinionIndex + 1) % opinions.length;
+    function closeModal() {
+        showModal = false;
+        dispatch('close');
+    }
+
+    function handleKeydown(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            closeModal();
         }
     }
 
-    function showPreviousOpinion() {
-        if (opinions.length > 1) {
-            currentOpinionIndex = (currentOpinionIndex - 1 + opinions.length) % opinions.length;
-        }
+    function calculateProportion(box: RPBox, total_amount: number): string {
+        if (total_amount === 0) return "0.00";
+        const proportion = (box.token_amount / total_amount) * 100;
+        return proportion.toFixed(2);
     }
-
-    // --- Helpers ---
-    function clear() {
-        textInput = '';
-        selectedTypeId = '';
-        results.clear();
-        opinions = [];
-        error = '';
-        hasSearched = false;
-        searchStore.set(null);
-        expandedDetails.clear();
-    }
-    
-    $: currentOpinion = opinions[currentOpinionIndex] as OpinionDetail | undefined;
-    $: currentQuery = searchMode === 'text' || searchMode === 'target' ? textInput : $types.get(selectedTypeId)?.typeName;
-    $: inputPlaceholder = searchMode === 'target' ? 'Object Pointer ID (e.g., a token ID)...' : 'Address, token ID, transaction hash...';
-
 </script>
 
-<div class="search-container">
-    <div class="search-box">
+<svelte:window on:keydown={handleKeydown}/>
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+{#if showModal}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="modal-overlay" on:click|self={closeModal}>
+    <article class="proof-card">
+        <button class="close-button" on:click={closeModal}>&times;</button>
+
+        <header class="proof-header">
+            <div>
+                <h1 class="proof-title">{proof.type.typeName}</h1>
+                <p class="proof-token-id" title={proof.token_id}>ID: {proof.token_id.substring(0, 20)}...</p>
+            </div>
+            <span class="network-badge">{proof.network}</span>
+        </header>
+
+        <section class="details-section">
+            <div class="details-grid">
+                <strong>Owner:</strong><span class="breakable" title={proof.owner_address}>{proof.owner_address}</span>
+                <strong>Description:</strong><span>{proof.type.description}</span>
+                <strong>Total Amount:</strong><span>{proof.total_amount}</span>
+                <strong>Schema:</strong><span class="breakable">{proof.type.schemaURI} (v{proof.type.version})</span>
+            </div>
+        </section>
+
+        <div class="view-switcher">
+            <button class:active={activeView === 'pointedBy'} on:click={() => activeView = 'pointedBy'}>
+                Pointed By ({referringBoxes.length})
+            </button>
+            <button class:active={activeView === 'boxes'} on:click={() => activeView = 'boxes'}>
+                Boxes ({proof.current_boxes.length})
+            </button>
         </div>
 
-    <div class="results-area">
-        {#if isLoading}
-            <div class="loader"></div>
-            <p>Searching on-chain data...</p>
-        {:else if error}
-            <p class="error-message">{error}</p>
-        
-        {:else if hasSearched && searchMode === 'target'}
-            {#if opinions.length > 0}
-                <div class="carousel-view">
-                    <div class="carousel-header">
-                        <h3 class="results-title">Opinions on object: <span class="highlight-text td-breakable">{textInput}</span></h3>
-                        <span class="carousel-counter">{currentOpinionIndex + 1} / {opinions.length}</span>
-                    </div>
-
-                    <div class="carousel-content">
-                        <button class="carousel-nav-button" on:click={showPreviousOpinion} disabled={opinions.length <= 1}>
-                            &lt;
-                        </button>
-                        
-                        {#if currentOpinion}
-                        <div class="opinion-card">
-                            <div class="opinion-header">
-                                <span class="result-type">{currentOpinion.parentProof.type.typeName}</span>
-                                <span class="opinion-polarity" class:negative={currentOpinion.box.polarization === false}>
-                                    {currentOpinion.box.polarization ? 'POSITIVE' : 'NEGATIVE'}
-                                </span>
-                            </div>
-
-                            <div class="opinion-details-grid">
-                                <strong>Weight:</strong>
-                                <span>{(currentOpinion.proportion * 100).toFixed(2)}%</span>
-
-                                <strong>Source Proof:</strong>
-                                <span class="td-breakable" title={currentOpinion.parentProof.token_id}>{token_rendered(currentOpinion.parentProof)}</span>
-
-                                <strong>Owner:</strong>
-                                <span class="td-breakable" title={currentOpinion.parentProof.owner_address}>{currentOpinion.parentProof.owner_address}</span>
-                                
-                                <strong>Source Box ID:</strong>
-                                <span class="td-breakable" title={currentOpinion.box.box_id}>{currentOpinion.box.box_id}</span>
-                            </div>
-
-                            {#if currentOpinion.box.content && Object.keys(currentOpinion.box.content).length > 0}
-                                <div class="opinion-box-content">
-                                    <h4>Box Content (R8)</h4>
-                                    <pre><code>{JSON.stringify(currentOpinion.box.content, null, 2)}</code></pre>
+        <div class="content-area">
+            {#if activeView === 'boxes'}
+                <div class="detailed-list">
+                    {#if proof.current_boxes.length > 0}
+                        {#each proof.current_boxes as box (box.box_id)}
+                            <div class="box-card">
+                                <header class="box-header">
+                                    <h3 class="box-id" title={box.box_id}>Box #{box.box_id.substring(0, 8)}...</h3>
+                                    <span class="polarity-badge" class:positive={box.polarization} class:negative={!box.polarization}>{box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
+                                </header>
+                                <div class="details-grid">
+                                    <strong>Object Pointer:</strong><span class="breakable" title={box.object_pointer}>{box.object_pointer}</span>
+                                    <strong>Weight:</strong><span>{box.token_amount} / {proof.total_amount} ({calculateProportion(box, proof.total_amount)}%)</span>
+                                    <strong>Locked:</strong><span>{box.is_locked ? 'Yes' : 'No'}</span>
                                 </div>
-                            {/if}
-                        </div>
-                        {/if}
-
-                        <button class="carousel-nav-button" on:click={showNextOpinion} disabled={opinions.length <= 1}>
-                            &gt;
-                        </button>
-                    </div>
+                                {#if box.content}
+                                    <div class="box-content">
+                                        <h4>Content</h4>
+                                        {#if typeof box.content === 'object'}<pre>{JSON.stringify(box.content, null, 2)}</pre>{:else}<p class="content-text">{box.content}</p>{/if}
+                                    </div>
+                                {/if}
+                            </div>
+                        {/each}
+                    {:else}
+                        <p class="empty-state">This proof does not contain any boxes.</p>
+                    {/if}
                 </div>
-            {:else}
-                <div class="no-results-box">
-                    <p>No opinions found for object "{currentQuery}".</p>
-                    <span class="no-results-hint">This object is not pointed to by any reputation proof.</span>
+            {:else} <div class="detailed-list">
+                    {#if referringBoxes.length > 0}
+                        {#each referringBoxes as ref (ref.box.box_id)}
+                            <div class="box-card">
+                                <header class="box-header">
+                                    <div>
+                                        <h3 class="box-id" title="Source Proof: {ref.parentProof.token_id}">From: {ref.parentProof.type.typeName}</h3>
+                                        <p class="referring-proof-owner">Owner: {ref.parentProof.owner_address.substring(0,15)}...</p>
+                                    </div>
+                                    <span class="polarity-badge" class:positive={ref.box.polarization} class:negative={!ref.box.polarization}>{ref.box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
+                                </header>
+                                <div class="details-grid">
+                                    <strong>Weight in Source:</strong><span>{ref.box.token_amount} / {ref.parentProof.total_amount} ({calculateProportion(ref.box, ref.parentProof.total_amount)}%)</span>
+                                    <strong>Source Box ID:</strong><span class="breakable" title={ref.box.box_id}>{ref.box.box_id}</span>
+                                </div>
+                                {#if ref.box.content}
+                                    <div class="box-content">
+                                        <h4>Content of Referring Box</h4>
+                                        {#if typeof ref.box.content === 'object'}<pre>{JSON.stringify(ref.box.content, null, 2)}</pre>{:else}<p class="content-text">{ref.box.content}</p>{/if}
+                                    </div>
+                                {/if}
+                            </div>
+                        {/each}
+                    {:else}
+                        <p class="empty-state">This proof is not being pointed to by any other proofs.</p>
+                    {/if}
                 </div>
             {/if}
-
-        {:else if results.size > 0}
-            <h3 class="results-title">Search Results ({results.size})</h3>
-            <ul class="results-list">
-                </ul>
-        {:else if hasSearched}
-            <div class="no-results-box">
-                <p>No results found for "{currentQuery}".</p>
-                <span class="no-results-hint">Please check your selection or try a different query.</span>
-            </div>
-        {/if}
-    </div>
+        </div>
+    </article>
 </div>
+{/if}
 
 <style>
-/* --- ESTILOS GENERALES Y DE RESULTADOS (SIN CAMBIOS) --- */
-/* ... Se mantienen todos los estilos anteriores ... */
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;justify-content:center;align-items:center;z-index:1000;padding:2rem;box-sizing:border-box}.close-button{position:absolute;top:15px;right:20px;background:0 0;border:none;font-size:2.5rem;color:#aaa;cursor:pointer;line-height:1;z-index:10}.close-button:hover{color:#fff}:root{--card-bg:#2a2a2a;--border-color:#444;--text-color:#e0e0e0;--text-muted:#aaa;--positive-color:#10B981;--positive-bg:rgba(4,120,87,.5);--negative-color:#EF4444;--negative-bg:rgba(153,27,27,.5);--accent-color:#FBBF24}.proof-card{position:relative;background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:1.5rem;color:var(--text-color);font-family:sans-serif;width:100%;max-width:900px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+    
+    /* CAMBIO: Se elimina .section-title y se añade margen a .details-section */
+    .details-section {
+        margin-top: 1.5rem;
+    }
 
-/* --- NUEVOS ESTILOS PARA EL CARRUSEL --- */
-.carousel-view {
-    width: 100%;
-    max-width: 900px; /* Ancho máximo del carrusel */
-    margin: 0 auto;
-    padding: 1rem;
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 12px;
-}
+    .proof-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #555;padding-bottom:1rem;padding-right:40px}.proof-title{font-size:1.75rem;margin:0;color:#fff}.proof-token-id{font-family:monospace;color:var(--text-muted);font-size:.9rem;margin-top:.25rem}.network-badge{background-color:#333;padding:.3rem .8rem;border-radius:15px;font-size:.8rem;font-weight:700;border:1px solid var(--border-color);flex-shrink:0}.details-grid{display:grid;grid-template-columns:140px 1fr;gap:.75rem 1.5rem;align-items:flex-start}.details-grid strong{color:var(--text-muted);text-align:right;font-weight:400}.breakable{word-break:break-all}
 
-.carousel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #444;
-}
-.carousel-header .results-title {
-    margin: 0;
-    padding: 0;
-    border: none;
-    text-align: left;
-}
-.highlight-text {
-    color: #FBBF24;
-    font-family: monospace;
-}
+    .view-switcher {
+        display: flex;
+        justify-content: center;
+        background-color: #222;
+        border-radius: 8px;
+        padding: 4px;
+        width: fit-content;
+        margin: 2rem auto 1rem auto;
+    }
 
-.carousel-counter {
-    font-size: 0.9rem;
-    background-color: #333;
-    padding: 0.25rem 0.75rem;
-    border-radius: 6px;
-    color: #ccc;
-}
+    .view-switcher button {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
 
-.carousel-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
+    .view-switcher button.active {
+        background-color: #444;
+        color: #fff;
+        font-weight: 600;
+    }
 
-.carousel-nav-button {
-    background: transparent;
-    border: 1px solid #666;
-    color: #ccc;
-    font-size: 1.5rem;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-.carousel-nav-button:hover:not(:disabled) {
-    background-color: #444;
-    border-color: #888;
-}
-.carousel-nav-button:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
+    .detailed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .empty-state {
+        color: var(--text-muted);
+        text-align: center;
+        padding: 2rem;
+        background-color: #262626;
+        border-radius: 8px;
+    }
 
-.opinion-card {
-    background-color: #333;
-    border-radius: 8px;
-    border: 1px solid #555;
-    padding: 1.5rem;
-    text-align: left;
-    width: 100%;
-    flex-grow: 1;
-}
-
-.opinion-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
-}
-.opinion-polarity {
-    font-weight: bold;
-    font-size: 0.9rem;
-    padding: 0.25rem 0.75rem;
-    border-radius: 15px;
-    background-color: rgba(4, 120, 87, 0.5); /* Verde por defecto (Positivo) */
-    border: 1px solid #10B981;
-    color: #A7F3D0;
-}
-.opinion-polarity.negative {
-    background-color: rgba(153, 27, 27, 0.5); /* Rojo para Negativo */
-    border-color: #EF4444;
-    color: #FECACA;
-}
-
-.opinion-details-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 1rem;
-    font-size: 0.95rem;
-    align-items: center;
-}
-.opinion-details-grid strong {
-    color: #aaa;
-    font-weight: normal;
-    text-align: right;
-}
-.opinion-details-grid span {
-    color: #f0f0f0;
-}
-
-.opinion-box-content {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #444;
-}
-.opinion-box-content h4 {
-    margin: 0 0 1rem 0;
-    color: #FBBF24;
-    font-size: 1rem;
-}
-.opinion-box-content pre {
-    background-color: #222;
-    padding: 1rem;
-    border-radius: 6px;
-    white-space: pre-wrap;
-    word-break: break-all;
-    max-height: 250px;
-    overflow-y: auto;
-}
-
-.td-breakable {
-    white-space: pre-wrap;
-    word-break: break-all;
-}
+    .box-card{background-color:#333;border:1px solid #555;border-radius:8px;padding:1.5rem;flex-shrink:0}.box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}.box-header>div{flex-shrink:1;min-width:0}.box-id{font-family:monospace;font-size:1.1rem;color:var(--accent-color);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.referring-proof-owner{font-size:.8rem;color:var(--text-muted);font-family:monospace;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.polarity-badge{font-weight:700;padding:.25rem .75rem;border-radius:15px;font-size:.9rem;flex-shrink:0}.polarity-badge.positive{background-color:var(--positive-bg);border:1px solid var(--positive-color);color:#A7F3D0}.polarity-badge.negative{background-color:var(--negative-bg);border:1px solid var(--negative-color);color:#FECACA}.box-content{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border-color)}.box-content h4{margin:0 0 .5rem;color:var(--text-muted);font-weight:700}.box-content pre{background-color:#1e1e1e;padding:1rem;border-radius:6px;white-space:pre-wrap;word-break:break-all;max-height:250px;overflow-y:auto}.content-text{background-color:#262626;padding:1rem;border-radius:6px;border:1px solid #404040}
 </style>

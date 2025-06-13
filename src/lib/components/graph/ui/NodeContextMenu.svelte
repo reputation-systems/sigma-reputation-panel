@@ -112,7 +112,7 @@
     <UpdateProofModal bind:showModal={showUpdateModal} bind:proof={proof} />
   {/if}
   <ComputeSearchModal bind:showModal={showComputeModal} bind:proof={proof} />
-  <DataModal bind:showModal={showDetailsModal} data={proof} />
+  <DataModal bind:showModal={showDetailsModal} proof={proof} />
 {/if}
 
 <style>
