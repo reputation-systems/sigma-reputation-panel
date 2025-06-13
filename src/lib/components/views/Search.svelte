@@ -188,7 +188,7 @@
                                                     <tr>
                                                         <td class="td-breakable" title={b.box_id}>{b.box_id}</td>
                                                         <td>{(parseFloat(Number(b.token_amount / result.total_amount * 100).toFixed(3)))}%</td>
-                                                        <td>{b.negative ? 'Yes' : 'No'}</td>
+                                                        <td>{b.polarization ? 'No' : 'Yes'}</td>
                                                         <td>{b.type.typeName ?? 'N/A'}</td>
                                                         <td class="td-breakable" title={b.object_pointer}>{(b.object_pointer ?? "")}</td>
                                                     </tr>
