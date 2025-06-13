@@ -2,9 +2,8 @@
     import { createEventDispatcher, onMount } from 'svelte';
     import { searchStore, types } from '$lib/store';
     import { updateReputationProofList, fetchTypeNfts } from '$lib/unspent_proofs';
-    import { ergo_tree_hash, explorer_uri } from '$lib/envs';
-    import { token_rendered, type ReputationProof, type TypeNFT } from '$lib/ReputationProof';
-    import { renderedToString } from '$lib/utils'; // <-- Importación añadida
+    import { type ReputationProof } from '$lib/ReputationProof';
+    import { renderedToString } from '$lib/utils';
 
     const dispatch = createEventDispatcher();
 
@@ -20,7 +19,7 @@
     let hasSearched = false;
 
     // --- UI State ---
-    let expandedDetails = new Set<string>(); // Estado para controlar los detalles expandidos
+    let expandedDetails = new Set<string>();
 
     onMount(async () => {
         isTypesLoading = true;
@@ -190,8 +189,8 @@
                                                         <td class="td-breakable" title={b.box_id}>{b.box_id}</td>
                                                         <td>{(parseFloat(Number(b.token_amount / result.total_amount * 100).toFixed(3)))}%</td>
                                                         <td>{b.negative ? 'Yes' : 'No'}</td>
-                                                        <td>{b.object_type ?? 'N/A'}</td>
-                                                        <td class="td-breakable" title={renderedToString(b.object_value)}>{(renderedToString(b.object_value) ?? "")}</td>
+                                                        <td>{b.type.typeName ?? 'N/A'}</td>
+                                                        <td class="td-breakable" title={b.object_pointer}>{(b.object_pointer ?? "")}</td>
                                                     </tr>
                                                 {/each}
                                             </tbody>
