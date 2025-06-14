@@ -94,7 +94,7 @@
                 Pointed By ({referringBoxes.length})
             </button>
             <button class:active={activeView === 'boxes'} on:click={() => activeView = 'boxes'}>
-                Boxes ({activeProof.current_boxes.length})
+                Opinions ({activeProof.current_boxes.length})
             </button>
         </div>
 
