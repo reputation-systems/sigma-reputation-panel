@@ -1,18 +1,18 @@
 <script lang="ts">
-  import ObjectDetailModal from "../../views/ObjectDetailModal.svelte";
+  import { createEventDispatcher } from 'svelte';
 
   export let objectId: string;
-  export let onClick: () => void;
+  export let onClick: () => void; // Para cerrar el menú
   export let top: number | undefined = undefined;
   export let left: number | undefined = undefined;
   export let right: number | undefined = undefined;
   export let bottom: number | undefined = undefined;
 
-  let showMenu = true;
-  let showDetailsModal = false;
+  const dispatch = createEventDispatcher();
 
+  // Ahora esta función solo despacha un evento hacia el padre
   function showDetails() {
-    showDetailsModal = true;
+    dispatch('showDetails', { objectId: objectId });
   }
 
   const menuItems = [
@@ -29,8 +29,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"/>
 </svelte:head>
 
-{#if showMenu}
-<nav use:getContextMenuDimension style:top="{top ? `${top}px` : ''}" style:left="{left ? `${left}px` : ''}" style:right="{right ? `${right}px` : ''}" style:bottom="{bottom ? `${bottom}px` : ''}" style="position: fixed; z-index: 2000;">
+{#if true} <nav use:getContextMenuDimension style:top="{top ? `${top}px` : ''}" style:left="{left ? `${left}px` : ''}" style:right="{right ? `${right}px` : ''}" style:bottom="{bottom ? `${bottom}px` : ''}" style="position: fixed; z-index: 2000;">
   <div class="navbar">
     <div class="info-block">
       <p>
@@ -42,7 +41,7 @@
     <ul>
       {#each menuItems as item}
         <li>
-            <button on:click={() => { item.onClick(); showMenu = false; onClick(); }}>
+            <button on:click={() => { item.onClick(); onClick(); }}>
                 <i class={item.class}></i>{item.displayText}
             </button>
         </li>
@@ -51,8 +50,6 @@
   </div>
 </nav>
 {/if}
-
-<ObjectDetailModal bind:showModal={showDetailsModal} {objectId} />
 
 <style>
     .navbar {
