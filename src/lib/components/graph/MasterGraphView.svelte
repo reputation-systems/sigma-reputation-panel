@@ -16,6 +16,7 @@
   import NodeCircleType from './nodes/NodeCircleType.svelte';
   import EdgeContextMenu from './ui/EdgeContextMenu.svelte';
   import NodeContextMenu from './ui/NodeContextMenu.svelte';
+  import ObjectContextMenu from './ui/ObjectContextMenu.svelte'; // <<< 1. IMPORTADO
   import NodeProofType from './nodes/NodeProofType.svelte';
   import UnconfirmedEdgeType from './edges/UnconfirmedEdgeType.svelte';
   import EdgeTypeBoth from './edges/EdgeTypeBoth.svelte';
@@ -23,6 +24,7 @@
 
   // --- Component State ---
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
+  let rightNodeForObjectMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null; // <<< 2. NUEVO ESTADO
   let rightEdgeMenu: { id: string; box_id?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   let width: number;
   let height: number;
@@ -30,14 +32,27 @@
   // --- Context Menu Handlers ---
   function handleNodeContextMenu({ detail: { event, node } }) {
     event.preventDefault();
-    if (node.data.proof) {
-      rightNodeForProofMenu = {
-        id: node.id,
-        proof: node.data.proof,
+    // <<< 3. LÓGICA ACTUALIZADA >>>
+    rightNodeForProofMenu = null;
+    rightNodeForObjectMenu = null;
+
+    const positionProps = {
         top: event.clientY < height - 200 ? event.clientY : undefined,
         left: event.clientX < width - 200 ? event.clientX : undefined,
         right: event.clientX >= width - 200 ? width - event.clientX : undefined,
         bottom: event.clientY >= height - 200 ? height - event.clientY : undefined
+    };
+
+    if (node.data.proof) {
+      rightNodeForProofMenu = {
+        id: node.id,
+        proof: node.data.proof,
+        ...positionProps
+      };
+    } else {
+      rightNodeForObjectMenu = {
+        id: node.data.label, // El ID del objeto está en la etiqueta
+        ...positionProps
       };
     }
   }
@@ -58,10 +73,11 @@
 
   function handlePaneClick() {
     rightNodeForProofMenu = null;
+    rightNodeForObjectMenu = null; // <<< 3. LÓGICA ACTUALIZADA
     rightEdgeMenu = null;
   }
   
-  // --- Data Fetching Logic ---
+  // --- Data Fetching Logic (sin cambios) ---
   let isFetching = false;
   async function fetchReputationProofs() {
     if (isFetching) return;
@@ -83,7 +99,7 @@
   onMount(() => { fetchReputationProofs(); });
   combinedStore.subscribe(() => { fetchReputationProofs(); });
 
-  // --- Graph Layout Logic ---
+  // --- Graph Layout Logic (sin cambios) ---
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   const nodeWidth = 350;
@@ -114,7 +130,7 @@
     edges.set(layouted.edges);
   }
 
-  // --- Graph Builder (Refactored Logic) ---
+  // --- Graph Builder (sin cambios) ---
   const nodes = writable<Node[]>([]);
   const edges = writable<Edge[]>([]);
   const nodeTypes: NodeTypes = { proof_type: NodeProofType, object_type: NodeCircleType };
@@ -255,6 +271,18 @@
       bottom={rightNodeForProofMenu.bottom}
     />
   {/if}
+
+  {#if rightNodeForObjectMenu}
+    <ObjectContextMenu
+      onClick={handlePaneClick}
+      objectId={rightNodeForObjectMenu.id}
+      top={rightNodeForObjectMenu.top}
+      left={rightNodeForObjectMenu.left}
+      right={rightNodeForObjectMenu.right}
+      bottom={rightNodeForObjectMenu.bottom}
+    />
+  {/if}
+
   {#if rightEdgeMenu}
     <EdgeContextMenu
       onClick={handlePaneClick}
