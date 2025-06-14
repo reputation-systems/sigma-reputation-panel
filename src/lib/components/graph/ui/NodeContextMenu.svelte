@@ -6,8 +6,8 @@
   // --- CHANGE 1: Import all necessary local modals ---
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import ComputeSearchModal from "./ComputeSearchModal.svelte";
-  // Import the refactored DataModal, which now accepts props
-  import DataModal from "../../views/DataModal.svelte";
+  // Import the refactored ProofDetailModal, which now accepts props
+  import ProofDetailModal from "../../views/ProofDetailModal.svelte";
 
   export let onClick: () => void;
   export let proof: ReputationProof | null;
@@ -47,7 +47,7 @@
   // --- CHANGE 3: Updated menu item actions to use local state variables ---
   function updateItem() { showUpdateModal = true; }
   function computeItem() { showComputeModal = true; }
-  function showDetails() { showDetailsModal = true; } // This now controls the local DataModal
+  function showDetails() { showDetailsModal = true; } // This now controls the local ProofDetailModal
 
   function linkExplorer() {
     if (!proof || proof.current_boxes.length === 0) return;
@@ -112,7 +112,7 @@
     <UpdateProofModal bind:showModal={showUpdateModal} bind:proof={proof} />
   {/if}
   <ComputeSearchModal bind:showModal={showComputeModal} bind:proof={proof} />
-  <DataModal bind:showModal={showDetailsModal} proof={proof} />
+  <ProofDetailModal bind:showModal={showDetailsModal} proof={proof} />
 {/if}
 
 <style>
