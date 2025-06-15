@@ -131,7 +131,6 @@
     .welcome-container h1 { font-size: 3rem; color: #FBBF24; }
     .welcome-container button { padding: 1rem 2rem; font-size: 1.2rem; }
 
-    /* --- MINIMALIST HEADER STYLES --- */
     .view-switcher {
         position: fixed;
         top: 0;
@@ -213,6 +212,9 @@
     .wizard-wrapper {
         display: flex;
         justify-content: center;
+        padding: 2rem;
+        width: 100%;
+        box-sizing: border-box;
         padding: 2rem;
     }
 </style>

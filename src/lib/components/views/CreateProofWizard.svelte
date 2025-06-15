@@ -157,7 +157,7 @@
             <textarea 
                 id="content-data" 
                 class="input" 
-                rows="5" 
+                rows="15" 
                 bind:value={contentString}
                 placeholder="Enter plain text or a valid JSON object..."
             />
@@ -199,7 +199,14 @@
     .error-text {
         color: #ff8a8a !important;
     }
-    .wizard-container { max-width: 700px; margin: 2rem auto; background: #2a2a2a; padding: 2rem; border-radius: 12px; border: 1px solid #444; }
+    .wizard-container { 
+        max-width: 1200px; 
+        margin: 2rem auto; 
+        background: #2a2a2a; 
+        padding: 2rem; 
+        border-radius: 12px; 
+        border: 1px solid #444; 
+    }
     h2, h4 { text-align: center; color: #FBBF24; margin-bottom: 1rem; }
     .progress-bar { width: 100%; background-color: #555; border-radius: 5px; height: 10px; margin-bottom: 2rem; }
     .progress-bar-fill { height: 100%; background-color: #FBBF24; border-radius: 5px; transition: width 0.3s; }
@@ -212,7 +219,7 @@
     .polarity-buttons { display: flex; gap: 1rem; margin: 1rem 0; }
     .polarity-buttons button { flex-grow: 1; padding: 1rem; background: #444; border: 2px solid #666; color: white; border-radius: 6px; cursor: pointer; transition: border-color 0.2s; }
     .polarity-buttons button.selected { border-color: #FBBF24; }
-    .summary { background: #333; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; word-break: break-all; }
+    .summary { background: #333; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; word-break: break-all; max-height: 250px; overflow-y: auto;}
     .summary p { margin: 0.5rem 0; color: #ccc;}
     .summary span { color: #f0f0f0; font-family: monospace; white-space: pre-wrap; }
     .feedback { padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center; color: white; }
