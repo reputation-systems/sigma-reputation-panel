@@ -1,20 +1,20 @@
 <script lang="ts">
     import type { ReputationProof, RPBox } from "$lib/ReputationProof";
     import { createEventDispatcher } from 'svelte';
-    import { proofs } from "$lib/store";
+    import { proofs, proof_by_token_type_nft_id } from "$lib/store";
+    import { get } from 'svelte/store';
 
     export let proof: ReputationProof;
     export let showModal: boolean;
 
     const dispatch = createEventDispatcher();
 
-    // CAMBIO: La vista por defecto ahora es 'pointedBy' para que coincida con la nueva pestaña izquierda.
     let activeView: 'boxes' | 'pointedBy' = 'pointedBy';
     let activeProof: ReputationProof;
 
     $: if (proof) {
         activeProof = proof;
-        activeView = 'pointedBy'; // Se resetea a la nueva vista por defecto.
+        activeView = 'pointedBy';
     }
     
     let referringBoxes: { parentProof: ReputationProof, box: RPBox }[] = [];
@@ -31,12 +31,13 @@
                     }
                 }
             }
-            referringBoxes = foundBoxes;
+            referringBoxes = foundBoxes
         }
     }
 
+    // CORRECCIÓN: Despacha un evento para notificar al padre que debe cerrar el modal.
     function closeModal() {
-        showModal = false;
+        dispatch('close');
     }
 
     function handleKeydown(event: KeyboardEvent) {
@@ -51,7 +52,26 @@
         
         if (newProof) {
             activeProof = newProof;
-            activeView = 'pointedBy'; // Se resetea a la nueva vista por defecto.
+            activeView = 'pointedBy';
+        }
+    }
+
+    /**
+     * Novedad: Maneja el clic en una tarjeta de "Opinión".
+     * Si la opinión apunta a otra prueba, navega internamente.
+     * Si apunta a un objeto, despacha un evento para que el padre abra el modal de objeto.
+     */
+    function handleOpinionClick(box: RPBox) {
+        if (!box.object_pointer) return;
+
+        const isProofPointer = box.type.tokenId === get(proof_by_token_type_nft_id);
+
+        if (isProofPointer && $proofs.has(box.object_pointer)) {
+            // Es un puntero a otra prueba, navega internamente.
+            viewProofDetails(box.object_pointer);
+        } else if (!isProofPointer) {
+            // Es un puntero a un objeto genérico, despacha un evento al padre.
+            dispatch('viewObject', { objectId: box.object_pointer });
         }
     }
 
@@ -64,8 +84,6 @@
 
 <svelte:window on:keydown={handleKeydown}/>
 
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if showModal && activeProof}
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="modal-overlay" on:click|self={closeModal}>
@@ -104,8 +122,9 @@
                     {#if activeProof.current_boxes.length > 0}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         {#each activeProof.current_boxes as box (box.box_id)}
+                            <!-- CORRECCIÓN: El click ahora llama a la nueva función de manejo -->
                             <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <div class="box-card" on:click={() => viewProofDetails(box.object_pointer)} role="button" tabindex="0">
+                            <div class="box-card" on:click={() => handleOpinionClick(box)} role="button" tabindex="0">
                                 <header class="box-header">
                                     <div>
                                         <h3 class="box-id" title={box.object_pointer}>{box.object_pointer}</h3>

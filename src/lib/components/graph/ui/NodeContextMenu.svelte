@@ -6,11 +6,12 @@
   // --- CHANGE 1: Import all necessary local modals ---
   import UpdateProofModal from "./UpdateProofModal.svelte";
   import ComputeSearchModal from "./ComputeSearchModal.svelte";
-  // Import the refactored ProofDetailModal, which now accepts props
-  import ProofDetailModal from "../../views/ProofDetailModal.svelte";
+    import { createEventDispatcher } from "svelte";
 
   export let onClick: () => void;
   export let proof: ReputationProof | null;
+
+  const dispatch = createEventDispatcher();
 
   let local_id: string = proof ? proof.token_id.slice(0, 10) : "";
 
@@ -23,7 +24,6 @@
   let showMenu = false;
   let showUpdateModal = false;
   let showComputeModal = false;
-  let showDetailsModal = false; // New local state for the details modal
 
   // Positioning functions (remain the same)
   function rightClickContextMenu(e: MouseEvent) {
@@ -47,7 +47,7 @@
   // --- CHANGE 3: Updated menu item actions to use local state variables ---
   function updateItem() { showUpdateModal = true; }
   function computeItem() { showComputeModal = true; }
-  function showDetails() { showDetailsModal = true; } // This now controls the local ProofDetailModal
+  function showDetails() { dispatch('showProofDetails', { proof: proof }); }
 
   function linkExplorer() {
     if (!proof || proof.current_boxes.length === 0) return;
@@ -112,7 +112,6 @@
     <UpdateProofModal bind:showModal={showUpdateModal} bind:proof={proof} />
   {/if}
   <ComputeSearchModal bind:showModal={showComputeModal} bind:proof={proof} />
-  <ProofDetailModal bind:showModal={showDetailsModal} proof={proof} />
 {/if}
 
 <style>

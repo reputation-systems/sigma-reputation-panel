@@ -21,16 +21,19 @@
   import UnconfirmedEdgeType from './edges/UnconfirmedEdgeType.svelte';
   import EdgeTypeBoth from './edges/EdgeTypeBoth.svelte';
   import PanelContextMenu from './ui/PanelContextMenu.svelte';
-  // *** 1. Se corrige la ruta de importación del modal ***
   import ObjectDetailModal from '../views/ObjectDetailModal.svelte';
+  import ProofDetailModal from '../views/ProofDetailModal.svelte';
 
   // --- Component State ---
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightNodeForObjectMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightEdgeMenu: { id: string; box_id?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   
+  // State para manejar la visibilidad de los modales
   let showObjectModal = false;
   let objectIdForModal: string | null = null;
+  let showProofModal = false;
+  let proofForModal: ReputationProof | null = null;
   
   let width: number;
   let height: number;
@@ -38,9 +41,6 @@
   // --- Context Menu Handlers ---
   function handleNodeContextMenu({ detail: { event, node } }) {
     event.preventDefault();
-    // LOG: Inspeccionar el nodo clickado
-    console.log('[LOG] handleNodeContextMenu: Node clicked:', node);
-    
     rightNodeForProofMenu = null;
     rightNodeForObjectMenu = null;
 
@@ -52,16 +52,14 @@
     };
 
     if (node.data.proof) {
-      console.log('[LOG] Node is a ReputationProof.');
       rightNodeForProofMenu = {
         id: node.id,
         proof: node.data.proof,
         ...positionProps
       };
     } else {
-      console.log('[LOG] Node is an Object. ID:', node.data.label);
       rightNodeForObjectMenu = {
-        id: node.data.label, // El ID del objeto está en la etiqueta
+        id: node.data.label,
         ...positionProps
       };
     }
@@ -87,12 +85,19 @@
     rightEdgeMenu = null;
   }
 
-  // LOG: Se añade log a la función que maneja el evento
+  // --- Modal Logic Handlers ---
   function onShowObjectDetails(event: CustomEvent) {
-    console.log('[LOG] onShowObjectDetails event received. Detail:', event.detail);
     objectIdForModal = event.detail.objectId;
     showObjectModal = true;
-    console.log(`[LOG] showObjectModal set to true for objectId: ${objectIdForModal}`);
+    // Nos aseguramos de que el otro modal esté cerrado
+    showProofModal = false; 
+  }
+
+  function onShowProofDetails(event: CustomEvent) {
+    proofForModal = event.detail.proof;
+    showProofModal = true;
+     // Nos aseguramos de que el otro modal esté cerrado
+    showObjectModal = false;
   }
   
   // --- Data Fetching Logic (sin cambios) ---
@@ -100,7 +105,6 @@
   async function fetchReputationProofs() {
     if (isFetching) return;
     isFetching = true;
-    console.log("Fetching data...");
     try {
       if (!get(connected)) fetch_all.set(true);
       proofs.set(await updateReputationProofList((typeof ergo !== "undefined") ? ergo : null, get(fetch_all), get(searchStore)));
@@ -157,8 +161,6 @@
   function build_graph(_proofs: ReputationProof[]) {
     if (get(building_graph)) { return; }
     building_graph.set(true);
-    console.log("Building graph...");
-
     const newNodes: Map<string, Node> = new Map();
     const newEdges: Edge[] = [];
     const emptyEdges: Edge[] = [];
@@ -241,7 +243,6 @@
     edges.set(layouted.edges);
     
     building_graph.set(false);
-    console.log("Graph build finished.");
   }
 </script>
 
@@ -275,6 +276,7 @@
   
   {#if rightNodeForProofMenu}
     <NodeContextMenu
+      on:showProofDetails={onShowProofDetails}
       onClick={handlePaneClick}
       proof={rightNodeForProofMenu.proof}
       top={rightNodeForProofMenu.top}
@@ -306,14 +308,23 @@
       bottom={rightEdgeMenu.bottom}
     />
   {/if}
+  
   <PanelContextMenu />
 
   {#if showObjectModal}
-    <!-- LOG: Añadimos un log para saber cuándo se intenta renderizar el modal -->
-    {console.log('[LOG] Rendering ObjectDetailModal with objectId:', objectIdForModal)}
     <ObjectDetailModal 
         objectId={objectIdForModal}
         on:close={() => showObjectModal = false}
+        on:viewProof={onShowProofDetails}
+    />
+  {/if}
+  
+  {#if showProofModal && proofForModal}
+    <ProofDetailModal
+      proof={proofForModal}
+      bind:showModal={showProofModal}
+      on:close={() => showProofModal = false}
+      on:viewObject={onShowObjectDetails}
     />
   {/if}
 </div>
