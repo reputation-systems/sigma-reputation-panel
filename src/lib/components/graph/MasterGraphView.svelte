@@ -16,23 +16,31 @@
   import NodeCircleType from './nodes/NodeCircleType.svelte';
   import EdgeContextMenu from './ui/EdgeContextMenu.svelte';
   import NodeContextMenu from './ui/NodeContextMenu.svelte';
-  import ObjectContextMenu from './ui/ObjectContextMenu.svelte'; // <<< 1. IMPORTADO
+  import ObjectContextMenu from './ui/ObjectContextMenu.svelte';
   import NodeProofType from './nodes/NodeProofType.svelte';
   import UnconfirmedEdgeType from './edges/UnconfirmedEdgeType.svelte';
   import EdgeTypeBoth from './edges/EdgeTypeBoth.svelte';
   import PanelContextMenu from './ui/PanelContextMenu.svelte';
+  // *** 1. Se corrige la ruta de importación del modal ***
+  import ObjectDetailModal from '../views/ObjectDetailModal.svelte';
 
   // --- Component State ---
   let rightNodeForProofMenu: { id: string; proof?: ReputationProof; top?: number; left?: number; right?: number; bottom?: number } | null;
-  let rightNodeForObjectMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null; // <<< 2. NUEVO ESTADO
+  let rightNodeForObjectMenu: { id: string; top?: number; left?: number; right?: number; bottom?: number } | null;
   let rightEdgeMenu: { id: string; box_id?: string; top?: number; left?: number; right?: number; bottom?: number } | null;
+  
+  let showObjectModal = false;
+  let objectIdForModal: string | null = null;
+  
   let width: number;
   let height: number;
   
   // --- Context Menu Handlers ---
   function handleNodeContextMenu({ detail: { event, node } }) {
     event.preventDefault();
-    // <<< 3. LÓGICA ACTUALIZADA >>>
+    // LOG: Inspeccionar el nodo clickado
+    console.log('[LOG] handleNodeContextMenu: Node clicked:', node);
+    
     rightNodeForProofMenu = null;
     rightNodeForObjectMenu = null;
 
@@ -44,12 +52,14 @@
     };
 
     if (node.data.proof) {
+      console.log('[LOG] Node is a ReputationProof.');
       rightNodeForProofMenu = {
         id: node.id,
         proof: node.data.proof,
         ...positionProps
       };
     } else {
+      console.log('[LOG] Node is an Object. ID:', node.data.label);
       rightNodeForObjectMenu = {
         id: node.data.label, // El ID del objeto está en la etiqueta
         ...positionProps
@@ -73,8 +83,16 @@
 
   function handlePaneClick() {
     rightNodeForProofMenu = null;
-    rightNodeForObjectMenu = null; // <<< 3. LÓGICA ACTUALIZADA
+    rightNodeForObjectMenu = null;
     rightEdgeMenu = null;
+  }
+
+  // LOG: Se añade log a la función que maneja el evento
+  function onShowObjectDetails(event: CustomEvent) {
+    console.log('[LOG] onShowObjectDetails event received. Detail:', event.detail);
+    objectIdForModal = event.detail.objectId;
+    showObjectModal = true;
+    console.log(`[LOG] showObjectModal set to true for objectId: ${objectIdForModal}`);
   }
   
   // --- Data Fetching Logic (sin cambios) ---
@@ -145,7 +163,6 @@
     const newEdges: Edge[] = [];
     const emptyEdges: Edge[] = [];
 
-    // First pass: Create nodes for all proofs
     _proofs.forEach(p => {
       newNodes.set(`proof::${p.token_id}`, {
         id: `proof::${p.token_id}`,
@@ -153,11 +170,10 @@
         targetPosition: Position.Top,
         data: { label: p.type.typeName, proof: p },
         type: "proof_type",
-        position: { x: 0, y: 0 }, // Position will be set by layout
+        position: { x: 0, y: 0 },
       });
     });
 
-    // Second pass: Create edges and object nodes based on the new architecture
     _proofs.forEach(p => {
       const sourceId = `proof::${p.token_id}`;
       
@@ -171,11 +187,9 @@
 
         if (b.object_pointer) {
           let targetId: string;
-          // This checks if the proof is a recursive "Proof-by-Token" type.
           if (b.type.tokenId === get(proof_by_token_type_nft_id)) {
             targetId = `proof::${b.object_pointer}`;
           } else {
-            // For all other proof types, the pointer refers to a generic object.
             targetId = `object::${b.object_pointer}`;
             if (!newNodes.has(targetId)) {
               newNodes.set(targetId, {
@@ -190,7 +204,6 @@
           }
           newEdges.push({ id: `box-edge::${b.box_id}`, source: sourceId, target: targetId, data: edgeData, type: 'edge_type' });
         } else {
-          // Handle boxes with no object pointer
           emptyEdges.push({ id: `box-edge::${b.box_id}`, source: sourceId, target: "empty-node", data: edgeData, type: 'edge_type' });
         }
       });
@@ -201,7 +214,6 @@
       newEdges.push(...emptyEdges);
     }
     
-    // Logic to handle bidirectional edges remains useful
     const finalEdges: Edge[] = [];
     const edgeMap = new Map<string, Edge>();
     newEdges.forEach(edge => {
@@ -217,12 +229,12 @@
           data: { source: existingEdge.data, target: edge.data },
           type: 'edge_type_both'
         });
-        edgeMap.delete(reverseKey); // Remove to prevent it from being added again
+        edgeMap.delete(reverseKey);
       } else {
         edgeMap.set(key, edge);
       }
     });
-    edgeMap.forEach(edge => finalEdges.push(edge)); // Add remaining single edges
+    edgeMap.forEach(edge => finalEdges.push(edge));
 
     const layouted = getLayoutedElements(Array.from(newNodes.values()), finalEdges, window.innerWidth < window.innerHeight ? 'TB' : 'LR');
     nodes.set(layouted.nodes);
@@ -274,6 +286,7 @@
 
   {#if rightNodeForObjectMenu}
     <ObjectContextMenu
+      on:showDetails={onShowObjectDetails}
       onClick={handlePaneClick}
       objectId={rightNodeForObjectMenu.id}
       top={rightNodeForObjectMenu.top}
@@ -294,4 +307,13 @@
     />
   {/if}
   <PanelContextMenu />
+
+  {#if showObjectModal}
+    <!-- LOG: Añadimos un log para saber cuándo se intenta renderizar el modal -->
+    {console.log('[LOG] Rendering ObjectDetailModal with objectId:', objectIdForModal)}
+    <ObjectDetailModal 
+        objectId={objectIdForModal}
+        on:close={() => showObjectModal = false}
+    />
+  {/if}
 </div>

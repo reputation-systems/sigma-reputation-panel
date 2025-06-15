@@ -1,55 +1,190 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
+  import { proofs } from '$lib/store';
+  import type { RPBox } from '$lib/ReputationProof';
 
-  export let objectId: string;
-  export let onClick: () => void; // Para cerrar el menú
-  export let top: number | undefined = undefined;
-  export let left: number | undefined = undefined;
-  export let right: number | undefined = undefined;
-  export let bottom: number | undefined = undefined;
+  export let objectId: string | null;
 
   const dispatch = createEventDispatcher();
 
-  // Ahora esta función solo despacha un evento hacia el padre
-  function showDetails() {
-    dispatch('showDetails', { objectId: objectId });
-  }
+  let proofsAboutObject: RPBox[] = [];
 
-  const menuItems = [
-    { name: "openInfo", onClick: showDetails, displayText: "Details", class: "fa-solid fa-info" },
-  ];
+  onMount(() => {
+    if (objectId) {
+      const allProofs = $proofs;
+      const relevantProofs: RPBox[] = [];
+      allProofs.forEach(proof => {
+        proof.current_boxes.forEach(box => {
+          if (box.object_pointer === objectId) {
+            relevantProofs.push(box);
+          }
+        });
+      });
+      proofsAboutObject = relevantProofs;
+    }
+  });
 
-  function getContextMenuDimension(node: HTMLElement) {
-    if (right !== undefined) node.style.left = `${window.innerWidth - node.offsetWidth - right}px`;
-    if (bottom !== undefined) node.style.top = `${window.innerHeight - node.offsetHeight - bottom}px`;
+  function handleClose() {
+    dispatch('close');
   }
 </script>
 
-<svelte:head>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"/>
-</svelte:head>
-
-<nav use:getContextMenuDimension style:top="{top ? `${top}px` : ''}" style:left="{left ? `${left}px` : ''}" style:right="{right ? `${right}px` : ''}" style:bottom="{bottom ? `${bottom}px` : ''}" style="position: fixed; z-index: 2000;">
-  <div class="navbar">
-    <div class="info-block">
-      <p>
-          <span class="label">Object ID:</span>
-          <a title={objectId}>{objectId.length > 20 ? `${objectId.slice(0, 20)}...` : objectId}</a>
-      </p>
-    </div>  
-    <ul>
-      {#each menuItems as item}
-        <li>
-            <button on:click={() => { item.onClick(); onClick(); }}>
-                <i class={item.class}></i>{item.displayText}
-            </button>
-        </li>
-      {/each}
-    </ul>
+<div class="modal-backdrop" on:click={handleClose}>
+  <div class="modal-content" on:click|stopPropagation>
+    <header class="modal-header">
+      <h2>Object Details</h2>
+      <button class="close-button" on:click={handleClose}>&times;</button>
+    </header>
+    <div class="modal-body">
+      {#if objectId}
+        <div class="object-id-section">
+          <strong>Object ID:</strong>
+          <span class="code-font">{objectId}</span>
+        </div>
+        <hr />
+        <h3>Reputation Proofs About This Object</h3>
+        {#if proofsAboutObject.length > 0}
+          <ul class="proof-list">
+            {#each proofsAboutObject as box}
+              <li class="proof-item" class:positive={box.polarization} class:negative={!box.polarization}>
+                <span class="polarization-icon">
+                  {box.polarization ? '👍' : '👎'}
+                </span>
+                <div class="proof-details">
+                  <p><strong>From Token:</strong> <span class="code-font small">{box.token_id.slice(0, 15)}...</span></p>
+                  <p><strong>Amount:</strong> {box.token_amount}</p>
+                   {#if typeof box.content === 'string' && box.content.trim() !== ''}
+                     <p><strong>Content:</strong> {box.content}</p>
+                   {:else if typeof box.content === 'object' && box.content !== null && Object.keys(box.content).length > 0}
+                     <!-- CORRECCIÓN: Se usa un div en lugar de un p para contener el pre -->
+                     <div>
+                        <strong>Content:</strong>
+                        <pre class="code-font small">{JSON.stringify(box.content, null, 2)}</pre>
+                     </div>
+                   {/if}
+                </div>
+              </li>
+            {/each}
+          </ul>
+        {:else}
+          <p>No reputation proofs found for this object.</p>
+        {/if}
+      {:else}
+        <p>No object ID provided.</p>
+      {/if}
+    </div>
   </div>
-</nav>
+</div>
 
 <style>
-    /* Los estilos son idénticos a los de NodeContextMenu.svelte para mantener la coherencia */
-    .navbar{display:inline-flex;border:1px #555 solid;width:250px;background-color:#2a2a2a;border-radius:10px;overflow:hidden;flex-direction:column;color:#f0f0f0;box-shadow:0 5px 15px rgba(0,0,0,.3)}.info-block{padding:10px;margin:6px;margin-bottom:0;background-color:#333;border-bottom:1px solid #444;border-radius:5px 5px 0 0}.info-block p{margin:0;font-size:.9rem;line-height:1.6}.label{font-weight:700;color:#aaa}.info-block a{color:#ccc;text-decoration:none;word-break:break-all}.navbar ul{margin:6px;padding:0}ul li{display:block;list-style-type:none}ul li button{font-size:1rem;color:#f0f0f0;width:100%;padding:0;height:32px;text-align:left;border:0;background-color:transparent;border-radius:5px;cursor:pointer;display:flex;align-items:center;transition:background-color .2s,color .2s}ul li button:hover{background-color:#FBBF24;color:#fff}ul li button i{padding:0 15px 0 10px;width:18px;text-align:center;margin-right:5px}
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  .modal-content {
+    background-color: #2c2c2e;
+    color: #f0f0f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #444;
+  }
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.75rem;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+  }
+   .close-button:hover {
+     color: white;
+   }
+  .modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+  .object-id-section {
+    margin-bottom: 1rem;
+  }
+  .code-font {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #3a3a3c;
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    word-break: break-all;
+  }
+  .small {
+      font-size: 0.8em;
+  }
+  hr {
+    border: none;
+    border-top: 1px solid #444;
+    margin: 1.5rem 0;
+  }
+  h3 {
+      margin-top: 0;
+      color: #FBBF24;
+  }
+  .proof-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .proof-item {
+    background-color: #3a3a3c;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    border-left: 5px solid;
+  }
+  .proof-item.positive {
+      border-left-color: #4caf50;
+  }
+  .proof-item.negative {
+      border-left-color: #f44336;
+  }
+  .polarization-icon {
+      font-size: 1.5rem;
+  }
+  .proof-details p {
+      margin: 0 0 0.5rem 0;
+  }
+  .proof-details p:last-child {
+      margin-bottom: 0;
+  }
+  pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: #222;
+      padding: 0.5rem;
+      border-radius: 4px;
+  }
 </style>
