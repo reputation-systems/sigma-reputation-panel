@@ -13,9 +13,9 @@
     let object_to_assign: string = '';
     let token_amount: number = 100;
     let is_negative: boolean = false;
-    let data: object = {};
+    let data: object|string|null = null; // Can be an object, a string, or null
     let is_locked: boolean = false;
-    let jsonDataString: string = '{}';
+    let contentString: string = ''; // Bound to the textarea, can hold any text
 
     // --- UI STATE ---
     let isLoading = false;
@@ -44,6 +44,7 @@
         }
 
         try {
+            // The 'data' variable now correctly holds a string, an object, or null
             const txId = await generate_reputation_proof(
                 token_amount,
                 token_amount,
@@ -68,8 +69,23 @@
         }
     }
 
+    // Reactive statement to update 'data' based on 'contentString'
+    $: {
+        const value = contentString.trim();
+        if (!value) {
+            data = null;
+        } else {
+            try {
+                // First, try to parse it as a JSON object
+                data = JSON.parse(value);
+            } catch (e) {
+                // If parsing fails, treat it as a plain string
+                data = value;
+            }
+        }
+    }
+
     $: selectedType = type_nft_id ? $types.get(type_nft_id) : null;
-    
     $: isReputationProofType = selectedType?.tokenId === $proof_by_token_type_nft_id;
 
 </script>
@@ -106,7 +122,6 @@
 
         {#if currentStep === 2}
             <h4>Step 2: Define First Pointer</h4>
-
             {#if isReputationProofType}
                 <label for="proof-select">Select an Existing Proof to Point To<span class="required">*</span></label>
                 <select id="proof-select" class="input" bind:value={object_to_assign} required>
@@ -124,7 +139,6 @@
                 <label for="object-assign-input">Object to Evaluate<span class="required">*</span></label>
                 <input id="object-assign-input" type="text" class="input" bind:value={object_to_assign} placeholder="URL, another token ID, text, etc." required />
             {/if}
-
         {/if}
 
         {#if currentStep === 3}
@@ -139,13 +153,13 @@
 
         {#if currentStep === 4}
             <h4>Step 4: Add Content (Optional)</h4>
-            <label for="json-data">Additional Data (in JSON format):</label>
+            <label for="content-data">Additional Data (Plain Text or JSON):</label>
             <textarea 
-                id="json-data" 
+                id="content-data" 
                 class="input" 
                 rows="5" 
-                bind:value={jsonDataString} 
-                on:input={(e) => { try { data = JSON.parse(e.currentTarget.value) } catch {} }}
+                bind:value={contentString}
+                placeholder="Enter plain text or a valid JSON object..."
             />
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="lock-checkbox" bind:checked={is_locked} />
@@ -159,6 +173,7 @@
                 <p><strong>Standard (Type NFT):</strong> <span>{selectedType?.typeName ?? 'Unknown Type'}</span></p>
                 <p><strong>Initial Pointer:</strong> <span>{object_to_assign}</span></p>
                 <p><strong>Opinion:</strong> {is_negative ? 'Negative' : 'Positive'} ({token_amount.toLocaleString()} tokens to mint)</p>
+                <p><strong>Content:</strong> <span>{contentString || 'Not provided'}</span></p>
                 <p><strong>Will be locked:</strong> {is_locked ? 'Yes' : 'No'}</p>
             </div>
             {#if isLoading}
@@ -199,7 +214,7 @@
     .polarity-buttons button.selected { border-color: #FBBF24; }
     .summary { background: #333; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; word-break: break-all; }
     .summary p { margin: 0.5rem 0; color: #ccc;}
-    .summary span { color: #f0f0f0; font-family: monospace; }
+    .summary span { color: #f0f0f0; font-family: monospace; white-space: pre-wrap; }
     .feedback { padding: 1rem; border-radius: 6px; margin: 1rem 0; text-align: center; color: white; }
     .feedback.loading { background-color: rgba(59, 89, 152, 0.8); }
     .feedback.success { background-color: rgba(76, 175, 80, 0.8); }

@@ -17,7 +17,7 @@ import { booleanToSerializer, generate_pk_proposition, SString, tupleToSerialize
  * @param type_nft_id The token ID of the Type NFT that defines the standard for this proof.
  * @param object_pointer The object this proof is about (e.g., a URL, another token ID).
  * @param polarization `true` for a positive proof, `false` for a negative one.
- * @param content The JSON content for register R9.
+ * @param content The JSON or string content for register R9.
  * @param is_locked `true` to make the resulting box immutable.
  * @param input_proof The existing RPBox to spend from (for splitting or modifying).
  * @returns A promise that resolves to the transaction ID string, or null on failure.
@@ -28,7 +28,7 @@ export async function generate_reputation_proof(
     type_nft_id: string,
     object_pointer: string,
     polarization: boolean,
-    content: object,
+    content: object|string|null,
     is_locked: boolean = false,
     input_proof?: RPBox,
 ): Promise<string | null> {
@@ -91,7 +91,7 @@ export async function generate_reputation_proof(
         R6: tupleToSerialized(is_locked, total_supply),
         R7: generate_pk_proposition(wallet_pk),
         R8: booleanToSerializer(polarization),
-        R9: SString(JSON.stringify(content))
+        R9: SString(typeof(content) === "object" ? JSON.stringify(content): content)
     });
 
     outputs.push(new_proof_output);
