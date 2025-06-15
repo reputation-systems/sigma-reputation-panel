@@ -7,7 +7,6 @@
 
   const dispatch = createEventDispatcher();
 
-  // Se almacenarán los datos completos del proof padre para tener más contexto.
   let proofsAboutObject: { parentProof: ReputationProof, box: RPBox }[] = [];
 
   onMount(() => {
@@ -17,7 +16,6 @@
       allProofs.forEach(proof => {
         proof.current_boxes.forEach(box => {
           if (box.object_pointer === objectId) {
-            // Guardamos el proof completo junto con la caja (box)
             relevantProofs.push({ parentProof: proof, box: box });
           }
         });
@@ -36,8 +34,6 @@
     }
   }
 
-  // Novedad: Al hacer clic en una prueba, se despacha un evento al padre
-  // para que este se encargue de abrir el modal de la prueba correspondiente.
   function handleProofClick(proof: ReputationProof) {
     dispatch('viewProof', { proof: proof });
   }
@@ -47,6 +43,23 @@
     const proportion = (box.token_amount / total_amount) * 100;
     return proportion.toFixed(2);
   }
+
+  /**
+   * Novedad: Comprueba si un string contiene caracteres típicos de Markdown.
+   * Es una heurística simple, no una validación completa.
+   */
+  function isLikelyMarkdown(text: string): boolean {
+    // Busca patrones como #, *, -, [ ], ( ), etc.
+    const markdownPattern = /(^#{1,6}\s)|(\*\*|__)|(\*|-|\+)\s|(\[.*\]\(.*\))/;
+    return markdownPattern.test(text);
+  }
+
+  // Carga la librería `marked` para el renderizado de Markdown
+  onMount(() => {
+    const script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
+    document.head.appendChild(script);
+  });
 
 </script>
 
@@ -66,16 +79,11 @@
             </div>
         </header>
 
-        <section class="details-section">
-            <p>A continuación se muestran todas las pruebas de reputación que apuntan a este objeto.</p>
-        </section>
-
         <div class="content-area">
             <div class="detailed-list">
                 {#if proofsAboutObject.length > 0}
                     {#each proofsAboutObject as ref (ref.box.box_id)}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- CORRECCIÓN: El click ahora llama a handleProofClick con el objeto de la prueba completo -->
+                        <!-- svelte-ignore a11y-click-events-have-key-events, a11y-no-static-element-interactions -->
                         <div class="box-card" on:click={() => handleProofClick(ref.parentProof)} role="button" tabindex="0">
                             <header class="box-header">
                                 <div>
@@ -87,10 +95,19 @@
                             <div class="details-grid">
                                 <strong>Source Owner:</strong><span class="breakable" title={ref.parentProof.owner_address}>{ref.parentProof.owner_address}</span>
                                 <strong>Weight in Source:</strong><span>{ref.box.token_amount} / {ref.parentProof.total_amount} ({calculateProportion(ref.box, ref.parentProof.total_amount)}%)</span>
-                                {#if typeof ref.box.content === 'string' && ref.box.content.trim() !== ''}
-                                  <strong>Content:</strong><span>{ref.box.content}</span>
-                                {:else if typeof ref.box.content === 'object' && ref.box.content !== null && Object.keys(ref.box.content).length > 0}
-                                  <strong>Content:</strong><div><pre class="code-font small">{JSON.stringify(ref.box.content, null, 2)}</pre></div>
+                            </div>
+                            
+                            <div class="content-section">
+                                {#if typeof ref.box.content === 'object' && ref.box.content !== null && Object.keys(ref.box.content).length > 0}
+                                    <pre class="code-font">{JSON.stringify(ref.box.content, null, 2)}</pre>
+                                {:else if typeof ref.box.content === 'string' && ref.box.content.trim() !== ''}
+                                    {#if isLikelyMarkdown(ref.box.content) && window.marked}
+                                        <div class="markdown-content">
+                                            {@html window.marked.parse(ref.box.content)}
+                                        </div>
+                                    {:else}
+                                        <p class="plain-text-content">{ref.box.content}</p>
+                                    {/if}
                                 {/if}
                             </div>
                         </div>
@@ -107,7 +124,8 @@
 
 <style>
     .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;justify-content:center;align-items:center;z-index:1000;padding:2rem;box-sizing:border-box}:root{--card-bg:#2a2a2a;--border-color:#444;--text-color:#e0e0e0;--text-muted:#aaa;--positive-color:#10B981;--positive-bg:rgba(4,120,87,.5);--negative-color:#EF4444;--negative-bg:rgba(153,27,27,.5);--accent-color:#FBBF24}.close-button{position:absolute;top:15px;right:20px;background:0 0;border:none;font-size:2.5rem;color:#aaa;cursor:pointer;line-height:1;z-index:10}.close-button:hover{color:#fff}
-    .details-section{padding-top:1.5rem;border-top:1px solid var(--border-color)}.details-grid{display:grid;grid-template-columns:140px 1fr;gap:.75rem 1.5rem;align-items:flex-start}.details-grid strong{color:var(--text-muted);text-align:right;font-weight:400}.breakable{word-break:break-all}.view-switcher{display:flex;justify-content:center;background-color:#222;border-radius:8px;padding:4px;width:-moz-fit-content;width:fit-content;margin:2rem auto 1rem}.view-switcher button{background:0 0;border:none;color:var(--text-muted);padding:.5rem 1.5rem;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:500;transition:all .2s ease-in-out}.view-switcher button.active{background-color:#444;color:#fff;font-weight:600}.detailed-list{display:flex;flex-direction:column;gap:1rem}.empty-state{color:var(--text-muted);text-align:center;padding:2rem;background-color:#262626;border-radius:8px}
+    .content-area { overflow-y: auto; }
+    .details-grid{display:grid;grid-template-columns:140px 1fr;gap:.75rem 1.5rem;align-items:center}.details-grid strong{color:var(--text-muted);text-align:right;font-weight:400}.breakable{word-break:break-all}.detailed-list{display:flex;flex-direction:column;gap:1rem; margin-top: 1rem;}.empty-state{color:var(--text-muted);text-align:center;padding:2rem;background-color:#262626;border-radius:8px}
     .box-card{background-color:#333;border:1px solid #555;border-radius:8px;padding:1.5rem;flex-shrink:0;transition:border-color .2s,transform .2s;cursor:pointer}.box-card:hover{border-color:var(--accent-color);transform:translateY(-2px)}.box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}.box-header>div{flex-shrink:1;min-width:0}.box-id{font-family:monospace;font-size:1.1rem;color:var(--accent-color);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .polarity-badge{font-weight:700;padding:.25rem .75rem;border-radius:15px;font-size:.9rem;flex-shrink:0}.polarity-badge.positive{background-color:var(--positive-bg);border:1px solid var(--positive-color);color:#A7F3D0}.polarity-badge.negative{background-color:var(--negative-bg);border:1px solid var(--negative-color);color:#FECACA}
     .card-source-id{font-family:monospace;color:var(--text-muted);font-size:.8rem;margin:.25rem 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -117,13 +135,13 @@
         background-color: var(--card-bg);
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        padding: 1.5rem;
+        padding: 2rem;
         color: var(--text-color);
         font-family: sans-serif;
         width: 100%;
-        max-width: 1200px;
+        max-width: 800px;
         max-height: 90vh;
-        overflow-y: auto;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
     }
@@ -144,9 +162,8 @@
         font-size: 1.5rem;
         color: #fff;
         margin: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: normal;
+        word-break: break-all;
     }
     .proof-subtitle {
         color: var(--text-muted);
@@ -155,28 +172,50 @@
         font-weight: 500;
     }
 
-    .network-badge{
-        background-color:#333;
-        padding:.3rem .8rem;
-        border-radius:15px;
-        font-size:.8rem;
-        font-weight:700;
-        border:1px solid var(--border-color);
-        flex-shrink:0
+    .content-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #444;
     }
-    .code-font {
+    .plain-text-content {
+        white-space: pre-wrap;
+    }
+    .code-font, pre {
         font-family: 'Courier New', Courier, monospace;
-        background-color: #3a3a3c;
-        padding: 0.2em 0.4em;
+        background-color: #222;
+        padding: 0.75rem;
         border-radius: 4px;
         font-size: 0.9em;
         word-break: break-all;
+        white-space: pre-wrap;
     }
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      background-color: #222;
-      padding: 0.5rem;
-      border-radius: 4px;
+    .markdown-content :global(h1), .markdown-content :global(h2), .markdown-content :global(h3) {
+        color: var(--accent-color);
+        border-bottom: 1px solid #555;
+        padding-bottom: 0.3em;
+    }
+    .markdown-content :global(p) {
+        line-height: 1.6;
+    }
+    .markdown-content :global(a) {
+        color: #6ebff5;
+    }
+    .markdown-content :global(ul), .markdown-content :global(ol) {
+        padding-left: 2em;
+    }
+    .markdown-content :global(li) {
+        margin-bottom: 0.5rem;
+    }
+    .markdown-content :global(blockquote) {
+        border-left: 4px solid var(--border-color);
+        padding-left: 1em;
+        margin-left: 0;
+        color: var(--text-muted);
+    }
+    .markdown-content :global(code) {
+        background-color: #3a3a3c;
+        padding: 0.2em 0.4em;
+        border-radius: 4px;
+        font-family: 'Courier New', Courier, monospace;
     }
 </style>
