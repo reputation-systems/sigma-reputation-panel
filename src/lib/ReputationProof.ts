@@ -11,7 +11,7 @@ export interface TypeNFT {
     typeName: string;
     description: string;
     schemaURI: string;
-    version: string;
+    isRepProof: boolean;
 }
 
 export interface ReputationProof {

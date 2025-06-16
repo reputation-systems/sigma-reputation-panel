@@ -43,7 +43,7 @@ export async function fetchTypeNfts() {
                 typeName: hexToUtf8(box.additionalRegisters.R4?.renderedValue || '') ?? "",
                 description: hexToUtf8(box.additionalRegisters.R5?.renderedValue || '') ?? "",
                 schemaURI: hexToUtf8(box.additionalRegisters.R6?.renderedValue || '') ?? "",
-                version: hexToUtf8(box.additionalRegisters.R7?.renderedValue || '') ?? "",
+                isRepProof: box.additionalRegisters.R7?.renderedValue ?? false,
             };
         }).filter((t: TypeNFT | null): t is TypeNFT => t !== null);
         
@@ -105,7 +105,7 @@ export async function updateReputationProofList(
                     let typeNftForBox = availableTypes.get(type_nft_id_for_box);
                     if (!typeNftForBox) {
                         console.log(`TypeNFT with ID ${type_nft_id_for_box} not found in store. Creating a default for this box.`);
-                        typeNftForBox = { tokenId: type_nft_id_for_box, boxId: '', typeName: "Unknown Type", description: "Metadata not found", schemaURI: "", version: "0.0" };
+                        typeNftForBox = { tokenId: type_nft_id_for_box, boxId: '', typeName: "Unknown Type", description: "Metadata not found", schemaURI: "", isRepProof: false };
                     }
                     
                     if (!proof) {
@@ -114,7 +114,7 @@ export async function updateReputationProofList(
 
                         proof = {
                             token_id: rep_token_id,
-                            type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", version: "" },
+                            type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
                             total_amount: r6_parsed.totalSupply,
                             owner_address: serializedToRendered(r7_value),
                             can_be_spend: await check_if_r7_is_local_addr(r7_value),

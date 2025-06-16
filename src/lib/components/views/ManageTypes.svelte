@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { get } from 'svelte/store';
     import {
         digital_public_good_ergo_tree
     } from '$lib/envs';
@@ -9,10 +8,11 @@
         TransactionBuilder,
         OutputBuilder,
         SAFE_MIN_BOX_VALUE,
-        RECOMMENDED_MIN_FEE_VALUE
+        RECOMMENDED_MIN_FEE_VALUE,
+        SInt,
     } from '@fleet-sdk/core';
     
-    import { proof_by_token_type_nft_id, types } from '$lib/store';
+    import { types } from '$lib/store';
     import { fetchTypeNfts } from '$lib/unspent_proofs'; 
 
     // --- Component State ---
@@ -23,7 +23,7 @@
     let newTypeName = '';
     let newTypeDescription = '';
     let newTypeSchema = '';
-    let newTypeVersion = '1.0.0';
+    let isReputationProof = false;
     let isCreating = false;
     let creationError = '';
     let creationSuccessMessage = '';
@@ -35,7 +35,6 @@
         isLoading = true;
         error = '';
         try {
-            // Llama a la función importada que actualiza el store global
             await fetchTypeNfts();
         } catch (e: any) {
             error = e.message || "An error occurred while fetching types.";
@@ -71,7 +70,7 @@
                 R4: SString(newTypeName),
                 R5: SString(newTypeDescription),
                 R6: SString(newTypeSchema),
-                R7: SString(newTypeVersion),
+                R7: SInt(isReputationProof ? 1:0),
             });
             
             const unsignedTransaction = await new TransactionBuilder(height)
@@ -91,7 +90,7 @@
             creationSuccessMessage = `Type NFT created successfully! Tx ID: ${txId}`;
             
             newTypeName = newTypeDescription = newTypeSchema = '';
-            newTypeVersion = '1.0.0';
+            isReputationProof = false;
             
             await loadTypes();
 
@@ -107,7 +106,6 @@
     }
     
     function copyToClipboard(text: string) {
-        // Use a temporary textarea to perform the copy command
         const textArea = document.createElement("textarea");
         textArea.value = text;
         document.body.appendChild(textArea);
@@ -115,14 +113,12 @@
         textArea.select();
         try {
             document.execCommand('copy');
-            // Consider using a more modern notification system instead of alert
         } catch (err) {
             console.error('Failed to copy text: ', err);
         }
         document.body.removeChild(textArea);
     }
 
-    // <-- ACTUALIZADO: onMount ahora llama a nuestro nuevo wrapper
     onMount(loadTypes);
 </script>
 
@@ -134,11 +130,16 @@
         </p>
         <form class="form" on:submit|preventDefault={createNewType}>
             <div class="form-grid">
-                <input class="form-input" bind:value={newTypeName} placeholder="Type Name (e.g., Web URL)" required disabled={isCreating} />
-                <input class="form-input" bind:value={newTypeVersion} placeholder="Version (e.g., 1.0.0)" required disabled={isCreating} />
+                <input class="form-input full-width" bind:value={newTypeName} placeholder="Type Name (e.g., Web URL)" required disabled={isCreating} />
                 <textarea class="form-input" bind:value={newTypeDescription} placeholder="Short Description..." required rows="2" disabled={isCreating}></textarea>
                 <input class="form-input" bind:value={newTypeSchema} placeholder="Schema URI (optional, e.g., https://...)" disabled={isCreating} />
             </div>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="is-reputation-proof" class="form-checkbox" bind:checked={isReputationProof} disabled={isCreating} />
+                <label for="is-reputation-proof">Is this type for a Reputation Proof?</label>
+            </div>
+            
             <button class="form-button" type="submit" disabled={isCreating}>
                 {#if isCreating}Creating...{:else}Create Type NFT{/if}
             </button>
@@ -166,10 +167,9 @@
                         <div class="type-header">
                             <span class="type-name">{type.typeName}</span>
                             <div class="version-wrapper">
-                                {#if type.tokenId === get(proof_by_token_type_nft_id)}
+                                {#if type.isRepProof}
                                     <span class="proof-tag">Reputation Proof</span>
                                 {/if}
-                                <span class="type-version">v{type.version}</span>
                             </div>
                         </div>
                         <p class="type-description">{type.description}</p>
@@ -209,12 +209,13 @@
     .form-box { width: 100%; max-width: 800px; padding: 2rem; border-radius: 12px; background-color: #2a2a2a; border: 1px solid #444; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
     .form-title { font-size: 1.75rem; margin: 0 0 0.5rem 0; text-align: center; color: #FBBF24; }
     .form-description { margin: 0 0 1.5rem 0; color: #ccc; font-size: 0.95rem; text-align: center; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-    .form-grid textarea, .form-grid input:last-child { grid-column: 1 / -1; }
+    .form-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem; }
     .form-input { width: 100%; box-sizing: border-box; padding: 0.75rem; font-size: 1rem; border-radius: 6px; border: 1px solid #666; background-color: #333; color: #f0f0f0; }
     .form-input:disabled { background-color: #444; cursor: not-allowed; }
     textarea.form-input { resize: vertical; }
-    .form-button { width: 100%; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background-color: #FBBF24; color: #1a1a1a; font-size: 1.1rem; margin-top: 1rem; }
+    .checkbox-container { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #ccc; }
+    .form-checkbox { width: 1.15rem; height: 1.15rem; accent-color: #FBBF24; cursor: pointer; }
+    .form-button { width: 100%; padding: 0.8rem 1.5rem; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; background-color: #FBBF24; color: #1a1a1a; font-size: 1.1rem; }
     .form-button:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
     .list-area { width: 100%; max-width: 1100px; text-align: center; }
     .list-title { font-size: 1.5rem; color: #f0f0f0; border-bottom: 1px solid #444; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
@@ -224,7 +225,6 @@
     .type-item { background-color: #333; padding: 1.5rem; border-radius: 8px; border: 1px solid #444; text-align: left; }
     .type-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
     .type-name { font-size: 1.25rem; font-weight: bold; color: #FBBF24; }
-    .type-version { font-size: 0.9rem; color: #aaa; }
     .type-description { color: #ccc; margin: 0.5rem 0 1rem 0; font-style: italic; }
     .type-schema { font-size: 0.9rem; margin: 0.5rem 0 1rem 0; }
     .type-schema a { color: #FBBF24; text-decoration: none; }
@@ -235,14 +235,9 @@
     .copy-button:hover { color: #FBBF24; }
     .error-message { color: #ff6b6b; background-color: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; padding: 0.75rem; border-radius: 6px; margin-top: 1rem; }
     .no-results-box { padding: 2rem; background-color: #2a2a2a; border-radius: 8px; }
-
-    .version-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
+    .version-wrapper { display: flex; align-items: center; gap: 0.75rem; }
     .proof-tag {
-        background-color: #8a5cf6a8;
+        background-color: #8b5cf6a8;
         color: white;
         padding: 0.2rem 0.6rem;
         border-radius: 9999px;

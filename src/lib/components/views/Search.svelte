@@ -140,7 +140,7 @@
                         {#if !isTypesLoading}
                             {#each Array.from($types.values()) as type (type.tokenId)}
                                 <option value={type.tokenId}>
-                                    {type.typeName} (v{type.version})
+                                    {type.typeName}
                                 </option>
                             {/each}
                         {/if}

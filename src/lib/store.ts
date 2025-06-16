@@ -19,4 +19,3 @@ export const compute_deep_level = writable<number>(5);
 export const searchStore = writable<string|null>(null);
 export const data_store = writable<any | null>(null);
 export const types = writable<Map<string, TypeNFT>>(new Map());
-export const proof_by_token_type_nft_id = writable<string>("00bd948e1bd4dc04f2237bcd7421f2367ec43032a2c8201fe1bad494f3e1a521");

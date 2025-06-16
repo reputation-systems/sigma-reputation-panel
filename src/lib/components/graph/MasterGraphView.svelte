@@ -8,7 +8,7 @@
   import { type ReputationProof } from '$lib/ReputationProof';
   import dagre from '@dagrejs/dagre';
 
-  import { advance_mode, building_graph, connected, fetch_all, proof_by_token_type_nft_id, proofs, searchStore } from '$lib/store';
+  import { advance_mode, building_graph, connected, fetch_all, proofs, searchStore } from '$lib/store';
   import { onMount } from 'svelte';
 
   // UI Components
@@ -189,7 +189,7 @@
 
         if (b.object_pointer) {
           let targetId: string;
-          if (b.type.tokenId === get(proof_by_token_type_nft_id)) {
+          if (b.type.isRepProof) {
             targetId = `proof::${b.object_pointer}`;
           } else {
             targetId = `object::${b.object_pointer}`;

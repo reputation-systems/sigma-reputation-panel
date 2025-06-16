@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ReputationProof, RPBox } from "$lib/ReputationProof";
     import { createEventDispatcher, onMount } from 'svelte';
-    import { proofs, proof_by_token_type_nft_id } from "$lib/store";
+    import { proofs } from "$lib/store";
     import { get } from 'svelte/store';
 
     export let proof: ReputationProof;
@@ -57,7 +57,7 @@
 
     function handleOpinionClick(box: RPBox) {
         if (!box.object_pointer) return;
-        const isProofPointer = box.type.tokenId === get(proof_by_token_type_nft_id);
+        const isProofPointer = box.type.isRepProof;
 
         if (isProofPointer && $proofs.has(box.object_pointer)) {
             viewProofDetails(box.object_pointer);
@@ -110,7 +110,7 @@
                 <strong>Owner:</strong><span class="breakable" title={activeProof.owner_address}>{activeProof.owner_address}</span>
                 <strong>Description:</strong><span>{activeProof.type.description}</span>
                 <strong>Total Amount:</strong><span>{activeProof.total_amount}</span>
-                <strong>Schema:</strong><span class="breakable">{activeProof.type.schemaURI} (v{activeProof.type.version})</span>
+                <strong>Schema:</strong><span class="breakable">{activeProof.type.schemaURI}</span>
             </div>
         </section>
 

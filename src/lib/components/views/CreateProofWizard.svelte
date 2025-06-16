@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generate_reputation_proof } from '$lib/generate_reputation_proof';
-    import { types, proofs, proof_by_token_type_nft_id } from '$lib/store';
+    import { types, proofs } from '$lib/store';
     import { fetchTypeNfts } from '$lib/unspent_proofs';
         
     // --- WIZARD STATE ---
@@ -86,7 +86,7 @@
     }
 
     $: selectedType = type_nft_id ? $types.get(type_nft_id) : null;
-    $: isReputationProofType = selectedType?.tokenId === $proof_by_token_type_nft_id;
+    $: isReputationProofType = selectedType?.isRepProof;
 
 </script>
 

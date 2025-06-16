@@ -13,7 +13,6 @@
 * exact replica of the input, except for its ERG value, which must
 * be greater than or equal. This allows for top-ups to pay storage rent.
 *
-* RECOMMENDED REGISTER STRUCTURE:
 * -----------------------------------------------------------------------------------
 * R4: Coll[Byte] -> typeName
 * - Purpose: Human-readable name of the type (e.g., "Web URL").
@@ -23,15 +22,16 @@
 *
 * R6: Coll[Byte] -> schemaURI
 * - Purpose: URI to a schema (JSON Schema, IPFS) that defines the data
-* structure for reputation proofs that use this type.
+* structure for proofs that use this type.
 *
-* R7: Coll[Byte] -> version
-* - Purpose: Version of the type standard (e.g., "1.0.0").
+* R7: Boolean -> isReputationProof
+* - Purpose: Boolean value that is `true` if this type is used for
+* a reputation proof, and `false` otherwise.
 *
-* R8: (Empty)    -> reserved_1
+* R8: (Empty) -> reserved_1
 * - Purpose: Reserved for future extensions.
 *
-* R9: (Empty)    -> reserved_2
+* R9: (Empty) -> reserved_2
 * - Purpose: Reserved for future extensions.
 * -----------------------------------------------------------------------------------
 */
@@ -47,11 +47,12 @@
 
     // Defines the immutability conditions.
     // Each register from R4 to R9 must be checked individually.
+    // R7 now checks for a Boolean instead of a Coll[Byte].
     val registersAreImmutable = (
       successor.R4[Coll[Byte]] == SELF.R4[Coll[Byte]] &&
       successor.R5[Coll[Byte]] == SELF.R5[Coll[Byte]] &&
       successor.R6[Coll[Byte]] == SELF.R6[Coll[Byte]] &&
-      successor.R7[Coll[Byte]] == SELF.R7[Coll[Byte]] &&
+      successor.R7[Boolean] == SELF.R7[Boolean] &&
       successor.R8[Coll[Byte]] == SELF.R8[Coll[Byte]] &&
       successor.R9[Coll[Byte]] == SELF.R9[Coll[Byte]]
     )
