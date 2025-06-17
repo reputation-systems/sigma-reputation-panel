@@ -2,21 +2,30 @@
     import type { ReputationProof, RPBox } from "$lib/ReputationProof";
     import { createEventDispatcher, onMount } from 'svelte';
     import { proofs } from "$lib/store";
-    import { get } from 'svelte/store';
 
     export let proof: ReputationProof;
     export let showModal: boolean;
 
     const dispatch = createEventDispatcher();
 
-    let activeView: 'boxes' | 'pointedBy' = 'pointedBy';
+    // --- Component State ---
+    let activeTab: 'boxes' | 'pointedBy' = 'pointedBy';
+    let activeView: 'list' | 'carousel' = 'list';
+    let carouselIndex = 0;
     let activeProof: ReputationProof;
 
+    // --- Reactivity ---
     $: if (proof) {
         activeProof = proof;
-        activeView = 'pointedBy';
+        activeTab = 'pointedBy';
+        activeView = 'list'; // Reset view on new proof
+        carouselIndex = 0;
     }
-    
+
+    $: if (activeTab) {
+        carouselIndex = 0; // Reset index when switching tabs
+    }
+
     let referringBoxes: { parentProof: ReputationProof, box: RPBox }[] = [];
     $: {
         if (activeProof && $proofs) {
@@ -35,6 +44,7 @@
         }
     }
 
+    // --- Event Handlers ---
     function closeModal() {
         dispatch('close');
     }
@@ -51,7 +61,6 @@
         
         if (newProof) {
             activeProof = newProof;
-            activeView = 'pointedBy';
         }
     }
 
@@ -65,15 +74,31 @@
             dispatch('viewObject', { objectId: box.object_pointer });
         }
     }
+    
+    // --- Carousel Functions ---
+    function nextItem() {
+        const totalItems = activeTab === 'boxes' ? activeProof.current_boxes.length : referringBoxes.length;
+        if (totalItems > 0) {
+            carouselIndex = (carouselIndex + 1) % totalItems;
+        }
+    }
 
+    function prevItem() {
+        const totalItems = activeTab === 'boxes' ? activeProof.current_boxes.length : referringBoxes.length;
+        if (totalItems > 0) {
+            carouselIndex = (carouselIndex - 1 + totalItems) % totalItems;
+        }
+    }
+
+    // --- Smart Rendering Logic ---
     function calculateProportion(box: RPBox, total_amount: number): string {
         if (total_amount === 0) return "0.00";
         const proportion = (box.token_amount / total_amount) * 100;
         return proportion.toFixed(2);
     }
     
-    // --- Lógica para renderizado inteligente del contenido ---
     function isLikelyMarkdown(text: string): boolean {
+        if (!text) return false;
         const markdownPattern = /(^#{1,6}\s)|(\*\*|__)|(\*|-|\+)\s|(\[.*\]\(.*\))/;
         return markdownPattern.test(text);
     }
@@ -88,11 +113,13 @@
 
 </script>
 
+<svelte:head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</svelte:head>
+
 <svelte:window on:keydown={handleKeydown}/>
 
 {#if showModal && activeProof}
-<!-- svelte-ignore a11y-click-events-have-key-events, a11y-no-static-element-interactions -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="modal-overlay" on:click|self={closeModal}>
     <article class="proof-card">
         <button class="close-button" on:click={closeModal}>&times;</button>
@@ -114,88 +141,135 @@
             </div>
         </section>
 
-        <div class="view-switcher">
-            <button class:active={activeView === 'pointedBy'} on:click={() => activeView = 'pointedBy'}>
-                Pointed By ({referringBoxes.length})
-            </button>
-            <button class:active={activeView === 'boxes'} on:click={() => activeView = 'boxes'}>
-                Opinions ({activeProof.current_boxes.length})
-            </button>
+        <div class="controls-wrapper">
+            <div class="tab-switcher">
+                <button class:active={activeTab === 'pointedBy'} on:click={() => activeTab = 'pointedBy'}>
+                    Pointed By ({referringBoxes.length})
+                </button>
+                <button class:active={activeTab === 'boxes'} on:click={() => activeTab = 'boxes'}>
+                    Opinions ({activeProof.current_boxes.length})
+                </button>
+            </div>
+            <div class="view-switcher">
+                <button class:active={activeView === 'list'} on:click={() => activeView = 'list'} title="List View">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class:active={activeView === 'carousel'} on:click={() => activeView = 'carousel'} title="Carousel View">
+                    <i class="fas fa-film"></i>
+                </button>
+            </div>
         </div>
 
         <div class="content-area">
-            {#if activeView === 'boxes'}
-                <!-- Pestaña de Opiniones Emitidas -->
-                <div class="detailed-list">
-                    {#if activeProof.current_boxes.length > 0}
-                        {#each activeProof.current_boxes as box (box.box_id)}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <div class="box-card" on:click={() => handleOpinionClick(box)} role="button" tabindex="0">
-                                <header class="box-header">
-                                    <div>
-                                        <h3 class="box-id" title={box.object_pointer}>{box.object_pointer}</h3>
-                                        <p class="card-source-id" title={box.box_id}>Type: {box.type.typeName}</p>
-                                    </div>
-                                    <span class="polarity-badge" class:positive={box.polarization} class:negative={!box.polarization}>{box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
-                                </header>
-                                <div class="details-grid">
-                                    <strong>Box ID:</strong><span>{box.box_id.substring(0, 15)}...</span>
-                                    <strong>Weight:</strong><span>{box.token_amount} / {activeProof.total_amount} ({calculateProportion(box, activeProof.total_amount)}%)</span>
-                                    <strong>Locked:</strong><span>{box.is_locked ? 'Yes' : 'No'}</span>
+            {#if activeTab === 'boxes'}
+                {@const items = activeProof.current_boxes}
+                {#if items.length > 0}
+                    {#if activeView === 'list'}
+                        <div class="detailed-list">
+                            {#each items as box (box.box_id)}
+                               <div class="box-card list-item" on:click={() => handleOpinionClick(box)} role="button" tabindex="0">
+                                   <header class="box-header">
+                                       <div class="header-info">
+                                           <h3 class="box-id clickable-title" title={box.object_pointer}>{box.object_pointer}</h3>
+                                           <p class="card-source-id">Type: {box.type.typeName}</p>
+                                       </div>
+                                       <span class="polarity-badge" class:positive={box.polarization} class:negative={!box.polarization}>{box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
+                                   </header>
+                                   <div class="details-grid-inner">
+                                       <strong>Box ID:</strong><span>{box.box_id.substring(0, 15)}...</span>
+                                       <strong>Weight:</strong><span>{box.token_amount} / {activeProof.total_amount} ({calculateProportion(box, activeProof.total_amount)}%)</span>
+                                       <strong>Locked:</strong><span>{box.is_locked ? 'Yes' : 'No'}</span>
+                                   </div>
+                                   <div class="content-section">
+                                       {#if typeof box.content === 'object' && box.content !== null && Object.keys(box.content).length > 0} <pre class="code-font">{JSON.stringify(box.content, null, 2)}</pre> {:else if typeof box.content === 'string' && box.content.trim() !== ''} {#if isLikelyMarkdown(box.content) && window.marked}<div class="markdown-content">{@html window.marked.parse(box.content)}</div>{:else}<p class="plain-text-content">{box.content}</p>{/if}{/if}
+                                   </div>
+                               </div>
+                            {/each}
+                        </div>
+                    {:else if activeView === 'carousel'}
+                        <div class="carousel-view">
+                            <button class="carousel-nav prev" on:click={prevItem} disabled={items.length <= 1}>&#10094;</button>
+                            {#if items[carouselIndex]}
+                                {@const box = items[carouselIndex]}
+                                <div class="box-card carousel-item" on:click={() => handleOpinionClick(box)} role="button" tabindex="0">
+                                    <header class="box-header">
+                                       <div class="header-info">
+                                           <h3 class="box-id clickable-title" title={box.object_pointer}>{box.object_pointer}</h3>
+                                           <p class="card-source-id">Type: {box.type.typeName}</p>
+                                       </div>
+                                       <span class="polarity-badge" class:positive={box.polarization} class:negative={!box.polarization}>{box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
+                                   </header>
+                                   <div class="details-grid-inner">
+                                       <strong>Box ID:</strong><span>{box.box_id.substring(0, 15)}...</span>
+                                       <strong>Weight:</strong><span>{box.token_amount} / {activeProof.total_amount} ({calculateProportion(box, activeProof.total_amount)}%)</span>
+                                       <strong>Locked:</strong><span>{box.is_locked ? 'Yes' : 'No'}</span>
+                                   </div>
+                                   <div class="content-section">
+                                       {#if typeof box.content === 'object' && box.content !== null && Object.keys(box.content).length > 0} <pre class="code-font">{JSON.stringify(box.content, null, 2)}</pre> {:else if typeof box.content === 'string' && box.content.trim() !== ''} {#if isLikelyMarkdown(box.content) && window.marked}<div class="markdown-content">{@html window.marked.parse(box.content)}</div>{:else}<p class="plain-text-content">{box.content}</p>{/if}{/if}
+                                   </div>
                                 </div>
-                                <div class="content-section">
-                                    {#if typeof box.content === 'object' && box.content !== null && Object.keys(box.content).length > 0}
-                                        <pre class="code-font">{JSON.stringify(box.content, null, 2)}</pre>
-                                    {:else if typeof box.content === 'string' && box.content.trim() !== ''}
-                                        {#if isLikelyMarkdown(box.content) && window.marked}
-                                            <div class="markdown-content">{@html window.marked.parse(box.content)}</div>
-                                        {:else}
-                                            <p class="plain-text-content">{box.content}</p>
-                                        {/if}
-                                    {/if}
-                                </div>
-                            </div>
-                        {/each}
-                    {:else}
-                        <p class="empty-state">This proof does not contain any boxes.</p>
+                            {/if}
+                            <button class="carousel-nav next" on:click={nextItem} disabled={items.length <= 1}>&#10095;</button>
+                        </div>
+                        <div class="carousel-counter">{carouselIndex + 1} / {items.length}</div>
                     {/if}
-                </div>
+                {:else}
+                    <p class="empty-state">This proof does not contain any boxes.</p>
+                {/if}
+                
             {:else}
-                <!-- Pestaña de Opiniones Recibidas -->
-                <div class="detailed-list">
-                    {#if referringBoxes.length > 0}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        {#each referringBoxes as ref (ref.box.box_id)}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <div class="box-card" on:click={() => viewProofDetails(ref.parentProof.token_id)} role="button" tabindex="0">
-                                <header class="box-header">
-                                    <div>
-                                        <h3 class="box-id" title={ref.parentProof.token_id}>{ref.parentProof.token_id}</h3>
-                                        <p class="card-source-id">Type: {ref.parentProof.type.typeName}</p>
+                {@const items = referringBoxes}
+                 {#if items.length > 0}
+                    {#if activeView === 'list'}
+                        <div class="detailed-list">
+                            {#each items as ref (ref.box.box_id)}
+                               <div class="box-card list-item" on:click={() => viewProofDetails(ref.parentProof.token_id)} role="button" tabindex="0">
+                                   <header class="box-header">
+                                       <div class="header-info">
+                                           <h3 class="box-id clickable-title" title={ref.parentProof.token_id}>{ref.parentProof.token_id}</h3>
+                                           <p class="card-source-id">Type: {ref.parentProof.type.typeName}</p>
+                                       </div>
+                                       <span class="polarity-badge" class:positive={ref.box.polarization} class:negative={!ref.box.polarization}>{ref.box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
+                                   </header>
+                                   <div class="details-grid-inner">
+                                       <strong>Source Owner:</strong><span class="breakable" title={ref.parentProof.owner_address}>{ref.parentProof.owner_address}</span>
+                                       <strong>Weight:</strong><span>{ref.box.token_amount} / {ref.parentProof.total_amount} ({calculateProportion(ref.box, ref.parentProof.total_amount)}%)</span>
+                                   </div>
+                                   <div class="content-section">
+                                       {#if typeof ref.box.content === 'object' && ref.box.content !== null && Object.keys(ref.box.content).length > 0} <pre class="code-font">{JSON.stringify(ref.box.content, null, 2)}</pre> {:else if typeof ref.box.content === 'string' && ref.box.content.trim() !== ''} {#if isLikelyMarkdown(ref.box.content) && window.marked}<div class="markdown-content">{@html window.marked.parse(ref.box.content)}</div>{:else}<p class="plain-text-content">{ref.box.content}</p>{/if}{/if}
+                                   </div>
+                               </div>
+                            {/each}
+                        </div>
+                    {:else if activeView === 'carousel'}
+                        <div class="carousel-view">
+                            <button class="carousel-nav prev" on:click={prevItem} disabled={items.length <= 1}>&#10094;</button>
+                            {#if items[carouselIndex]}
+                                {@const ref = items[carouselIndex]}
+                                <div class="box-card carousel-item" on:click={() => viewProofDetails(ref.parentProof.token_id)} role="button" tabindex="0">
+                                    <header class="box-header">
+                                        <div class="header-info">
+                                            <h3 class="box-id clickable-title" title={ref.parentProof.token_id}>{ref.parentProof.token_id}</h3>
+                                            <p class="card-source-id">Type: {ref.parentProof.type.typeName}</p>
+                                        </div>
+                                        <span class="polarity-badge" class:positive={ref.box.polarization} class:negative={!ref.box.polarization}>{ref.box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
+                                    </header>
+                                    <div class="details-grid-inner">
+                                        <strong>Source Owner:</strong><span class="breakable" title={ref.parentProof.owner_address}>{ref.parentProof.owner_address}</span>
+                                        <strong>Weight:</strong><span>{ref.box.token_amount} / {ref.parentProof.total_amount} ({calculateProportion(ref.box, ref.parentProof.total_amount)}%)</span>
                                     </div>
-                                    <span class="polarity-badge" class:positive={ref.box.polarization} class:negative={!ref.box.polarization}>{ref.box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
-                                </header>
-                                <div class="details-grid">
-                                    <strong>Source Owner:</strong><span class="breakable" title={ref.parentProof.owner_address}>{ref.parentProof.owner_address}</span>
-                                    <strong>Weight in Source:</strong><span>{ref.box.token_amount} / {ref.parentProof.total_amount} ({calculateProportion(ref.box, ref.parentProof.total_amount)}%)</span>
+                                    <div class="content-section">
+                                        {#if typeof ref.box.content === 'object' && ref.box.content !== null && Object.keys(ref.box.content).length > 0} <pre class="code-font">{JSON.stringify(ref.box.content, null, 2)}</pre> {:else if typeof ref.box.content === 'string' && ref.box.content.trim() !== ''} {#if isLikelyMarkdown(ref.box.content) && window.marked}<div class="markdown-content">{@html window.marked.parse(ref.box.content)}</div>{:else}<p class="plain-text-content">{ref.box.content}</p>{/if}{/if}
+                                    </div>
                                 </div>
-                                <div class="content-section">
-                                     {#if typeof ref.box.content === 'object' && ref.box.content !== null && Object.keys(ref.box.content).length > 0}
-                                        <pre class="code-font">{JSON.stringify(ref.box.content, null, 2)}</pre>
-                                    {:else if typeof ref.box.content === 'string' && ref.box.content.trim() !== ''}
-                                        {#if isLikelyMarkdown(ref.box.content) && window.marked}
-                                            <div class="markdown-content">{@html window.marked.parse(ref.box.content)}</div>
-                                        {:else}
-                                            <p class="plain-text-content">{ref.box.content}</p>
-                                        {/if}
-                                    {/if}
-                                </div>
-                            </div>
-                        {/each}
-                    {:else}
-                        <p class="empty-state">This proof is not being pointed to by any other proofs.</p>
+                            {/if}
+                            <button class="carousel-nav next" on:click={nextItem} disabled={items.length <= 1}>&#10095;</button>
+                        </div>
+                         <div class="carousel-counter">{carouselIndex + 1} / {items.length}</div>
                     {/if}
-                </div>
+                {:else}
+                    <p class="empty-state">This proof is not being pointed to by any other proofs.</p>
+                {/if}
             {/if}
         </div>
     </article>
@@ -203,42 +277,89 @@
 {/if}
 
 <style>
+    /* --- Variables and Base Styles --- */
+    :root {
+        --card-bg: #2a2a2a;
+        --border-color: #444;
+        --text-color: #e0e0e0;
+        --text-muted: #aaa;
+        --accent-color: #FBBF24;
+    }
+
     .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;justify-content:center;align-items:center;z-index:1000;padding:2rem;box-sizing:border-box}
-    .proof-card{position:relative;background-color:#2a2a2a;border:1px solid #444;border-radius:12px;padding:2rem;color:#e0e0e0;font-family:sans-serif;width:100%;max-width:800px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
-    .close-button{position:absolute;top:15px;right:20px;background:0 0;border:none;font-size:2.5rem;color:#aaa;cursor:pointer;line-height:1;z-index:10}
+    .proof-card{position:relative;background-color:var(--card-bg);border:1px solid var(--border-color);border-radius:12px;padding:2rem 2.5rem;color:var(--text-color);font-family:sans-serif;width:95%;max-width:1200px;height:90vh;overflow:hidden;display:flex;flex-direction:column}
+    .close-button{position:absolute;top:15px;right:20px;background:0 0;border:none;font-size:2.5rem;color:var(--text-muted);cursor:pointer;line-height:1;z-index:10;transition:color .2s}
     .close-button:hover{color:#fff}
-    .proof-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;padding-right:50px}
-    .header-main-content{flex-grow:1;min-width:0}
-    .proof-title{font-family:monospace;font-size:1.5rem;color:#fff;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .proof-subtitle{color:#aaa;font-size:.9rem;margin:.5rem 0 0;font-weight:500}
-    .network-badge{background-color:#333;padding:.3rem .8rem;border-radius:15px;font-size:.8rem;font-weight:700;border:1px solid #444;flex-shrink:0}
-    .details-section{padding-top:1.5rem;border-top:1px solid #444;margin-bottom: 1rem;}
+
+    /* --- Main Header --- */
+    .proof-header{display:flex;align-items:flex-start;gap:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border-color)}
+    .header-main-content{flex-grow:0;min-width:0} /* Changed flex-grow to 0 */
+    .proof-title{font-family:monospace;font-size:1.75rem;color:#fff;margin:0.25rem 0 0 0;line-height:1.2;white-space:normal;word-break:break-all}
+    .proof-subtitle{color:var(--text-muted);font-size:.9rem;margin:.5rem 0 0;font-weight:500}
+    .network-badge{background-color:#333;padding:.3rem .8rem;border-radius:15px;font-size:.8rem;font-weight:700;border:1px solid #444;flex-shrink:0;margin-top:0.25rem;}
+
+    /* --- Details Section --- */
+    .details-section{padding:1rem 0;margin-bottom:1rem;border-top:1px solid var(--border-color);}
     .details-grid{display:grid;grid-template-columns:140px 1fr;gap:.75rem 1.5rem;align-items:center}
-    .details-grid strong{color:#aaa;text-align:right;font-weight:400}
+    .details-grid strong{color:var(--text-muted);text-align:right;font-weight:400}
     .breakable{word-break:break-all}
-    .view-switcher{display:flex;justify-content:center;background-color:#222;border-radius:8px;padding:4px;width:-moz-fit-content;width:fit-content;margin:1rem auto}
-    .view-switcher button{background:0 0;border:none;color:#aaa;padding:.5rem 1.5rem;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:500;transition:all .2s ease-in-out}
+    
+    /* --- Controls (Tabs & View Switcher) --- */
+    .controls-wrapper { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+    .tab-switcher { display: flex; background-color: #222; border-radius: 8px; padding: 4px; gap: 4px; }
+    .tab-switcher button { background: 0 0; border: none; color: var(--text-muted); padding: .5rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: 500; transition: all .2s ease-in-out; }
+    .tab-switcher button.active { background-color: #444; color: #fff; font-weight: 600; }
+    .view-switcher{display:flex;background-color:#222;border-radius:8px;padding:4px;gap:4px}
+    .view-switcher button{background:0 0;border:none;color:var(--text-muted);padding:.5rem;width:50px;height:40px;border-radius:6px;cursor:pointer;font-size:1rem;font-weight:500;transition:all .2s ease-in-out;display:flex;align-items:center;justify-content:center;gap:.5rem}
     .view-switcher button.active{background-color:#444;color:#fff;font-weight:600}
-    .content-area{overflow-y:auto;padding-top:1rem;border-top:1px solid #444;margin-top:1rem;}
-    .detailed-list{display:flex;flex-direction:column;gap:1rem}
-    .empty-state{color:#aaa;text-align:center;padding:2rem;background-color:#262626;border-radius:8px}
-    .box-card{background-color:#333;border:1px solid #555;border-radius:8px;padding:1.5rem;flex-shrink:0;transition:border-color .2s,transform .2s;cursor:pointer}
-    .box-card:hover{border-color:#FBBF24;transform:translateY(-2px)}
-    .box-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-    .box-header>div{flex-shrink:1;min-width:0}
-    .box-id{font-family:monospace;font-size:1.1rem;color:#FBBF24;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .card-source-id{font-family:monospace;color:#aaa;font-size:.8rem;margin:.25rem 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .polarity-badge{font-weight:700;padding:.25rem .75rem;border-radius:15px;font-size:.9rem;flex-shrink:0}
-    .polarity-badge.positive{background-color:rgba(4,120,87,.5);border:1px solid #10B981;color:#A7F3D0}
-    .polarity-badge.negative{background-color:rgba(153,27,27,.5);border:1px solid #EF4444;color:#FECACA}
-    .content-section{margin-top:1rem;padding-top:1rem;border-top:1px solid #444}
+    
+    /* --- Content Area --- */
+    .content-area{overflow-y:auto;margin-top:1.5rem;padding-right:1rem;flex-grow:1;min-height:0}
+    .detailed-list{display:flex;flex-direction:column;gap:1.5rem;margin-top:1rem}
+    .empty-state{color:var(--text-muted);text-align:center;padding:3rem;background-color:#262626;border-radius:8px;height:100%;display:flex;align-items:center;justify-content:center}
+
+    /* --- Carousel --- */
+    .carousel-view{display:flex;align-items:stretch;justify-content:center;gap:1rem;height:95%}
+    .carousel-nav{background:0 0;border:1px solid #555;color:#fff;border-radius:50%;width:45px;height:45px;font-size:1.5rem;cursor:pointer;transition:background-color .2s,border-color .2s;flex-shrink:0;align-self:center}
+    .carousel-nav:hover:not(:disabled){background-color:#444;border-color:var(--accent-color)}
+    .carousel-nav:disabled{opacity:.3;cursor:not-allowed}
+    .carousel-counter{text-align:center;margin-top:1rem;color:var(--text-muted);flex-shrink:0}
+
+    /* --- Opinion Box Card --- */
+    .box-card{background-color:#333;border:1px solid #555;border-radius:8px;padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
+    .box-card.list-item { cursor: pointer; transition: border-color .2s,transform .2s; }
+    .box-card.list-item:hover{border-color:var(--accent-color);transform:translateY(-2px)}
+    .carousel-item { border-color: #555; width: 90%; height: 90%; cursor: pointer; }
+    
+    .box-header{display:flex;justify-content:space-between;align-items:flex-start}
+    .header-info{flex-grow:1;min-width:0}
+    .box-id{font-family:monospace;font-size:1rem;color:var(--accent-color);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .clickable-title:hover { text-decoration: underline; }
+    .card-source-id{font-family:monospace;color:var(--text-muted);font-size:.8rem;margin-top:.25rem}
+
+    .polarity-badge{font-weight:700;padding:.25rem .75rem;border-radius:15px;font-size:.8rem;flex-shrink:0;text-transform:uppercase}
+    .polarity-badge.positive{background-color:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#A7F3D0}
+    .polarity-badge.negative{background-color:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#FECACA}
+    
+    .details-grid-inner{display:grid;grid-template-columns:110px 1fr;gap:.5rem 1.5rem;align-items:center;font-size:0.9rem}
+    .details-grid-inner strong{color:var(--text-muted);text-align:right;font-weight:400}
+    
+    /* --- Content Section inside card --- */
+    .content-section{margin-top:1rem;padding-top:1rem;border-top:1px solid #444;flex-grow:1;overflow-y:auto;min-height:0}
     .plain-text-content{white-space:pre-wrap}
-    .code-font,pre{font-family:'Courier New',Courier,monospace;background-color:#222;padding:.75rem;border-radius:4px;font-size:.9em;word-break:break-all;white-space:pre-wrap}
-    .markdown-content :global(h1),.markdown-content :global(h2),.markdown-content :global(h3){color:#FBBF24;border-bottom:1px solid #555;padding-bottom:.3em}
+    .code-font,pre{font-family:'Courier New',Courier,monospace;background-color:#222;padding:.75rem;border-radius:4px;font-size:.9em;word-break:break-all;white-space:pre-wrap;height:100%;box-sizing:border-box}
+    
+    .markdown-content :global(h1),.markdown-content :global(h2),.markdown-content :global(h3){color:var(--accent-color);border-bottom:1px solid #555;padding-bottom:.3em}
     .markdown-content :global(p){line-height:1.6}
     .markdown-content :global(a){color:#6ebff5}
     .markdown-content :global(ul),.markdown-content :global(ol){padding-left:2em}
     .markdown-content :global(li){margin-bottom:.5rem}
-    .markdown-content :global(blockquote){border-left:4px solid #444;padding-left:1em;margin-left:0;color:#aaa}
+    .markdown-content :global(blockquote){border-left:4px solid var(--border-color);padding-left:1em;margin-left:0;color:var(--text-muted)}
     .markdown-content :global(code){background-color:#3a3a3c;padding:.2em .4em;border-radius:4px;font-family:'Courier New',Courier,monospace}
+
+    /* --- Scrollbar --- */
+    .content-area::-webkit-scrollbar, .content-section::-webkit-scrollbar { width: 8px; }
+    .content-area::-webkit-scrollbar-track, .content-section::-webkit-scrollbar-track { background: #222; border-radius: 10px; }
+    .content-area::-webkit-scrollbar-thumb, .content-section::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
+    .content-area::-webkit-scrollbar-thumb:hover, .content-section::-webkit-scrollbar-thumb:hover { background: #777; }
 </style>
