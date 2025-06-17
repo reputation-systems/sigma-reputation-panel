@@ -134,12 +134,12 @@
                                 <header class="box-header">
                                     <div>
                                         <h3 class="box-id" title={box.object_pointer}>{box.object_pointer}</h3>
-                                        <p class="card-source-id" title={box.box_id}>Box ID: {box.box_id.substring(0, 15)}...</p>
                                         <p class="card-source-id" title={box.box_id}>Type: {box.type.typeName}</p>
                                     </div>
                                     <span class="polarity-badge" class:positive={box.polarization} class:negative={!box.polarization}>{box.polarization ? 'POSITIVE' : 'NEGATIVE'}</span>
                                 </header>
                                 <div class="details-grid">
+                                    <strong>Box ID:</strong><span>{box.box_id.substring(0, 15)}...</span>
                                     <strong>Weight:</strong><span>{box.token_amount} / {activeProof.total_amount} ({calculateProportion(box, activeProof.total_amount)}%)</span>
                                     <strong>Locked:</strong><span>{box.is_locked ? 'Yes' : 'No'}</span>
                                 </div>
