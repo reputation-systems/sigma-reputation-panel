@@ -1,138 +1,123 @@
-# **Sigma Reputation System**  
+# **Decentralized Reputation System on Ergo**
 
-[![Ergo Platform Badge](https://img.shields.io/badge/Built_on-Ergo-FBBF24)](https://ergoplatform.org)  
-[![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)](https://unlicense.org)
+[![Ergo Platform Badge](https://img.shields.io/badge/Built_on-Ergo-FBBF24)](https://ergoplatform.org)
 
-> "In the blockchain ecosystem, trust is not given - it's earned."
+## 1. Summary
 
-## 🌐 **Introduction**  
-Blockchain technology has reshaped trust management by decentralizing authority, allowing users to interact in a transparent and secure manner. In this context, a robust **Reputation System** becomes indispensable for fostering trust and ensuring reliability across interactions. This decentralized trust infrastructure aims to bridge the gap where traditional centralized systems have fallen short, providing:
+This document describes a decentralized reputation system built on the Ergo blockchain. The system is designed to create, manage, and verify reputation claims in an atomic, secure, and transparent way. Its architecture is based on two interdependent ErgoScript contracts:
 
-- **Transparent trust metrics**  
-- **User-controlled reputation portability**  
-- **Incentive-aligned interactions**  
+1. **"Digital Public Good" Contract (Type NFT)**: Defines immutable standards for the types of reputation that can exist in the ecosystem.
+2. **"Reputation Token" Contract**: Governs the boxes (UTXOs) that contain the reputation proofs, ensuring state consistency, data uniqueness, and owner control.
 
-### Traditional Systems vs. Our Solution
-
-| Traditional Systems         | Our Decentralized Reputation System |
-|-----------------------------|--------------------------------------|
-| Centralized control         | Decentralized governance             |
-| Opaque scoring              | Transparent, auditable metrics       |
-| Platform-locked reputation  | Chain-agnostic and portable         |
+The design leverages Ergo's eUTXO model to enable complex validations and ensure that reputation collections are updated atomically, preventing inconsistent states.
 
 ---
 
-## ❓ **Why Reputation Matters**  
+## 2. System Architecture
 
-### Key Challenges Addressed:
+The system is composed of two types of boxes (UTXOs), each governed by a specific contract that defines its purpose and state transition rules.
 
-- **Trust Asymmetry**: Blind interactions with unverified smart contracts and users  
-- **Sybil Attacks**: Fake identities that undermine the integrity of networks  
-- **Reputation Fragmentation**: Isolated, incompatible trust systems across platforms  
+### 2.1. "Digital Public Good" Contract (Type NFT)
 
-### Proposed solution:  
-This reputation system addresses these issues by using **decentralized verification** and **economic incentives** to ensure accurate, fair assessments. By allowing users to build trust across the network, it transforms interactions from "trustless" to "trust-based" while maintaining decentralization.  
-For example, **P2P marketplaces** can dynamically adjust pricing based on reputation scores validated by the community, helping eliminate middlemen and instilling confidence in users.
+This contract protects a box that contains a unique NFT, which serves as a public and immutable standard for a specific type of reputation.
 
----
+#### **Purpose**
 
-## 🛠️ **System Design**  
-The reputation system is composed of several core components that work seamlessly within the **Sigma Chains ecosystem**.
+* **Standardization**: Defines a reputation type (e.g., “Verified URL”, “Smart Contract Review”) and its associated data structure.
+* **Immutability**: Ensures that the type definition cannot be altered, providing a stable foundation for the entire ecosystem.
+* **Digital Public Good**: The box is designed to be community-maintained, allowing ERG top-ups to cover storage rent without altering its contents.
 
-### Core Components:
+#### **Register Structure**
 
-| Component             | Functionality                                  | Advantage for Ergo Ecosystem       |
-|-----------------------|-----------------------------------------------|------------------------------------|
-| **Reputation Tokens**  | Portable units of trust across the network    | UTXO-based tracking and ownership |
-| **Rating Engine**      | Dynamic reputation score calculation          | Fast and lightweight verification |
-| **Sigma Chains UTXOs** | Store reputation data and enforce rules       | Ensures decentralization and integrity |
+| Register  | Type         | Description                                                                              |
+| :-------- | :----------- | :--------------------------------------------------------------------------------------- |
+| **R4**    | `Coll[Byte]` | `typeName`: Human-readable name of the type (e.g., “Web URL”).                           |
+| **R5**    | `Coll[Byte]` | `description`: Purpose and use of the type.                                              |
+| **R6**    | `Coll[Byte]` | `schemaURI`: URI to a schema (e.g., JSON Schema, IPFS) that defines the proof structure. |
+| **R7**    | `Boolean`    | `isReputationProof`: `true` if used for reputation proofs, `false` otherwise.            |
+| **R8-R9** | `(Empty)`    | Reserved for future extensions.                                                          |
 
-### UTXO Structure Explained  
-Each Reputation Token UTXO contains essential data that defines the relationship between an evaluator and a subject:
+#### **Spending Logic**
 
-- 🔵 **Object Type**: Specifies what is being rated (e.g., contract, URL, user)  
-- 🔢 **Object ID**: Unique identifier (e.g., contract hash, IPFS CID)  
-- 🔑 **Owner Key**: The public key of the evaluator  
-- ⚖️ **Polarity**: The evaluation itself, positive or negative  
+The contract enforces a single spending rule:
 
-As reputation tokens circulate, their value increases not by consensus alone but through user interactions and engagement, enhancing their significance within the ecosystem.
+1. **Anyone can spend the box.**
+2. The transaction is valid **only if it creates a single output box** that is an exact replica of the input in all aspects (script, NFT token, and registers R4-R9).
+3. The only exception is the ERG value, which **must be greater than or equal to** (`successor.value >= SELF.value`), allowing for top-ups to pay for storage rent.
 
----
+This logic prevents the destruction or duplication of the standard, ensuring its permanence and reliability.
 
-## 🔐 **Smart Contract Logic**  
+> If R7 is active, then in the Reputation contract, R5 will be interpreted as referring to a token contained in boxes using a reputation script. If not active, R5 in the Reputation contract may contain any other definition as per the type standard.
 
-Reputation tokens are governed by specific smart contract logic to ensure integrity and authenticity. Here’s an example of the core logic that regulates how tokens are created, stored, and used:
+### 2.2. "Reputation Token" Contract (Reputation Box)
 
-```ergoscript
-// Reputation Token Contract
-{
-  proveDlog(SELF.R7[GroupElement].get) &&  // Owner authentication
-  sigmaProp(SELF.tokens.size == 1) &&      // Single token condition
-  sigmaProp(OUTPUTS.forall { (x: Box) =>   // State validation
-    !(x.tokens.exists { (token: (Coll[Byte], Long)) => 
-      token._1 == SELF.tokens(0)._1 
-    }) || (
-      x.R7[GroupElement].get == SELF.R7[GroupElement].get &&
-      x.tokens.size == 1 &&
-      x.propositionBytes == SELF.propositionBytes &&
-      (x.R8[Bool] == true || x.R8[Bool] == false)
-    )
-  })
-}
-```
+This contract governs a box that represents an individual piece of reputation. These boxes form part of distributed collections that must maintain internal consistency.
 
-This contract ensures that the reputation data remains tamper-proof, as only the owner of the token can modify it, and the data is securely linked to the evaluator’s public key.
+#### **Purpose**
 
----
+* **Governance**: Defines rules for creating, modifying, and transferring a reputation proof.
+* **Atomic Consistency**: Ensures that an entire reputation collection (“sibling” boxes) is validated together.
+* **Uniqueness**: Ensures that each reputation proof about an object is unique within its collection.
+* **Owner Control**: Grants the owner exclusive authority over substantial modifications.
 
-## 📋 **Technical Specifications**  
+#### **Register and Token Structure**
 
-| Register | Type          | Description                   |
-|----------|---------------|-------------------------------|
-| R5       | Coll[Byte]    | Entity type identifier        |
-| R6       | Coll[Byte]    | Object fingerprint            |
-| R7       | GroupElement  | Evaluator's public key        |
-| R8       | Boolean       | ✅ Positive / ❌ Negative      |
+| Element      | Type                 | Description                                                                                        |
+| :----------- | :------------------- | :------------------------------------------------------------------------------------------------- |
+| **Token(0)** | `(Coll[Byte], Long)` | `(repTokenId, amount)`: The reputation token protected by this box.                                |
+| **R4**       | `Coll[Byte]`         | `typeNftTokenId`: Token ID of the associated Type NFT.                                             |
+| **R5**       | `Coll[Byte]`         | `uniqueObjectData`: Data that, along with R4, uniquely identifies the object.                      |
+| **R6**       | `(Boolean, Long)`    | `(isLocked, totalSupply)`: Tuple defining the lock state and total token supply of the collection. |
+| **R7**       | `SigmaProp`          | `ownerPublicKey`: Public key of the owner that must authorize transactions.                        |
+| **R8**       | `Boolean`            | `customFlag`: Boolean flag for custom application logic.                                           |
+| **R9**       | `Coll[Byte]`         | Reserved for future extensions.                                                                    |
 
-### Key Transaction Rules:
-1. **Single token per UTXO**: Each token represents a unique reputation assessment.  
-2. **Owner-controlled modifications**: Only the owner of the token can modify the reputation data.  
-3. **State consistency**: Reputation information must follow a strict set of rules to maintain integrity across the network.
+#### **Spending Logic (Two Paths)**
 
----
+The contract allows the box to be spent via two distinct paths:
 
-## 🌍 Use Case Examples
-#### Decentralized P2P Marketplaces
-In a decentralized version of Airbnb, a user’s reputation score determines the terms and costs of renting a property. Similarly, a host’s reputation, built through community feedback, impacts their trustworthiness and attractiveness to renters. This creates a transparent, trust-based ecosystem without the need for intermediaries.
+**2.2.1. Management Path (Signature Required)**
 
-#### Node and Service Trust in the [Celaut Project](https://github.com/celaut-project/paradigm/?tab=readme-ov-file#reputation-systems)
-Reputation systems can also empower decentralized service ecosystems, as seen in the Celaut Project. In this model, reputation records on ledgers allow nodes, users, and services to form a social decision-making framework:
+This path allows the owner to make significant changes to the reputation collection. It strictly requires:
 
-- Nodes: Use reputation to evaluate which peers they can trust to execute services reliably.
-- Users: Leverage reputation to choose services best suited to their needs.
-- Services: For deterministic services (default isolated mode), reputation remains consistent over time unless network interactions occur. If connected to networks, the service’s reputation can depend on those networks' trustworthiness.
+1. **Authorization**: The transaction must be signed by the owner (`SELF.R7[SigmaProp]`).
+2. **Link to Standard**: The corresponding **Type NFT** box must be included as `dataInputs(0)`. The `typeNftTokenId` (in R4) of the reputation box must match the NFT token ID.
+3. **Proof of Completeness**: All “sibling” boxes sharing the same `repTokenId` must be included as `dataInputs`. The contract sums the `amount` of the tokens across all boxes (SELF + dataInputs) and checks that the total matches the `totalSupply` stored in R6. This ensures the transaction has a complete view of the distributed state.
+4. **Output Rules**:
 
-For example, when nodes communicate, they share reputation proofs to evaluate each other’s trustworthiness. These opinions are non-consensual, meaning every actor independently decides whom to trust, based on their trusted sources. Reputation thus becomes a dynamic and adaptive mechanism for fostering decentralized trust.
+   * **Uniqueness**: The `(R4, R5)` combination of every output reputation box must be unique across all inputs and outputs.
+   * **Preservation**: `totalSupply` and `ownerPublicKey` must remain unchanged in all outputs.
+   * **Locking Logic (`isLocked`)**:
+
+     * If `isLocked == true`, the box is immutable. The output must be an exact replica of the input (except for ERG value).
+     * If `isLocked == false`, modifications are allowed, as long as the fundamental structure (script, defined registers) is preserved.
+
+**2.2.2. ERG Top-Up Path (Public)**
+
+This path does **not require a signature**, allowing anyone to top up the box with ERG to pay for storage rent. Conditions are identical to the Type NFT contract:
+
+* The transaction must create a single output box.
+* The output must be an **exact replica** of the input (script, tokens, and all registers).
+* The ERG value of the output must be **greater than or equal to** the input.
 
 ---
 
-## 🔐 **Security Considerations**  
-The decentralized nature of the reputation system ensures a high degree of security. Each transaction is verifiable, and reputation tokens cannot be forged or manipulated without consensus from the community. Moreover, the system encourages participation from all users by offering economic incentives, rewarding those who contribute honest and valuable assessments.
+## 3. System Interaction Flow
+
+1. **Creating a Standard**: An entity creates a **Type NFT** to define a new reputation type (e.g., “Service Rating”). This NFT becomes an immutable digital public good.
+2. **Issuing Reputation**: A user (the `owner`) creates one or more **Reputation Boxes**. R4 specifies the corresponding `Type NFT` ID. R5 contains unique data about the rated object. R7 stores the user's public key.
+3. **Atomic Management**: To modify any part of their reputation collection (e.g., update a rating or add a new one), the owner must execute a transaction through the **Management Path**. All reputation boxes must be included in `dataInputs` so the contract can validate `totalSupply` and data uniqueness.
+4. **Maintenance**: Any user may, at any time, top up a Reputation Box or a Type NFT with ERG via the **Top-Up Path**, ensuring system longevity without requiring owner intervention.
 
 ---
 
-## 🛡️ **Incentive Model**  
-By leveraging Ergo’s native tokenomics, users are incentivized to participate in reputation scoring. Validators receive rewards for honest assessments, and penalties are imposed for malicious actions or false reporting. This ensures the long-term sustainability of the system, aligning user behavior with the interests of the broader community.
+## 4. Conclusion
 
----
+This reputation system offers a robust and formally verifiable model for managing trust assertions in a decentralized environment. Key features of the design include:
 
-## **Conclusion**  
-The **Decentralized Reputation System** offers a way to build trust in the blockchain ecosystem, enabling secure, transparent interactions. By integrating with the **Sigma Chains** infrastructure, it promises to empower users and foster a more reliable, decentralized digital environment.
+* **Immutability of Standards**: Type NFTs provide a permanently anchored foundation of trust.
+* **User Ownership and Control**: Signature keys ensure only the owner can make substantial changes.
+* **Atomic State Consistency**: Prevents state fragmentation and ensures collections are validated as coherent wholes.
+* **Long-Term Sustainability**: Public top-up paths ensure that boxes are not lost due to Ergo’s storage rent.
 
----
-
-**License**: [The Unlicense](LICENSE) - Public Domain Dedication  
-
-```text
-This is free and unencumbered software released into the public domain.
-```
+The system transforms reputation management into a transparent, secure, and mathematically rigorous process, fully aligned with the principles of Ergo's eUTXO model.
