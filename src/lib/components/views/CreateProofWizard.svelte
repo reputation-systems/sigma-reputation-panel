@@ -6,16 +6,15 @@
         
     // --- WIZARD STATE ---
     let currentStep = 1;
-    const totalSteps = 5;
+    const totalSteps = 4;
 
     // --- FORM DATA ---
     let type_nft_id: string = ''; 
-    let object_to_assign: string = '';
-    let token_amount: number = 100;
+    let token_amount: number = 1000000;
     let is_negative: boolean = false;
-    let data: object|string|null = null; // Can be an object, a string, or null
-    let is_locked: boolean = false;
-    let contentString: string = ''; // Bound to the textarea, can hold any text
+    let data: object|string|null = null;
+    let is_locked: boolean = false; // Se mantiene en 'false' para que no sea inmutable.
+    let contentString: string = '';
 
     // --- UI STATE ---
     let isLoading = false;
@@ -37,22 +36,21 @@
         errorMessage = '';
         successMessage = '';
         
-        if (!type_nft_id || !object_to_assign || token_amount <= 0) {
-            errorMessage = "Please fill in all required fields: Type NFT Standard, Object Pointer, and Token Amount.";
+        if (!type_nft_id || token_amount <= 0) {
+            errorMessage = "Please fill in all required fields: Type NFT Standard and Token Amount.";
             isLoading = false;
             return;
         }
 
         try {
-            // The 'data' variable now correctly holds a string, an object, or null
             const txId = await generate_reputation_proof(
                 token_amount,
                 token_amount,
                 type_nft_id,
-                object_to_assign,
+                undefined, 
                 !is_negative,
                 data,
-                is_locked,
+                is_locked, // Esto siempre será 'false' (No bloqueado).
                 undefined
             );
 
@@ -76,17 +74,14 @@
             data = null;
         } else {
             try {
-                // First, try to parse it as a JSON object
                 data = JSON.parse(value);
             } catch (e) {
-                // If parsing fails, treat it as a plain string
                 data = value;
             }
         }
     }
 
     $: selectedType = type_nft_id ? $types.get(type_nft_id) : null;
-    $: isReputationProofType = selectedType?.isRepProof;
 
 </script>
 
@@ -121,38 +116,13 @@
         {/if}
 
         {#if currentStep === 2}
-            <h4>Step 2: Define First Pointer</h4>
-            {#if isReputationProofType}
-                <label for="proof-select">Select an Existing Proof to Point To<span class="required">*</span></label>
-                <select id="proof-select" class="input" bind:value={object_to_assign} required>
-                    <option value="" disabled>-- Choose one of your proofs --</option>
-                    {#each Array.from($proofs.values()) as proof (proof.token_id)}
-                        <option value={proof.token_id}>
-                            {proof.type.typeName} (ID: {proof.token_id.substring(0, 10)}...)
-                        </option>
-                    {/each}
-                </select>
-                {#if $proofs.size === 0}
-                    <p class="help-text error-text">You do not own any reputation proofs to point to.</p>
-                {/if}
-            {:else}
-                <label for="object-assign-input">Object to Evaluate<span class="required">*</span></label>
-                <input id="object-assign-input" type="text" class="input" bind:value={object_to_assign} placeholder="URL, another token ID, text, etc." required />
-            {/if}
+            <h4>Step 2: Set Initial Token Amount</h4>
+            <label for="token-amount">Amount of Tokens to Mint<span class="required">*</span></label>
+            <input id="token-amount" type="number" class="input" bind:value={token_amount} min="1" step="1" />
         {/if}
 
         {#if currentStep === 3}
-            <h4>Step 3: Set Initial Tokens & Opinion</h4>
-            <label for="token-amount">Amount of Tokens to Mint<span class="required">*</span></label>
-            <input id="token-amount" type="number" class="input" bind:value={token_amount} min="1" step="1" />
-            <div class="polarity-buttons">
-                <button class:selected={!is_negative} on:click={() => is_negative = false}>👍 Positive</button>
-                <button class:selected={is_negative} on:click={() => is_negative = true}>👎 Negative</button>
-            </div>
-        {/if}
-
-        {#if currentStep === 4}
-            <h4>Step 4: Add Content (Optional)</h4>
+            <h4>Step 3: Add Content (Optional)</h4>
             <label for="content-data">Additional Data (Plain Text or JSON):</label>
             <textarea 
                 id="content-data" 
@@ -161,21 +131,16 @@
                 bind:value={contentString}
                 placeholder="Enter plain text or a valid JSON object..."
             />
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="lock-checkbox" bind:checked={is_locked} />
-                <label for="lock-checkbox" class="form-check-label">Lock this first box (make it immutable)</label>
-            </div>
-        {/if}
+            {/if}
 
-        {#if currentStep === 5}
-            <h4>Step 5: Summary and Submit</h4>
+        {#if currentStep === 4}
+            <h4>Step 4: Summary and Submit</h4>
             <div class="summary">
                 <p><strong>Standard (Type NFT):</strong> <span>{selectedType?.typeName ?? 'Unknown Type'}</span></p>
-                <p><strong>Initial Pointer:</strong> <span>{object_to_assign}</span></p>
+                <p><strong>Initial Pointer:</strong> <span>Self (this new proof)</span></p>
                 <p><strong>Opinion:</strong> {is_negative ? 'Negative' : 'Positive'} ({token_amount.toLocaleString()} tokens to mint)</p>
                 <p><strong>Content:</strong> <span>{contentString || 'Not provided'}</span></p>
-                <p><strong>Will be locked:</strong> {is_locked ? 'Yes' : 'No'}</p>
-            </div>
+                </div>
             {#if isLoading}
                 <div class="feedback loading">Sending transaction... Please check your wallet.</div>
             {:else if successMessage}
@@ -191,7 +156,7 @@
 
     <div class="wizard-nav">
         <button on:click={prevStep} disabled={currentStep === 1}>&larr; Previous</button>
-        <button on:click={nextStep} disabled={currentStep === 5 || !type_nft_id}>Next &rarr;</button>
+        <button on:click={nextStep} disabled={currentStep === totalSteps || !type_nft_id}>Next &rarr;</button>
     </div>
 </div>
 

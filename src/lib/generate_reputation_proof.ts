@@ -26,7 +26,7 @@ export async function generate_reputation_proof(
     token_amount: number,
     total_supply: number,
     type_nft_id: string,
-    object_pointer: string,
+    object_pointer: string|undefined,
     polarization: boolean,
     content: object|string|null,
     is_locked: boolean = false,
