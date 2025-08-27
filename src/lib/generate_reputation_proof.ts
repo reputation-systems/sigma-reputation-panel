@@ -47,6 +47,8 @@ export async function generate_reputation_proof(
     const inputs: Box<Amount>[] = input_proof ? [input_proof.box, ...utxos] : utxos;
     const dataInputs = [typeNftBox];
 
+    if (!object_pointer) object_pointer = inputs[0].boxId;  // Points to the self token being evaluated by default
+
     const outputs: OutputBuilder[] = [];
 
     // --- Create the main output for the new/modified proof ---

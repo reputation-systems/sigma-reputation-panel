@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { generate_reputation_proof } from '$lib/generate_reputation_proof';
-    import { types, proofs } from '$lib/store';
+    import { types } from '$lib/store';
     import { fetchTypeNfts } from '$lib/unspent_proofs';
         
     let currentStep = 1;
