@@ -54,12 +54,12 @@ export async function generate_reputation_proof(
     }
     const typeNftBox = (await typeNftBoxResponse.json()).items[0];
 
+    console.log("type nft box ", typeNftBox)
+
     // Inputs for the transaction
     const utxos = await ergo.get_utxos();
     const inputs: Box<Amount>[] = input_proof ? [input_proof.box, ...utxos] : utxos;
     const dataInputs = [typeNftBox];
-
-    if (!object_pointer) object_pointer = inputs[0].boxId;  // Points to the self token being evaluated by default
 
     const outputs: OutputBuilder[] = [];
 
@@ -75,7 +75,10 @@ export async function generate_reputation_proof(
             amount: token_amount.toString(),
             name: "Reputation Proof Token", // Optional: EIP-4 metadata
         });
-    } else {
+
+        if (!object_pointer) object_pointer = inputs[0].boxId;  // Points to the self token being evaluated by default
+    } 
+    else {
         // Transferring existing tokens
         new_proof_output.addTokens({
             tokenId: input_proof.token_id,
@@ -94,6 +97,8 @@ export async function generate_reputation_proof(
                 .setAdditionalRegisters(input_proof.box.additionalRegisters)
             );
         }
+
+        if (!object_pointer) object_pointer = input_proof.token_id
     }
     
     // --- Set registers according to the new contract specification ---
@@ -107,6 +112,10 @@ export async function generate_reputation_proof(
     });
 
     outputs.push(new_proof_output);
+
+    console.log("inputs ", inputs)
+    console.log("outputs ", outputs)
+    console.log("data inputs ", dataInputs, dataInputs.length)
 
     // --- Build and submit the transaction ---
     try {
