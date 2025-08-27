@@ -16,7 +16,7 @@ export interface TypeNFT {
 
 export interface ReputationProof {
     token_id: string;
-    type: TypeNFT; 
+    type: TypeNFT;  // SELF identification of the proof type (by Type NFT)
     total_amount: number;
     owner_address: string;
     can_be_spend: boolean;

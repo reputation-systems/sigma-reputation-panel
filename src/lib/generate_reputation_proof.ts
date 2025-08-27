@@ -33,6 +33,18 @@ export async function generate_reputation_proof(
     input_proof?: RPBox,
 ): Promise<string | null> {
 
+
+    console.log("Generating reputation proof with parameters:", {
+        token_amount,
+        total_supply,
+        type_nft_id,    
+        object_pointer,
+        polarization,
+        content,
+        is_locked,
+        input_proof
+    });
+
     const wallet_pk = await ergo.get_change_address();
     // Fetch the Type NFT box to be used in dataInputs. This is required by the contract.
     const typeNftBoxResponse = await fetch(`${explorer_uri}/api/v1/boxes/byTokenId/${type_nft_id}`);
@@ -81,8 +93,6 @@ export async function generate_reputation_proof(
                 // The change box must retain the original registers
                 .setAdditionalRegisters(input_proof.box.additionalRegisters)
             );
-            // The spent box must also be included in dataInputs for the completeness proof
-            dataInputs.push(input_proof.box);
         }
     }
     
