@@ -82,6 +82,12 @@
 </main>
 
 <style>
+    :global(html, body) {
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+    
     :global(body) {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -91,6 +97,7 @@
         background-color: #1a1a1a;
         color: #f0f0f0;
         min-height: 100vh;
+        overflow: visible; /* MUY IMPORTANTE: permite que el contenido de 'main' desborde y haga crecer al 'body' */
     }
     
     /* --- Welcome Screen Styles --- */
