@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { generate_reputation_proof } from '$lib/generate_reputation_proof';
     import { types, proofs } from '$lib/store';
+    import type { RPBox } from '$lib/ReputationProof';
 
     // --- WIZARD STATE ---
     let currentStep = 1;
@@ -21,8 +22,20 @@
     let errorMessage = '';
     let successMessage = '';
     
+    // --- REACTIVE LOGIC ---
     $: selectedProof = proof_to_update_id ? $proofs.get(proof_to_update_id) : null;
-    $: isReputationProofType = selectedProof?.type.isRepProof;
+    
+    // Encuentra la caja principal (que se apunta a sí misma) para gastar los tokens.
+    let spendable_box: RPBox | undefined;
+    $: {
+        if (selectedProof) {
+            spendable_box = selectedProof.current_boxes.find(
+                box => box.object_pointer === selectedProof?.token_id
+            );
+        } else {
+            spendable_box = undefined;
+        }
+    }
 
     function nextStep() { if (currentStep < totalSteps) currentStep++; }
     function prevStep() { if (currentStep > 1) currentStep--; }
@@ -38,8 +51,16 @@
             return;
         }
 
-        if (token_amount > selectedProof.total_amount) {
-            errorMessage = `The amount cannot exceed the total supply of the proof (${selectedProof.total_amount}).`;
+        // Validar que la caja desde la que gastamos tokens exista.
+        if (!spendable_box) {
+            errorMessage = "The selected proof has no unassigned tokens available to create a new opinion.";
+            isLoading = false;
+            return;
+        }
+
+        // Validar que la cantidad no exceda los tokens disponibles en esa caja.
+        if (token_amount > spendable_box.token_amount) {
+            errorMessage = `The amount cannot exceed the available supply in the main box (${spendable_box.token_amount}).`;
             isLoading = false;
             return;
         }
@@ -53,7 +74,7 @@
                 !is_negative,
                 data,
                 is_locked,
-                proof_to_update_id
+                spendable_box
             );
 
             if (txId) {
@@ -98,16 +119,22 @@
             <select id="proof-select" class="input" bind:value={proof_to_update_id} required>
                 <option value="" disabled>-- Choose one of your proofs --</option>
                 {#each Array.from($proofs.values()) as proof (proof.token_id)}
-                    <option value={proof.token_id}>
-                        {proof.type.typeName} (Total: {proof.total_amount}) - ID: {proof.token_id.substring(0, 10)}...
-                    </option>
+                    {#if proof.can_be_spend}
+                        <option value={proof.token_id}>
+                            {proof.type.typeName} (Total: {proof.total_amount}) - ID: {proof.token_id.substring(0, 10)}...
+                        </option>
+                    {/if}
                 {/each}
             </select>
             {#if $proofs.size === 0}
                 <p class="help-text error-text">You do not own any reputation proofs to update.</p>
             {/if}
             {#if selectedProof}
-                 <p class="help-text">You are adding a new opinion to the proof "{selectedProof.type.typeName}".</p>
+                {#if spendable_box}
+                    <p class="help-text">Tokens available to assign: {spendable_box.token_amount}</p>
+                {:else}
+                    <p class="help-text error-text">Warning: This proof has no unassigned tokens. You cannot add new opinions.</p>
+                {/if}
             {/if}
         {/if}
 
@@ -121,9 +148,9 @@
         {#if currentStep === 3}
             <h4>Step 3: Assign Weight & Opinion</h4>
             <label for="token-amount">Amount of Tokens to Assign to this Opinion<span class="required">*</span></label>
-            <input id="token-amount" type="number" class="input" bind:value={token_amount} min="1" max={selectedProof?.total_amount} step="1" />
-            {#if selectedProof}
-                <p class="help-text">This amount will be deducted from the main supply of the proof (Total: {selectedProof.total_amount}).</p>
+            <input id="token-amount" type="number" class="input" bind:value={token_amount} min="1" max={spendable_box?.token_amount} step="1" />
+            {#if spendable_box}
+                <p class="help-text">This amount will be deducted from the unassigned supply (Available: {spendable_box.token_amount}).</p>
             {/if}
             <div class="polarity-buttons">
                 <button class:selected={!is_negative} on:click={() => is_negative = false}>👍 Positive</button>
@@ -169,7 +196,7 @@
 
     <div class="wizard-nav">
         <button on:click={prevStep} disabled={currentStep === 1}>&larr; Previous</button>
-        <button on:click={nextStep} disabled={currentStep === totalSteps || !proof_to_update_id}>Next &rarr;</button>
+        <button on:click={nextStep} disabled={currentStep === totalSteps || !proof_to_update_id || !spendable_box}>Next &rarr;</button>
     </div>
 </div>
 
