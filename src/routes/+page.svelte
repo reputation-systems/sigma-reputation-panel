@@ -3,9 +3,8 @@
     import { connected } from '$lib/store';
     import { connectNautilus } from '$lib/connect';
     
-    // Importing the main views
     import MasterGraphView from '$lib/components/graph/MasterGraphView.svelte';
-    import CreateProofWizard from '$lib/components/views/CreateProofWizard.svelte';
+    import Submit from '$lib/components/views/Submit.svelte';
     import Search from '$lib/components/views/Search.svelte';
     import Settings from '$lib/components/views/Settings.svelte';
     import ManageTypes from '$lib/components/views/ManageTypes.svelte';
@@ -68,7 +67,7 @@
                 <Search on:searchGraph={() => currentPage = 'graph'} />
             {:else if currentPage === 'create'}
                 <div class="wizard-wrapper">
-                    <CreateProofWizard />
+                    <Submit />
                 </div>
             {:else if currentPage === 'types'}
                  <div class="wizard-wrapper">
@@ -97,10 +96,9 @@
         background-color: #1a1a1a;
         color: #f0f0f0;
         min-height: 100vh;
-        overflow: visible; /* MUY IMPORTANTE: permite que el contenido de 'main' desborde y haga crecer al 'body' */
+        overflow: visible; 
     }
     
-    /* --- Welcome Screen Styles --- */
     .welcome-container {
         position: relative;
         display: flex;
