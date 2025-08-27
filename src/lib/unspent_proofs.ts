@@ -75,8 +75,8 @@ export async function updateReputationProofList(
 
     if (search) {
         search_bodies.push({ assets: [search] });
-        search_bodies.push({ registers: { "R5": SString(search) } }); // TODO check
-        search_bodies.push({ registers: { "R4": SString(search) } });  // TODO check
+        search_bodies.push({ registers: { "R5": SString(search) } });
+        search_bodies.push({ registers: { "R4": SString(search) } });
         try { search_bodies.push({ registers: { "R7": generate_pk_proposition(search) } }); }
         catch (e) { console.log("Search term is not a valid address, skipping R7 search."); }
     } else {
@@ -100,6 +100,34 @@ export async function updateReputationProofList(
 
                     const rep_token_id = box.assets[0].tokenId;
                     let proof = proofs.get(rep_token_id);
+                    const box_owner_address = serializedToRendered(box.additionalRegisters.R7?.serializedValue ?? "");
+
+                    if (proof && proof.owner_address !== box_owner_address) {
+                        console.warn(`Reputation Proof with token ID ${rep_token_id} has conflicting owner addresses. Skipping this proof.`, {
+                            expectedOwner: proof.owner_address,
+                            foundOwner: box_owner_address,
+                            conflictingBox: box.boxId
+                        });
+                        proofs.delete(rep_token_id);
+                        continue; // Skip adding this box to the list
+                    } else if (proofs.has(rep_token_id) && proof?.owner_address === box_owner_address) {
+                        // Proof already exists and owner matches, continue
+                    } else if (!proof) {
+                        // New proof, initialize with the current box's owner
+                        const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
+                        proof = {
+                            token_id: rep_token_id,
+                            type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
+                            total_amount: r6_parsed.totalSupply,
+                            owner_address: box_owner_address,
+                            can_be_spend: await check_if_r7_is_local_addr(box.additionalRegisters.R7?.serializedValue ?? ""),
+                            current_boxes: [],
+                            number_of_boxes: 0,
+                            network: Network.ErgoMainnet,
+                            data: {}
+                        };
+                        proofs.set(rep_token_id, proof);
+                    }
 
                     const type_nft_id_for_box = hexToUtf8(box.additionalRegisters.R4.renderedValue) ?? "";
                     let typeNftForBox = availableTypes.get(type_nft_id_for_box);
@@ -108,23 +136,6 @@ export async function updateReputationProofList(
                         typeNftForBox = { tokenId: type_nft_id_for_box, boxId: '', typeName: "Unknown Type", description: "Metadata not found", schemaURI: "", isRepProof: false };
                     }
                     
-                    if (!proof) {
-                        const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
-                        const r7_value = box.additionalRegisters.R7?.serializedValue ?? "";
-
-                        proof = {
-                            token_id: rep_token_id,
-                            type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
-                            total_amount: r6_parsed.totalSupply,
-                            owner_address: serializedToRendered(r7_value),
-                            can_be_spend: await check_if_r7_is_local_addr(r7_value),
-                            current_boxes: [],
-                            number_of_boxes: 0,
-                            network: Network.ErgoMainnet,
-                            data: {}
-                        };
-                    }
-
                     let box_content: string|object|null = {};
 
                     try {
@@ -175,7 +186,6 @@ export async function updateReputationProofList(
                     proof.current_boxes.push(current_box);
                     proof.number_of_boxes += 1;
                     
-                    proofs.set(rep_token_id, proof);
                     console.log(proof)
                 }
                 offset += limit;
