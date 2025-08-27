@@ -88,7 +88,7 @@
           <span class="label">Proof:</span> <a>{local_id}</a><br>
           <span class="label">Network:</span> <a>{$network}</a><br>
           {#if proof}
-              <span class="label">Tags:</span> <a>{proof.tag || 'N/A'}</a>
+              <span class="label">Type:</span> <a>{proof.type.typeName || 'N/A'}</a>
           {/if}
       </p>
     </div>  
