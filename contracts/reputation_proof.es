@@ -84,7 +84,7 @@
       val repBoxesOnDataInputs = CONTEXT.dataInputs.filter { (b: Box) =>
         b.propositionBytes == SELF.propositionBytes &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
-        b.R6[(Boolean, Long)]._2 == totalSupply &&
+        b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R4[Coll[Byte]].isDefined &&
         b.R5[Coll[Byte]].isDefined &&
         b.R6[(Boolean, Long)].isDefined &&
@@ -94,7 +94,7 @@
       val repBoxesOnInputs = INPUTS.filter { (b: Box) =>
         b.propositionBytes == SELF.propositionBytes &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
-        b.R6[(Boolean, Long)]._2 == totalSupply &&
+        b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R4[Coll[Byte]].isDefined &&
         b.R5[Coll[Byte]].isDefined &&
         b.R6[(Boolean, Long)].isDefined &&
@@ -104,7 +104,7 @@
       val repBoxesOnOutputs = OUTPUTS.filter { (b: Box) =>
         b.propositionBytes == SELF.propositionBytes &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
-        b.R6[(Boolean, Long)]._2 == totalSupply &&
+        b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R4[Coll[Byte]].isDefined &&
         b.R5[Coll[Byte]].isDefined &&
         b.R6[(Boolean, Long)].isDefined &&
