@@ -72,7 +72,16 @@ export function tupleToSerialized(isLocked: boolean, totalSupply: number): strin
 export async function check_if_r7_is_local_addr(r7Value: string): Promise<boolean> {
     if (!get(connected)) return false;
     // The first 4 bytes of a sigma prop are metadata, so they are sometimes omitted.
-    const localPkProp = generate_pk_proposition((await ergo.get_change_address()));
+    const change_address = await ergo.get_change_address();
+    if (!change_address) {
+        throw new Error("Could not get the creator's address from the wallet.");
+    }
+    const creatorP2PKAddress = ErgoAddress.fromBase58(change_address);
+    const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
+    if (!creatorPkBytes) {
+        throw new Error(`Could not extract the public key from the address ${change_address}.`);
+    }
+    let localPkProp = SColl(SByte, creatorPkBytes).toHex();
     return localPkProp.endsWith(r7Value);
 }
 

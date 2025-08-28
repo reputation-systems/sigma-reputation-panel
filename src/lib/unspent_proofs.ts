@@ -3,6 +3,7 @@ import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializ
 import { get } from "svelte/store";
 import { connected, types } from "./store";
 import { digital_public_good_contract_hash, ergo_tree_hash, explorer_uri } from "./envs";
+import { ErgoAddress, SByte, SColl } from "@fleet-sdk/core";
 
 type RegisterValue = { renderedValue: string; serializedValue: string; };
 type ApiBox = {
@@ -70,15 +71,26 @@ export async function updateReputationProofList(
 
     const proofs = new Map<string, ReputationProof>();
     const search_bodies = [];
+    let r7_filter: { [key: string]: any };
     const change_address = get(connected) && ergo ? await ergo.get_change_address() : null;
-    const r7_filter = !all && change_address ? { "R7": generate_pk_proposition(change_address) } : {};
+    if (change_address && !all) {
+        if (!change_address) {
+            throw new Error("Could not get the creator's address from the wallet.");
+        }
+        const creatorP2PKAddress = ErgoAddress.fromBase58(change_address);
+        const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
+        if (!creatorPkBytes) {
+            throw new Error(`Could not extract the public key from the address ${change_address}.`);
+        }
+        r7_filter = { "R7": SColl(SByte, creatorPkBytes) };
+    } else {
+        r7_filter = { };
+    }
 
     if (search) {
         search_bodies.push({ assets: [search] });
-        search_bodies.push({ registers: { "R5": SString(search) } });
         search_bodies.push({ registers: { "R4": SString(search) } });
-        try { search_bodies.push({ registers: { "R7": generate_pk_proposition(search) } }); }
-        catch (e) { console.log("Search term is not a valid address, skipping R7 search."); }
+        search_bodies.push({ registers: { "R5": SString(search) } });
     } else {
         search_bodies.push({});
     }

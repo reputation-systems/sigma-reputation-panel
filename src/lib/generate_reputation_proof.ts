@@ -4,7 +4,10 @@ import {
     RECOMMENDED_MIN_FEE_VALUE,
     TransactionBuilder,
     type Box,
-    type Amount
+    type Amount,
+    ErgoAddress,
+    SColl,
+    SByte
 } from '@fleet-sdk/core';
 import { type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address, explorer_uri } from './envs';
@@ -45,7 +48,17 @@ export async function generate_reputation_proof(
         input_proof
     });
 
-    const wallet_pk = await ergo.get_change_address();
+    const creatorAddressString = await ergo.get_change_address();
+    const wallet_pk = creatorAddressString;
+    if (!creatorAddressString) {
+        throw new Error("Could not get the creator's address from the wallet.");
+    }
+    const creatorP2PKAddress = ErgoAddress.fromBase58(creatorAddressString);
+    const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
+    if (!creatorPkBytes) {
+        throw new Error(`Could not extract the public key from the address ${creatorAddressString}.`);
+    }
+
     // Fetch the Type NFT box to be used in dataInputs. This is required by the contract.
     const typeNftBoxResponse = await fetch(`${explorer_uri}/api/v1/boxes/byTokenId/${type_nft_id}`);
     if (!typeNftBoxResponse.ok) {
@@ -106,7 +119,7 @@ export async function generate_reputation_proof(
         R4: SString(type_nft_id),
         R5: SString(object_pointer),
         R6: tupleToSerialized(is_locked, total_supply),
-        R7: generate_pk_proposition(wallet_pk),
+        R7: SColl(SByte, creatorPkBytes),
         R8: booleanToSerializer(polarization),
         R9: SString(typeof(content) === "object" ? JSON.stringify(content): content)
     });
