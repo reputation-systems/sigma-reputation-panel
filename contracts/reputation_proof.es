@@ -54,7 +54,7 @@
 */
 {
 
-  DIGITAL_PUBLIC_GOOD = fromBase16("`+DIGITAL_PUBLIC_GOOD+`")
+  DIGITAL_PUBLIC_GOOD = fromBase16("`+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH+`")
 
   /*
     TODO:
@@ -119,7 +119,15 @@
       // OUTPUTS VALIDATION
       val outputsValid = repBoxesOnOutputs.forall { (x: Box) =>
         {
-            // val typeIsValid = x.R4[Coll[Byte]].get in typeNftBox.tokens(0)._1  <--  this sintax is not valid, but the idea is to check if R4 is a vaild type NFT id checking into a list of valid type NFTs
+            val typeExists: Boolean = {
+
+              val typeTokenIdToCheck: Coll[Byte] = x.R4[Coll[Byte]].get
+
+              val availableTypeTokenIds: Seq[Coll[Byte]] = typeNftBoxes.map { (b: Box) => 
+                b.tokens(0)._1 
+              }
+              availableTypeTokenIds.contains(typeTokenIdToCheck)
+            }
 
             // There is no data input pointing to the same object (R4, R5) as this output box.
             val uniqueInDataInputs = repBoxesOnDataInputs.forall { (d: Box) =>
@@ -131,7 +139,7 @@
                 (otherOut.id == x.id) ||
                 ((otherOut.R4[Coll[Byte]].get, otherOut.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get))
             }
-            uniqueInDataInputs && uniqueInOutputs
+            typeExists && uniqueInDataInputs && uniqueInOutputs
         }
       }
 
