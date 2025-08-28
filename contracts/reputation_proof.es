@@ -54,13 +54,9 @@
 */
 {
   /*
-    El contrato requiere varios cambios.
-    - typeIsValid debería asegurarse de los OUTPUTS, no del SELF ... (asegurar la creación no tiene sentido aqui, mas bien en fetch.ts)
-    - allBoxesArePresent parece estar correcto.
-    - validationLogic:
-      - la primera condición debería asegurarse de que todos los tokens de salidas tengan el mismo token.
-      - la segunda no llego a comprenderla del todo.
-      - igualmente ... es importante asegurarse de que hablamos solo de los OUTPUTS con SEFL.propertyBytes
+    TODO:
+    - Validate all typeNFTs are valid. (currently commented)
+    - Allow strict typeNFT schema validation (eg: sigmaverse quality standard - 1.Trust; 2. Access;).   Use R9 for schema.
   */
   // --- Path 1: Admin Transaction (signed by the owner) ---
   val ownerSignedPath = {
