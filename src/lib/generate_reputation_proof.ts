@@ -113,8 +113,9 @@ export async function generate_reputation_proof(
 
     outputs.push(new_proof_output);
 
-    console.log("inputs ", inputs)
-    console.log("outputs ", outputs)
+    console.log("input ", inputs[0])
+    console.log("output 0 ", outputs[0])
+    console.log("output 1", outputs[1])
     console.log("data inputs ", dataInputs, dataInputs.length)
 
     // --- Build and submit the transaction ---

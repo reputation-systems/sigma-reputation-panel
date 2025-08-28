@@ -54,72 +54,113 @@
 * -----------------------------------------------------------------------------------
 */
 {
+  /*
+    El contrato requiere varios cambios.
+    - typeIsValid debería asegurarse de los OUTPUTS, no del SELF ... (asegurar la creación no tiene sentido aqui, mas bien en fetch.ts)
+    - allBoxesArePresent parece estar correcto.
+    - validationLogic:
+      - la primera condición debería asegurarse de que todos los tokens de salidas tengan el mismo token.
+      - la segunda no llego a comprenderla del todo.
+      - igualmente ... es importante asegurarse de que hablamos solo de los OUTPUTS con SEFL.propertyBytes
+  */
   // --- Path 1: Admin Transaction (signed by the owner) ---
   val ownerSignedPath = {
     // The transaction must be signed by the owner of the key in R7.
     if (SELF.R7[SigmaProp].isDefined) {
-      // The "Type NFT" box is required in dataInputs(0).
-      val typeNftBox = CONTEXT.dataInputs(0)
-      
-      // TYPE VALIDATION: This box's R4 must match the token ID of the Type NFT.
-      val typeIsValid = SELF.R4[Coll[Byte]].get == typeNftBox.tokens(0)._1
 
+      /*
+      val typeNftBoxes = CONTEXT.dataInputs.filter { (b: Box) =>
+        b.propositionBytes == DIGITAL_PUBLIC_GOOD
+      }
+      */
+      
       // Extract data from this box's (SELF) register structure.
       val r6Tuple = SELF.R6[(Boolean, Long)].get
       val isLocked = r6Tuple._1
       val totalSupply = r6Tuple._2
       val repTokenId = SELF.tokens(0)._1
       
-      // PROOF OF COMPLETENESS:
-      val otherReputationBoxes = CONTEXT.dataInputs.slice(1, CONTEXT.dataInputs.size)
-      val dataInputsAmount = otherReputationBoxes.fold(0L, { (sum: Long, b: Box) =>
-        if (b.tokens.size > 0 && b.tokens(0)._1 == repTokenId) {
-          sum + b.tokens(0)._2
-        } else {
-          sum
-        }
-      })
-      val allBoxesArePresent = (SELF.tokens(0)._2 + dataInputsAmount) == totalSupply
+      // PROOF OF COMPLETENESS
+      val repBoxesOnDataInputs = CONTEXT.dataInputs.filter { (b: Box) =>
+        b.propositionBytes == SELF.propositionBytes &&
+        b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
+        b.R6[(Boolean, Long)]._2 == totalSupply &&
+        b.R4[Coll[Byte]].isDefined &&
+        b.R5[Coll[Byte]].isDefined &&
+        b.R6[(Boolean, Long)].isDefined &&
+        b.R8[Boolean].isDefined
+      }
+
+      val repBoxesOnInputs = INPUTS.filter { (b: Box) =>
+        b.propositionBytes == SELF.propositionBytes &&
+        b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
+        b.R6[(Boolean, Long)]._2 == totalSupply &&
+        b.R4[Coll[Byte]].isDefined &&
+        b.R5[Coll[Byte]].isDefined &&
+        b.R6[(Boolean, Long)].isDefined &&
+        b.R8[Boolean].isDefined
+      }
+
+      val repBoxesOnOutputs = OUTPUTS.filter { (b: Box) =>
+        b.propositionBytes == SELF.propositionBytes &&
+        b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
+        b.R6[(Boolean, Long)]._2 == totalSupply &&
+        b.R4[Coll[Byte]].isDefined &&
+        b.R5[Coll[Byte]].isDefined &&
+        b.R6[(Boolean, Long)].isDefined &&
+        b.R8[Boolean].isDefined
+      }
+
+      val correctManagedSupply = {
+        val dataInputsAmount = repBoxesOnDataInputs.fold(0L, { (sum: Long, b: Box) => sum + b.tokens(0)._2 })
+        val inputsAmount = repBoxesOnInputs.fold(0L, { (sum: Long, b: Box) => sum + b.tokens(0)._2 })
+        val outputsAmount = repBoxesOnOutputs.fold(0L, { (sum: Long, b: Box) => sum + b.tokens(0)._2 })
+        
+        (inputsAmount + dataInputsAmount) == totalSupply && // All boxes are present.
+        inputsAmount == outputsAmount                    // All tokens are preserved.
+      }
       
-      val validationLogic = OUTPUTS.forall { (x: Box) =>
-        !(x.tokens.exists { (token: (Coll[Byte], Long)) => token._1 == repTokenId }) || {
-          val uniqueInDataInputs = otherReputationBoxes.forall { (d: Box) =>
-              (d.id == SELF.id) || ((d.R4[Coll[Byte]].get, d.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get))
-          }
-          val uniqueInOutputs = OUTPUTS.forall { (otherOut: Box) =>
-              (otherOut.id == x.id) || !(otherOut.tokens.exists { (t: (Coll[Byte], Long)) => t._1 == repTokenId }) ||
-              ((otherOut.R4[Coll[Byte]].get, otherOut.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get))
-          }
-          val objectIsUnique = uniqueInDataInputs && uniqueInOutputs
-          
-          val outputR6Tuple = x.R6[(Boolean, Long)].get
-          val totalSupplyIsPreserved = outputR6Tuple._2 == totalSupply
-          val ownerIsPreserved = x.R7[SigmaProp].get == SELF.R7[SigmaProp].get
-          
-          val lockResult = {
-            if (isLocked) {
-              x.tokens(0)._2 == SELF.tokens(0)._2 &&
-              x.propositionBytes == SELF.propositionBytes &&
-              x.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get &&
-              x.R5[Coll[Byte]].get == SELF.R5[Coll[Byte]].get &&
-              outputR6Tuple._1 == isLocked &&
-              x.R8[Boolean].get == SELF.R8[Boolean].get &&
-              x.R9[Coll[Byte]].get == SELF.R9[Coll[Byte]].get
-            } else {
-              x.propositionBytes == SELF.propositionBytes &&
-              x.R4[Coll[Byte]].isDefined &&
-              x.R5[Coll[Byte]].isDefined &&
-              x.R6[(Boolean, Long)].isDefined &&
-              x.R8[Boolean].isDefined
+      // VALIDATION LOGIC
+      val validationLogic = repBoxesOnOutputs.forall { (x: Box) =>
+        {
+
+            // val typeIsValid = x.R4[Coll[Byte]].get in typeNftBox.tokens(0)._1  <--  esta sintaxis no es válida.
+
+            val objectIsUnique = {
+              // There is no data input pointing to the same object (R4, R5) as this output box.
+              val uniqueInDataInputs = repBoxesOnDataInputs.forall { (d: Box) =>
+                  (d.R4[Coll[Byte]].get, d.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get)
+              }
+
+              // There is no other output box (except itself) pointing to the same object (R4, R5).
+              val uniqueInOutputs = repBoxesOnOutputs.forall { (otherOut: Box) =>
+                  (otherOut.id == x.id) ||
+                  ((otherOut.R4[Coll[Byte]].get, otherOut.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get))
+              }
+              uniqueInDataInputs && uniqueInOutputs
             }
-          }
-          objectIsUnique && totalSupplyIsPreserved && ownerIsPreserved && lockResult
+
+            val ownerIsPreserved = x.R7[SigmaProp].get == SELF.R7[SigmaProp].get  // This could be relaxed if needed.
+            
+            // A partir de aqui, se está asumiendo que tansolo hay una RPBox como input.
+            val lockResult = {
+              if (isLocked) {
+                x.tokens(0)._2 == SELF.tokens(0)._2 &&              // Preserve token amount.
+                x.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get &&  // Preserve type NFT ID.
+                x.R5[Coll[Byte]].get == SELF.R5[Coll[Byte]].get &&  // Preserve unique object data.
+                x.R6[(Boolean, Long)].get._1 == true &&             // Once locked, always locked.
+                x.R9[Coll[Byte]].get == SELF.R9[Coll[Byte]].get     // Preserve reserved data.
+              } 
+              else { true }
+            }
+
+            objectIsUnique && ownerIsPreserved && lockResult
         }
       }
-      typeIsValid && allBoxesArePresent && validationLogic
-    } else {
-      false
-    }
+
+      correctManagedSupply && validationLogic
+    } 
+    else { false }
   }
 
   // --- Path 2: ERG Top-Up (public, no signature) ---
