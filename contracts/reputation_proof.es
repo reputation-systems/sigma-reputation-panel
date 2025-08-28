@@ -43,8 +43,7 @@
 * - Purpose: A tuple that stores the lock status and the total token supply
 * of the collection.
 *
-* R7: SigmaProp                -> ownerPublicKey
-* - Purpose: Public key of the owner who must sign the transaction.
+* R7: Coll[Byte]              -> propositionBytes of the owner, must be spent one box with this script to confirm ownership
 *
 * R8: Boolean                  -> customFlag
 * - Purpose: A boolean flag for custom application logic.
@@ -65,8 +64,8 @@
   */
   // --- Path 1: Admin Transaction (signed by the owner) ---
   val ownerSignedPath = {
-    // The transaction must be signed by the owner of the key in R7.
-    if (SELF.R7[SigmaProp].isDefined) {
+    val isOwner = INPUTS.exists { (b: Box) => b.propositionBytes == SELF.R7[Coll[Byte]].get }
+    if (isOwner) {
 
       /*
       val typeNftBoxes = CONTEXT.dataInputs.filter { (b: Box) =>
@@ -85,9 +84,9 @@
         b.propositionBytes == SELF.propositionBytes &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
+        b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
         b.R4[Coll[Byte]].isDefined &&
         b.R5[Coll[Byte]].isDefined &&
-        b.R6[(Boolean, Long)].isDefined &&
         b.R8[Boolean].isDefined
       }
 
@@ -95,9 +94,9 @@
         b.propositionBytes == SELF.propositionBytes &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
+        b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
         b.R4[Coll[Byte]].isDefined &&
         b.R5[Coll[Byte]].isDefined &&
-        b.R6[(Boolean, Long)].isDefined &&
         b.R8[Boolean].isDefined
       }
 
@@ -105,9 +104,9 @@
         b.propositionBytes == SELF.propositionBytes &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
+        b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
         b.R4[Coll[Byte]].isDefined &&
         b.R5[Coll[Byte]].isDefined &&
-        b.R6[(Boolean, Long)].isDefined &&
         b.R8[Boolean].isDefined
       }
 
@@ -123,26 +122,19 @@
       // OUTPUTS VALIDATION
       val outputsValid = repBoxesOnOutputs.forall { (x: Box) =>
         {
-
             // val typeIsValid = x.R4[Coll[Byte]].get in typeNftBox.tokens(0)._1  <--  this sintax is not valid, but the idea is to check if R4 is a vaild type NFT id checking into a list of valid type NFTs
 
-            val objectIsUnique = {
-              // There is no data input pointing to the same object (R4, R5) as this output box.
-              val uniqueInDataInputs = repBoxesOnDataInputs.forall { (d: Box) =>
-                  (d.R4[Coll[Byte]].get, d.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get)
-              }
-
-              // There is no other output box (except itself) pointing to the same object (R4, R5).
-              val uniqueInOutputs = repBoxesOnOutputs.forall { (otherOut: Box) =>
-                  (otherOut.id == x.id) ||
-                  ((otherOut.R4[Coll[Byte]].get, otherOut.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get))
-              }
-              uniqueInDataInputs && uniqueInOutputs
+            // There is no data input pointing to the same object (R4, R5) as this output box.
+            val uniqueInDataInputs = repBoxesOnDataInputs.forall { (d: Box) =>
+                (d.R4[Coll[Byte]].get, d.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get)
             }
 
-            val ownerIsPreserved = x.R7[SigmaProp].get == SELF.R7[SigmaProp].get  // This could be relaxed if needed.
-
-            objectIsUnique && ownerIsPreserved
+            // There is no other output box (except itself) pointing to the same object (R4, R5).
+            val uniqueInOutputs = repBoxesOnOutputs.forall { (otherOut: Box) =>
+                (otherOut.id == x.id) ||
+                ((otherOut.R4[Coll[Byte]].get, otherOut.R5[Coll[Byte]].get) != (x.R4[Coll[Byte]].get, x.R5[Coll[Byte]].get))
+            }
+            uniqueInDataInputs && uniqueInOutputs
         }
       }
 
