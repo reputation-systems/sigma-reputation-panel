@@ -53,6 +53,9 @@
 * -----------------------------------------------------------------------------------
 */
 {
+
+  DIGITAL_PUBLIC_GOOD = fromBase16("`+DIGITAL_PUBLIC_GOOD+`")
+
   /*
     TODO:
     - Validate all typeNFTs are valid. (currently commented)
@@ -63,11 +66,9 @@
     val isOwner = INPUTS.exists { (b: Box) => b.propositionBytes == SELF.R7[Coll[Byte]].get }
     if (isOwner) {
 
-      /*
       val typeNftBoxes = CONTEXT.dataInputs.filter { (b: Box) =>
-        b.propositionBytes == DIGITAL_PUBLIC_GOOD
+        blake2b256(b.propositionBytes) == DIGITAL_PUBLIC_GOOD
       }
-      */
       
       // Extract data from this box's (SELF) register structure.
       val r6Tuple = SELF.R6[(Boolean, Long)].get
@@ -77,7 +78,7 @@
       
       // PROOF OF COMPLETENESS
       val repBoxesOnDataInputs = CONTEXT.dataInputs.filter { (b: Box) =>
-        b.propositionBytes == SELF.propositionBytes &&
+        blake2b256(b.propositionBytes) == blake2b256(SELF.propositionBytes) &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
@@ -87,7 +88,7 @@
       }
 
       val repBoxesOnInputs = INPUTS.filter { (b: Box) =>
-        b.propositionBytes == SELF.propositionBytes &&
+        blake2b256(b.propositionBytes) == blake2b256(SELF.propositionBytes) &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
@@ -97,7 +98,7 @@
       }
 
       val repBoxesOnOutputs = OUTPUTS.filter { (b: Box) =>
-        b.propositionBytes == SELF.propositionBytes &&
+        blake2b256(b.propositionBytes) == blake2b256(SELF.propositionBytes) &&
         b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
