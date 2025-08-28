@@ -120,11 +120,11 @@
         inputsAmount == outputsAmount                    // All tokens are preserved.
       }
       
-      // VALIDATION LOGIC
-      val validationLogic = repBoxesOnOutputs.forall { (x: Box) =>
+      // OUTPUTS VALIDATION
+      val outputsValid = repBoxesOnOutputs.forall { (x: Box) =>
         {
 
-            // val typeIsValid = x.R4[Coll[Byte]].get in typeNftBox.tokens(0)._1  <--  esta sintaxis no es válida.
+            // val typeIsValid = x.R4[Coll[Byte]].get in typeNftBox.tokens(0)._1  <--  this sintax is not valid, but the idea is to check if R4 is a vaild type NFT id checking into a list of valid type NFTs
 
             val objectIsUnique = {
               // There is no data input pointing to the same object (R4, R5) as this output box.
@@ -141,24 +141,26 @@
             }
 
             val ownerIsPreserved = x.R7[SigmaProp].get == SELF.R7[SigmaProp].get  // This could be relaxed if needed.
-            
-            // A partir de aqui, se está asumiendo que tansolo hay una RPBox como input.
-            val lockResult = {
-              if (isLocked) {
-                x.tokens(0)._2 == SELF.tokens(0)._2 &&              // Preserve token amount.
-                x.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get &&  // Preserve type NFT ID.
-                x.R5[Coll[Byte]].get == SELF.R5[Coll[Byte]].get &&  // Preserve unique object data.
-                x.R6[(Boolean, Long)].get._1 == true &&             // Once locked, always locked.
-                x.R9[Coll[Byte]].get == SELF.R9[Coll[Byte]].get     // Preserve reserved data.
-              } 
-              else { true }
-            }
 
-            objectIsUnique && ownerIsPreserved && lockResult
+            objectIsUnique && ownerIsPreserved
         }
       }
 
-      correctManagedSupply && validationLogic
+      // LOCKING LOGIC
+      val correctLock =  {
+        if (isLocked) {
+          repBoxesOnOutputs.exists { (x: Box) => {
+            x.tokens(0)._2 >= SELF.tokens(0)._2 &&              // Preserve token amount or increase it.
+            x.R4[Coll[Byte]].get == SELF.R4[Coll[Byte]].get &&  // Preserve type NFT ID.
+            x.R5[Coll[Byte]].get == SELF.R5[Coll[Byte]].get &&  // Preserve unique object data.
+            x.R6[(Boolean, Long)].get._1 == true &&             // Once locked, always locked.
+            x.R9[Coll[Byte]].get == SELF.R9[Coll[Byte]].get     // Preserve reserved data.
+          }}
+        }
+        else { true }
+      }
+
+      correctManagedSupply && outputsValid && correctLock
     } 
     else { false }
   }
