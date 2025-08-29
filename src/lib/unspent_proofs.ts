@@ -97,12 +97,12 @@ export async function updateReputationProofList(
 
     const change_address = get(connected) && ergo ? await ergo.get_change_address() : null;
     if (change_address) {
-        const creatorP2PKAddress = ErgoAddress.fromBase58(change_address);
-        const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
-        if (creatorPkBytes) {
-            const sigmaPropBytes = new Uint8Array([0x00, 0x08, 0xcd, ...creatorPkBytes]);
-            const hashedPk = blake2b256(sigmaPropBytes);
-            userR7SerializedHex = SColl(SByte, hashedPk).toHex();
+        const userAddress = ErgoAddress.fromBase58(change_address);
+        const propositionBytes = hexToBytes(userAddress.ergoTree);
+
+        if (propositionBytes) {
+            const hashedProposition = blake2b256(propositionBytes);
+            userR7SerializedHex = SColl(SByte, hashedProposition).toHex();
             if (!all) {
                 r7_filter = { "R7": userR7SerializedHex };
             }
@@ -169,7 +169,6 @@ export async function updateReputationProofList(
                         proofs.set(rep_token_id, proof);
                     }
 
-                    // R4 contains the raw token ID, its renderedValue is the hex string
                     const type_nft_id_for_box = box.additionalRegisters.R4.renderedValue ?? "";
                     let typeNftForBox = availableTypes.get(type_nft_id_for_box);
                     if (!typeNftForBox) {

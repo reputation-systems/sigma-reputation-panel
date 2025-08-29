@@ -51,15 +51,10 @@ export async function generate_reputation_proof(
     });
 
     const creatorAddressString = await ergo.get_change_address();
-    const wallet_pk = creatorAddressString;
     if (!creatorAddressString) {
         throw new Error("Could not get the creator's address from the wallet.");
     }
     const creatorP2PKAddress = ErgoAddress.fromBase58(creatorAddressString);
-    const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
-    if (!creatorPkBytes) {
-        throw new Error(`Could not extract the public key from the address ${creatorAddressString}.`);
-    }
 
     // Fetch the Type NFT box to be used in dataInputs. This is required by the contract.
     const typeNftBoxResponse = await fetch(`${explorer_uri}/api/v1/boxes/byTokenId/${type_nft_id}`);
@@ -123,16 +118,17 @@ export async function generate_reputation_proof(
         }
     }
     
-    // --- Set registers according to the new contract specification ---
-    // The owner's public key is stored as the Blake2b256 hash of their Sigma proposition (ProveDlog).
-    const sigmaPropBytes = new Uint8Array([0x00, 0x08, 0xcd, ...creatorPkBytes]);
-    const hashedPk = blake2b256(sigmaPropBytes);
+    const propositionBytes = hexToBytes(creatorP2PKAddress.ergoTree);
+    if (!propositionBytes) {
+        throw new Error(`Could not get proposition bytes from address ${creatorAddressString}.`);
+    }
+    const hashedProposition = blake2b256(propositionBytes);
 
     new_proof_output.setAdditionalRegisters({
         R4: SColl(SByte, hexToBytes(type_nft_id) ?? "").toHex(),
         R5: SString(object_pointer),
         R6: tupleToSerialized(is_locked, total_supply),
-        R7: SColl(SByte, hashedPk).toHex(),
+        R7: SColl(SByte, hashedProposition).toHex(), // <-- Valor R7 Corregido
         R8: booleanToSerializer(polarization),
         R9: SString(typeof(content) === "object" ? JSON.stringify(content): content ?? "")
     });
@@ -152,6 +148,8 @@ export async function generate_reputation_proof(
 
         const signedTransaction = await ergo.sign_tx(unsignedTransaction);
         const transactionId = await ergo.submit_tx(signedTransaction);
+
+
 
         console.log("Transaction ID -> ", transactionId);
         return transactionId;
