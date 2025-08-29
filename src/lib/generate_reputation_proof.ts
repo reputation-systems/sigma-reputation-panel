@@ -12,6 +12,7 @@ import {
 import { type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address, explorer_uri } from './envs';
 import { booleanToSerializer, generate_pk_proposition, SString, tupleToSerialized } from './utils';
+import { getAllRPBoxesFromProof, getReputationProofFromRPBox } from './unspent_proofs';
 
 /**
  * Generates or modifies a reputation proof by building and submitting a transaction.
@@ -72,7 +73,7 @@ export async function generate_reputation_proof(
     // Inputs for the transaction
     const utxos = await ergo.get_utxos();
     const inputs: Box<Amount>[] = input_proof ? [input_proof.box, ...utxos] : utxos;
-    const dataInputs = [typeNftBox];
+    let dataInputs = [typeNftBox];
 
     const outputs: OutputBuilder[] = [];
 
@@ -112,6 +113,13 @@ export async function generate_reputation_proof(
         }
 
         if (!object_pointer) object_pointer = input_proof.token_id
+
+        const parentProof = getReputationProofFromRPBox(input_proof);
+        if (parentProof) {
+            let all_boxes = getAllRPBoxesFromProof(parentProof);
+            all_boxes = all_boxes.filter(b => b.box_id !== input_proof.box_id); // Exclude the spent box
+            dataInputs = dataInputs.concat(all_boxes);
+        }
     }
     
     // --- Set registers according to the new contract specification ---

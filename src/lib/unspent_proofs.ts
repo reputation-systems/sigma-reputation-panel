@@ -1,7 +1,7 @@
 import { Network, type RPBox, type ReputationProof, type TypeNFT } from "$lib/ReputationProof";
-import { check_if_r7_is_local_addr, generate_pk_proposition, hexToUtf8, serializedToRendered, SString } from "$lib/utils";
+import { check_if_r7_is_local_addr, hexToUtf8, serializedToRendered, SString } from "$lib/utils";
 import { get } from "svelte/store";
-import { connected, types } from "./store";
+import { connected, proofs, types } from "./store";
 import { digital_public_good_contract_hash, ergo_tree_hash, explorer_uri } from "./envs";
 import { ErgoAddress, SByte, SColl } from "@fleet-sdk/core";
 
@@ -208,4 +208,25 @@ export async function updateReputationProofList(
         console.error('An error occurred during the reputation proof search:', error);
         return new Map();
     }
+}
+
+/**
+ * Retrieves all boxes (RPBox) associated with a specific ReputationProof.
+ * @param proof The ReputationProof object from which to extract the boxes.
+ * @returns An array of RPBox objects.
+ */
+export function getAllRPBoxesFromProof(proof: ReputationProof): RPBox[] {
+    return proof.current_boxes;
+}
+
+/**
+ * Finds and returns the ReputationProof to which a specific RPBox belongs.
+ * This function retrieves the complete map of proofs from the 'proofs' Svelte store.
+ * @param box The RPBox for which to find its parent ReputationProof.
+ * @returns The corresponding ReputationProof or 'undefined' if not found.
+ */
+export function getReputationProofFromRPBox(
+    box: RPBox
+): ReputationProof | undefined {
+    return get(proofs).get(box.token_id);
 }
