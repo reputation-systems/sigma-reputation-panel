@@ -108,7 +108,7 @@ describe("Reputation Proof Contract Tests", () => {
         name: "Reputation Proof Token Test",
     })
     .setAdditionalRegisters({
-        R4: SString(typeNftId),
+        R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(objectPointer),
         R6: tupleToSerialized(false, totalSupply), // isLocked: false
         R7: SColl(SByte, creatorPkBytes),
@@ -135,7 +135,7 @@ describe("Reputation Proof Contract Tests", () => {
     
     expect(mintedTokenId).to.equal(tx.inputs[0].boxId); // The token ID is the ID of the first input box
     expect(createdBox.assets[0].amount).to.equal(BigInt(totalSupply));
-    expect(createdBox.additionalRegisters.R4).to.equal(SString(typeNftId));
+    expect(createdBox.additionalRegisters.R4).to.equal(SColl(SByte, hexToBytes(typeNftId) ?? "").toHex());
     expect(createdBox.additionalRegisters.R5).to.equal(SString(objectPointer));
     expect(createdBox.additionalRegisters.R8).to.equal(booleanToSerializer(true));
   });

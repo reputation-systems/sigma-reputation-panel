@@ -9,9 +9,10 @@ import {
     SColl,
     SByte
 } from '@fleet-sdk/core';
+import { blake2b256 } from '@fleet-sdk/crypto';
 import { type RPBox } from '$lib/ReputationProof';
 import { ergo_tree_address, explorer_uri } from './envs';
-import { booleanToSerializer, generate_pk_proposition, SString, tupleToSerialized } from './utils';
+import { booleanToSerializer, SString, tupleToSerialized, hexToBytes } from './utils';
 import { getAllRPBoxesFromProof, getReputationProofFromRPBox } from './unspent_proofs';
 
 /**
@@ -123,13 +124,17 @@ export async function generate_reputation_proof(
     }
     
     // --- Set registers according to the new contract specification ---
+    // The owner's public key is stored as the Blake2b256 hash of their Sigma proposition (ProveDlog).
+    const sigmaPropBytes = new Uint8Array([0x00, 0x08, 0xcd, ...creatorPkBytes]);
+    const hashedPk = blake2b256(sigmaPropBytes);
+
     new_proof_output.setAdditionalRegisters({
-        R4: SString(type_nft_id),
+        R4: SColl(SByte, hexToBytes(type_nft_id) ?? "").toHex(),
         R5: SString(object_pointer),
         R6: tupleToSerialized(is_locked, total_supply),
-        R7: SColl(SByte, creatorPkBytes),
+        R7: SColl(SByte, hashedPk).toHex(),
         R8: booleanToSerializer(polarization),
-        R9: SString(typeof(content) === "object" ? JSON.stringify(content): content)
+        R9: SString(typeof(content) === "object" ? JSON.stringify(content): content ?? "")
     });
 
     outputs.push(new_proof_output);
@@ -139,7 +144,7 @@ export async function generate_reputation_proof(
         const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
             .from(inputs)
             .to(outputs)
-            .sendChangeTo(wallet_pk)
+            .sendChangeTo(creatorP2PKAddress)
             .payFee(RECOMMENDED_MIN_FEE_VALUE)
             .withDataFrom(dataInputs)
             .build()
