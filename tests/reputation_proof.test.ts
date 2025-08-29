@@ -8,9 +8,10 @@ import {
   TransactionBuilder,
   Box,
   Amount,
+  Party,
 } from "@fleet-sdk/core";
-import { SByte, SColl, SBool, SPair, SLong, SConstant } from "@fleet-sdk/serializer";
-import { blake2b256, sha256 } from "@fleet-sdk/crypto";
+import { SByte, SColl, SBool, SPair, SLong } from "@fleet-sdk/serializer";
+import { blake2b256 } from "@fleet-sdk/crypto";
 import * as fs from "fs";
 import * as path from "path";
 import { stringToBytes } from "@scure/base";
@@ -36,14 +37,12 @@ function uint8ArrayToHex(bytes: Uint8Array): string {
 
 // --- Contract Loading and Compilation ---
 
-const contractsDir = path.resolve(__dirname, "../contracts"); // Make sure the path to your contracts is correct
+const contractsDir = path.resolve(__dirname, "../contracts");
 
-// Contract for the "Type NFT"
 const DIGITAL_PUBLIC_GOOD_SOURCE = fs.readFileSync(path.join(contractsDir, "digital_public_good.es"), "utf-8");
 const digitalPublicGoodErgoTree = compile(DIGITAL_PUBLIC_GOOD_SOURCE, { version: 1 });
 const digitalPublicGoodScriptHash = uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.bytes));
 
-// Main contract for the Reputation Proof
 const REPUTATION_PROOF_SOURCE_TEMPLATE = fs.readFileSync(path.join(contractsDir, "reputation_proof.es"), "utf-8");
 const REPUTATION_PROOF_SOURCE = REPUTATION_PROOF_SOURCE_TEMPLATE.replace("`+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH+`", digitalPublicGoodScriptHash);
 const reputationProofErgoTree = compile(REPUTATION_PROOF_SOURCE, { version: 1 });
@@ -51,15 +50,20 @@ const reputationProofErgoTree = compile(REPUTATION_PROOF_SOURCE, { version: 1 })
 
 describe("Reputation Proof Contract Tests", () => {
   let mockChain: MockChain;
-  let creator: ReturnType<MockChain["newParty"]>;
+  let creator: Party;
   
-  // Contract Parties
-  let reputationProofContract: ReturnType<MockChain["addParty"]>;
-  let digitalPublicGoodContract: ReturnType<MockChain["addParty"]>;
+  let reputationProofContract: Party;
+  let digitalPublicGoodContract: Party;
 
-  // Reusable Boxes and Tokens
   let typeNftBox: Box<Amount>;
   const typeNftId = "01c236e723a189c99e9c9380dc48a6058e888c88e9a107df1c0519d0a5bf838e";
+
+  function getCorrectR7(party: Party): string {
+    const ergoTreeBytes = hexToBytes(party.address.ergoTree);
+    if (!ergoTreeBytes) throw new Error("Could not get ergoTree bytes");
+    const hashedProposition = blake2b256(ergoTreeBytes);
+    return SColl(SByte, hashedProposition).toHex();
+  }
 
   afterEach(() => {
     mockChain.reset();
@@ -68,15 +72,12 @@ describe("Reputation Proof Contract Tests", () => {
   beforeEach(() => {
     mockChain = new MockChain({ height: 800_000 });
 
-    // --- Actors ---
     creator = mockChain.newParty("Creator");
-    creator.addBalance({ nanoergs: 10_000_000n }); // 0.01 ERG
+    creator.addBalance({ nanoergs: 10_000_000n });
 
-    // --- Contract Parties ---
     reputationProofContract = mockChain.addParty(reputationProofErgoTree.toHex(), "ReputationProofContract");
     digitalPublicGoodContract = mockChain.addParty(digitalPublicGoodErgoTree.toHex(), "DigitalPublicGoodContract");
 
-    // --- Creation of the "Type NFT" box (used in dataInputs) ---
     digitalPublicGoodContract.addUTxOs({
       creationHeight: mockChain.height,
       ergoTree: digitalPublicGoodErgoTree.toHex(),
@@ -96,9 +97,7 @@ describe("Reputation Proof Contract Tests", () => {
     const currentHeight = mockChain.height;
     const totalSupply = 1000;
     const objectPointer = "https://ergoplatform.org";
-    const creatorPkBytes = creator.address.getPublicKeys()[0];
 
-    // --- Definition of the reputation proof Output ---
     const newProofOutput = new OutputBuilder(
       SAFE_MIN_BOX_VALUE,
       reputationProofContract.address
@@ -110,13 +109,12 @@ describe("Reputation Proof Contract Tests", () => {
     .setAdditionalRegisters({
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(objectPointer),
-        R6: tupleToSerialized(false, totalSupply), // isLocked: false
-        R7: SColl(SByte, creatorPkBytes),
-        R8: booleanToSerializer(true), // polarization: true (positive)
+        R6: tupleToSerialized(false, totalSupply),
+        R7: getCorrectR7(creator),
+        R8: booleanToSerializer(true),
         R9: SString(JSON.stringify({ message: "Initial creation" }))
     });
 
-    // --- Transaction Construction ---
     const tx = new TransactionBuilder(currentHeight)
       .from(creator.utxos)
       .to(newProofOutput)
@@ -125,7 +123,6 @@ describe("Reputation Proof Contract Tests", () => {
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .build();
     
-    // --- Execution and Verification ---
     const executionResult = mockChain.execute(tx, { signers: [creator] });
     expect(executionResult).to.be.true;
     
@@ -133,7 +130,7 @@ describe("Reputation Proof Contract Tests", () => {
     const createdBox = reputationProofContract.utxos.toArray()[0];
     const mintedTokenId = createdBox.assets[0].tokenId;
     
-    expect(mintedTokenId).to.equal(tx.inputs[0].boxId); // The token ID is the ID of the first input box
+    expect(mintedTokenId).to.equal(tx.inputs[0].boxId);
     expect(createdBox.assets[0].amount).to.equal(BigInt(totalSupply));
     expect(createdBox.additionalRegisters.R4).to.equal(SColl(SByte, hexToBytes(typeNftId) ?? "").toHex());
     expect(createdBox.additionalRegisters.R5).to.equal(SString(objectPointer));
@@ -141,13 +138,11 @@ describe("Reputation Proof Contract Tests", () => {
   });
 
   it("should update an existing reputation proof by splitting it", () => {
-    // --- Initial State: Create a reputation proof to be spent ---
     const initialTotalSupply = 1000;
     const initialObjectPointer = "https://github.com/ergoplatform";
-    const creatorPkBytes = creator.address.getPublicKeys()[0];
-    const initialProofTokenId = "a".repeat(64); // predictable token ID
+    const initialProofTokenId = "a".repeat(64);
 
-    const r7 = SColl(SByte, blake2b256(new Uint8Array([...( new Uint8Array([0x00, 0x08, 0xcd])), ...creatorPkBytes]))).toHex();
+    const r7 = getCorrectR7(creator);
 
     reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
@@ -165,14 +160,11 @@ describe("Reputation Proof Contract Tests", () => {
     });
     const proofToSpend = reputationProofContract.utxos.toArray()[0];
 
-    // --- Parameters for the update ---
     const updatedAmount = 200;
-    const changeAmount = initialTotalSupply - updatedAmount; // 800
+    const changeAmount = initialTotalSupply - updatedAmount;
     const updatedObjectPointer = "https://google.io";
-    const updatedPolarization = false; // Change to negative
+    const updatedPolarization = false;
 
-    // --- Definition of the Outputs ---
-    // 1. The updated box with new data and 200 tokens
     const updatedProofOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, reputationProofContract.address)
       .addTokens([{ tokenId: initialProofTokenId, amount: updatedAmount.toString() }])
       .setAdditionalRegisters({
@@ -184,46 +176,39 @@ describe("Reputation Proof Contract Tests", () => {
         R9: SString(JSON.stringify({ message: "This is an updated proof." }))
       });
 
-    // 2. The "change" box with the remaining 800 tokens and original registers
     const changeProofOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, reputationProofContract.address)
       .addTokens([{ tokenId: initialProofTokenId, amount: changeAmount.toString() }])
       .setAdditionalRegisters(proofToSpend.additionalRegisters);
     
-    // --- Transaction Construction ---
     const tx = new TransactionBuilder(mockChain.height)
       .from([proofToSpend, ...creator.utxos.toArray()])
       .to([updatedProofOutput, changeProofOutput])
-      .withDataFrom([typeNftBox]) // The "Proof of Completeness" is satisfied because 100% of the supply is in the inputs.
+      .withDataFrom([typeNftBox])
       .sendChangeTo(creator.address)
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .build();
 
-    // --- Execution and Verification ---
     const executionResult = mockChain.execute(tx, { signers: [creator] });
     expect(executionResult).to.be.true;
 
     expect(reputationProofContract.utxos.length).to.equal(2);
 
-    // Verify the updated box
     const updatedBox = reputationProofContract.utxos.toArray().find(box => box.assets[0].amount === BigInt(updatedAmount));
     expect(updatedBox).to.not.be.undefined;
     expect(updatedBox?.additionalRegisters.R5).to.equal(SString(updatedObjectPointer));
     expect(updatedBox?.additionalRegisters.R8).to.equal(booleanToSerializer(updatedPolarization));
 
-    // Verify the change box
     const changeBox = reputationProofContract.utxos.toArray().find(box => box.assets[0].amount === BigInt(changeAmount));
     expect(changeBox).to.not.be.undefined;
-    expect(changeBox?.additionalRegisters.R5).to.equal(SString(initialObjectPointer)); // It must keep the original R5
+    expect(changeBox?.additionalRegisters.R5).to.equal(SString(initialObjectPointer));
     expect(changeBox?.additionalRegisters).to.deep.equal(proofToSpend.additionalRegisters);
   })
 
   it("should fail to update if the transaction is not signed by the owner", () => {
-    // --- Initial State: Proof box owned by 'creator' ---
     const initialTotalSupply = 1000;
-    const creatorPkBytes = creator.address.getPublicKeys()[0];
     const initialProofTokenId = "b".repeat(64);
-    // The creator's public key is saved in R7 for ownership verification
-    const r7 = SColl(SByte, blake2b256(new Uint8Array([...( new Uint8Array([0x00, 0x08, 0xcd])), ...creatorPkBytes]))).toHex();
+    
+    const r7 = getCorrectR7(creator);
 
     reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
@@ -241,7 +226,6 @@ describe("Reputation Proof Contract Tests", () => {
     });
     const proofToSpend = reputationProofContract.utxos.toArray()[0];
 
-    // --- An unauthorized actor attempts to update the box ---
     const attacker = mockChain.newParty("Attacker");
     attacker.addBalance({ nanoergs: 10_000_000n });
 
@@ -257,22 +241,18 @@ describe("Reputation Proof Contract Tests", () => {
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .build();
 
-    // --- Execution and Verification ---
-    // The execution must fail because the 'attacker' is not the owner defined in R7
     const executionResult = mockChain.execute(tx, { signers: [attacker], throw: false });
     expect(executionResult).to.be.false;
     
-    // The contract's state should not have changed
     expect(reputationProofContract.utxos.length).to.equal(1);
     expect(reputationProofContract.utxos.toArray()[0].additionalRegisters.R5).to.equal(SString("some-pointer"));
   });
 
   it("should allow anyone to add ERGs to a proof box (top-up for demurrage)", () => {
-    // --- Initial State: Proof box owned by 'creator' ---
     const initialTotalSupply = 1000;
-    const creatorPkBytes = creator.address.getPublicKeys()[0];
     const initialProofTokenId = "c".repeat(64);
-    const r7 = SColl(SByte, blake2b256(new Uint8Array([...( new Uint8Array([0x00, 0x08, 0xcd])), ...creatorPkBytes]))).toHex();
+
+    const r7 = getCorrectR7(creator); 
 
     reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
@@ -290,12 +270,10 @@ describe("Reputation Proof Contract Tests", () => {
     });
     const proofToSpend = reputationProofContract.utxos.toArray()[0];
     
-    // --- A 'good samaritan' adds ERGs to the box ---
     const goodSamaritan = mockChain.newParty("GoodSamaritan");
-    const topUpAmount = 1_000_000n; // 0.001 ERG
+    const topUpAmount = 1_000_000n;
     goodSamaritan.addBalance({ nanoergs: topUpAmount + RECOMMENDED_MIN_FEE_VALUE });
 
-    // The output is an exact copy of the input, but with more ERGs
     const toppedUpOutput = new OutputBuilder(proofToSpend.value + topUpAmount, reputationProofContract.address)
       .addTokens(proofToSpend.assets)
       .setAdditionalRegisters(proofToSpend.additionalRegisters);
@@ -308,25 +286,20 @@ describe("Reputation Proof Contract Tests", () => {
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .build();
 
-    // --- Execution and Verification ---
-    // The execution should succeed, as this action does not require the owner's signature
     const executionResult = mockChain.execute(tx, { signers: [goodSamaritan] });
     expect(executionResult).to.be.true;
 
-    // Verify that the box has been replaced by one with more ERGs
     expect(reputationProofContract.utxos.length).to.equal(1);
     const newBox = reputationProofContract.utxos.toArray()[0];
     expect(newBox.value).to.equal(proofToSpend.value + topUpAmount);
-    // The other data must remain identical
     expect(newBox.additionalRegisters).to.deep.equal(proofToSpend.additionalRegisters);
   });
 
   it("should update multiple proof boxes of the same token in one transaction", () => {
-    // --- Initial State: Two boxes of the same proof, both owned by 'creator' ---
     const initialTotalSupply = 1000;
-    const creatorPkBytes = creator.address.getPublicKeys()[0];
     const proofTokenId = "d".repeat(64);
-    const r7 = SColl(SByte, blake2b256(new Uint8Array([...( new Uint8Array([0x00, 0x08, 0xcd])), ...creatorPkBytes]))).toHex();
+    
+    const r7 = getCorrectR7(creator); 
     
     const commonRegisters = {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
@@ -335,8 +308,7 @@ describe("Reputation Proof Contract Tests", () => {
         R9: SString("{}")
     };
 
-    // CORRECTION: Call addUTxOs twice, once for each box.
-    reputationProofContract.addUTxOs({ // Box 1
+    reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
       ergoTree: reputationProofErgoTree.toHex(), 
       value: SAFE_MIN_BOX_VALUE,
@@ -344,7 +316,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: { ...commonRegisters, R5: SString("pointer-A"), R8: booleanToSerializer(true) }
     });
     
-    reputationProofContract.addUTxOs({ // Box 2
+    reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
       ergoTree: reputationProofErgoTree.toHex(),
       value: SAFE_MIN_BOX_VALUE,
@@ -354,11 +326,9 @@ describe("Reputation Proof Contract Tests", () => {
 
     const [proofToSpend1, proofToSpend2] = reputationProofContract.utxos.toArray();
 
-    // --- Update parameters: we will consolidate and change R5 and R8 ---
     const newPointer = "consolidated-pointer";
     const newPolarization = false;
 
-    // New single output that consolidates the tokens
     const consolidatedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE * 2n, reputationProofContract.address)
       .addTokens([{ tokenId: proofTokenId, amount: BigInt(initialTotalSupply) }])
       .setAdditionalRegisters({
@@ -375,11 +345,9 @@ describe("Reputation Proof Contract Tests", () => {
       .payFee(RECOMMENDED_MIN_FEE_VALUE)
       .build();
 
-    // --- Execution and Verification ---
     const executionResult = mockChain.execute(tx, { signers: [creator] });
     expect(executionResult).to.be.true;
 
-    // Verify that the two old boxes were replaced by a new, consolidated one
     expect(reputationProofContract.utxos.length).to.equal(1);
     const consolidatedBox = reputationProofContract.utxos.toArray()[0];
     expect(consolidatedBox.assets[0].amount).to.equal(BigInt(initialTotalSupply));
