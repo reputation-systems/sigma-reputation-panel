@@ -19,6 +19,7 @@ export interface ReputationProof {
     type: TypeNFT;  // SELF identification of the proof type (by Type NFT)
     total_amount: number;
     owner_address: string;
+    owner_hash_serialized: string;
     can_be_spend: boolean;
     current_boxes: RPBox[];
     number_of_boxes: number;
@@ -72,6 +73,7 @@ function internal_compute(
     console.log(`Compute (deep_level: ${deep_level}) on proof: ${proof.type.typeName} (${proof.token_id})`);
     
     return proof.current_boxes.reduce((total, box) => {
+        if (proof.total_amount === 0) return total; // Avoid division by zero
         const proportion = box.token_amount / proof.total_amount;
         const boxReputation = computeBoxReputation(all_proofs, proof, box, target_object_pointer, deep_level);
         const signedReputation = (box.polarization ? 1 : -1) * boxReputation;

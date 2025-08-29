@@ -1,9 +1,10 @@
 import { Network, type RPBox, type ReputationProof, type TypeNFT } from "$lib/ReputationProof";
-import { check_if_r7_is_local_addr, hexToUtf8, serializedToRendered, SString } from "$lib/utils";
+import { hexToBytes, hexToUtf8, serializedToRendered, SString } from "$lib/utils";
 import { get } from "svelte/store";
 import { connected, proofs, types } from "./store";
 import { digital_public_good_contract_hash, ergo_tree_hash, explorer_uri } from "./envs";
 import { ErgoAddress, SByte, SColl } from "@fleet-sdk/core";
+import { blake2b256 } from "@fleet-sdk/crypto";
 
 type RegisterValue = { renderedValue: string; serializedValue: string; };
 type ApiBox = {
@@ -26,27 +27,47 @@ function parseR6(r6RenderedValue: string): { isLocked: boolean; totalSupply: num
 
 export async function fetchTypeNfts() {
     try {
-        const url = `${explorer_uri}/api/v1/boxes/unspent/search`;
-        const body = { "ergoTreeTemplateHash": digital_public_good_contract_hash };
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        });
-        if (!response.ok) throw new Error("Failed to fetch type boxes from the explorer.");
-        
-        const data = await response.json();
-        const fetchedTypesArray = data.items.map((box: any): TypeNFT | null => {
-            if (!box.assets || box.assets.length === 0) return null;
-            return {
-                tokenId: box.assets[0].tokenId,
-                boxId: box.boxId,
-                typeName: hexToUtf8(box.additionalRegisters.R4?.renderedValue || '') ?? "",
-                description: hexToUtf8(box.additionalRegisters.R5?.renderedValue || '') ?? "",
-                schemaURI: hexToUtf8(box.additionalRegisters.R6?.renderedValue || '') ?? "",
-                isRepProof: box.additionalRegisters.R7?.renderedValue ?? false,
-            };
-        }).filter((t: TypeNFT | null): t is TypeNFT => t !== null);
+        const fetchedTypesArray: TypeNFT[] = [];
+        let offset = 0;
+        const limit = 100;
+        let moreDataAvailable = true;
+
+        while (moreDataAvailable) {
+            const url = `${explorer_uri}/api/v1/boxes/unspent/search?offset=${offset}&limit=${limit}`;
+            const body = { "ergoTreeTemplateHash": digital_public_good_contract_hash };
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
+
+            if (!response.ok) {
+                moreDataAvailable = false;
+                console.error("Failed to fetch a page of type boxes from the explorer.");
+                continue;
+            }
+            
+            const data = await response.json();
+            if (data.items.length === 0) {
+                moreDataAvailable = false;
+                continue;
+            }
+
+            const pageTypes = data.items.map((box: any): TypeNFT | null => {
+                if (!box.assets || box.assets.length === 0) return null;
+                return {
+                    tokenId: box.assets[0].tokenId,
+                    boxId: box.boxId,
+                    typeName: hexToUtf8(box.additionalRegisters.R4?.renderedValue || '') ?? "",
+                    description: hexToUtf8(box.additionalRegisters.R5?.renderedValue || '') ?? "",
+                    schemaURI: hexToUtf8(box.additionalRegisters.R6?.renderedValue || '') ?? "",
+                    isRepProof: box.additionalRegisters.R7?.renderedValue ?? false,
+                };
+            }).filter((t: TypeNFT | null): t is TypeNFT => t !== null);
+            
+            fetchedTypesArray.push(...pageTypes);
+            offset += limit;
+        }
         
         const typesMap = new Map(fetchedTypesArray.map(type => [type.tokenId, type]));
         types.set(typesMap);
@@ -71,26 +92,30 @@ export async function updateReputationProofList(
 
     const proofs = new Map<string, ReputationProof>();
     const search_bodies = [];
-    let r7_filter: { [key: string]: any };
+    let r7_filter = {};
+    let userR7SerializedHex: string | null = null;
+
     const change_address = get(connected) && ergo ? await ergo.get_change_address() : null;
     if (change_address && !all) {
-        if (!change_address) {
-            throw new Error("Could not get the creator's address from the wallet.");
-        }
         const creatorP2PKAddress = ErgoAddress.fromBase58(change_address);
         const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
-        if (!creatorPkBytes) {
-            throw new Error(`Could not extract the public key from the address ${change_address}.`);
+        if (creatorPkBytes) {
+            const sigmaPropBytes = new Uint8Array([0x00, 0x08, 0xcd, ...creatorPkBytes]);
+            const hashedPk = blake2b256(sigmaPropBytes);
+            userR7SerializedHex = SColl(SByte, hashedPk).toHex();
+            r7_filter = { "R7": userR7SerializedHex };
         }
-        r7_filter = { "R7": SColl(SByte, creatorPkBytes) };
-    } else {
-        r7_filter = { };
     }
 
     if (search) {
+        // Search by asset (token ID)
         search_bodies.push({ assets: [search] });
-        search_bodies.push({ registers: { "R4": SString(search) } });
+        // Search by R5 (string content)
         search_bodies.push({ registers: { "R5": SString(search) } });
+        // If search term is a valid token ID, search by R4 (Coll[Byte])
+        if (search.length === 64 && /^[0-9a-fA-F]+$/.test(search)) {
+            search_bodies.push({ registers: { "R4": SColl(SByte, hexToBytes(search) ?? "").toHex() }});
+        }
     } else {
         search_bodies.push({});
     }
@@ -108,31 +133,32 @@ export async function updateReputationProofList(
                 if (json_data.items.length === 0) { moreDataAvailable = false; continue; }
 
                 for (const box of json_data.items as ApiBox[]) {
-                    if (!box.assets?.length || !box.additionalRegisters.R4 || !box.additionalRegisters.R6) continue;
+                    if (!box.assets?.length || !box.additionalRegisters.R4 || !box.additionalRegisters.R6 || !box.additionalRegisters.R7) continue;
 
                     const rep_token_id = box.assets[0].tokenId;
-                    let proof = proofs.get(rep_token_id);
-                    const box_owner_address = serializedToRendered(box.additionalRegisters.R7?.serializedValue ?? "");
+                    const owner_hash_serialized = box.additionalRegisters.R7.serializedValue;
 
-                    if (proof && proof.owner_address !== box_owner_address) {
-                        console.warn(`Reputation Proof with token ID ${rep_token_id} has conflicting owner addresses. Skipping this proof.`, {
-                            expectedOwner: proof.owner_address,
-                            foundOwner: box_owner_address,
+                    let proof = proofs.get(rep_token_id);
+
+                    if (proof && proof.owner_hash_serialized !== owner_hash_serialized) {
+                        console.warn(`Reputation Proof with token ID ${rep_token_id} has conflicting owner hashes. Skipping this proof.`, {
+                            expectedOwnerHash: proof.owner_hash_serialized,
+                            foundOwnerHash: owner_hash_serialized,
                             conflictingBox: box.boxId
                         });
                         proofs.delete(rep_token_id);
-                        continue; // Skip adding this box to the list
-                    } else if (proofs.has(rep_token_id) && proof?.owner_address === box_owner_address) {
-                        // Proof already exists and owner matches, continue
-                    } else if (!proof) {
-                        // New proof, initialize with the current box's owner
+                        continue;
+                    }
+
+                    if (!proof) {
                         const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
                         proof = {
                             token_id: rep_token_id,
                             type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
                             total_amount: r6_parsed.totalSupply,
-                            owner_address: box_owner_address,
-                            can_be_spend: await check_if_r7_is_local_addr(box.additionalRegisters.R7?.serializedValue ?? ""),
+                            owner_address: serializedToRendered(owner_hash_serialized),
+                            owner_hash_serialized: owner_hash_serialized,
+                            can_be_spend: userR7SerializedHex ? owner_hash_serialized === userR7SerializedHex : false,
                             current_boxes: [],
                             number_of_boxes: 0,
                             network: Network.ErgoMainnet,
@@ -141,35 +167,25 @@ export async function updateReputationProofList(
                         proofs.set(rep_token_id, proof);
                     }
 
-                    const type_nft_id_for_box = hexToUtf8(box.additionalRegisters.R4.renderedValue) ?? "";
+                    // R4 contains the raw token ID, its renderedValue is the hex string
+                    const type_nft_id_for_box = box.additionalRegisters.R4.renderedValue ?? "";
                     let typeNftForBox = availableTypes.get(type_nft_id_for_box);
                     if (!typeNftForBox) {
-                        console.log(`TypeNFT with ID ${type_nft_id_for_box} not found in store. Creating a default for this box.`);
                         typeNftForBox = { tokenId: type_nft_id_for_box, boxId: '', typeName: "Unknown Type", description: "Metadata not found", schemaURI: "", isRepProof: false };
                     }
                     
                     let box_content: string|object|null = {};
-
                     try {
-                    const rawValue = box.additionalRegisters.R9?.renderedValue;
-
-                    if (rawValue) {
-                        let potentialString;
-
-                        try {
-                        potentialString = hexToUtf8(rawValue);
-                        } catch (hexError) {
-                        potentialString = rawValue;
+                        const rawValue = box.additionalRegisters.R9?.renderedValue;
+                        if (rawValue) {
+                            const potentialString = hexToUtf8(rawValue);
+                            try {
+                                box_content = JSON.parse(potentialString ?? "");
+                            } catch (jsonError) {
+                                box_content = potentialString;
+                            }
                         }
-
-                        try {
-                        box_content = JSON.parse(potentialString ?? "");
-                        } catch (jsonError) {
-                        box_content = potentialString;
-                        }
-                    }
                     } catch (error) {
-                        console.warn(`Failed to process R9 for box ${box.boxId}:`, error);
                         box_content = {};
                     }
                     
@@ -197,8 +213,6 @@ export async function updateReputationProofList(
 
                     proof.current_boxes.push(current_box);
                     proof.number_of_boxes += 1;
-                    
-                    console.log(proof)
                 }
                 offset += limit;
             }
