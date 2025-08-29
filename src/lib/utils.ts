@@ -23,6 +23,29 @@ export function hexToUtf8(hexString: string): string | null {
     }
 }
 
+export function hexToBytes(hexString: string | undefined | null): Uint8Array | null {
+    if (!hexString || typeof hexString !== 'string' || !/^[0-9a-fA-F]*$/.test(hexString)) {
+        return null;
+    }
+    if (hexString.length % 2 !== 0) {
+        return null; 
+    }
+    try {
+        const byteArray = new Uint8Array(hexString.length / 2);
+        for (let i = 0; i < byteArray.length; i++) {
+            const byte = parseInt(hexString.substring(i * 2, i * 2 + 2), 16);
+            if (isNaN(byte)) {
+                throw new Error("Se encontró un carácter hexadecimal inválido durante el parseInt.");
+            }
+            byteArray[i] = byte;
+        }
+        return byteArray;
+    } catch (e) {
+        console.error("hexToBytes: Error convirtiendo hex a bytes:", hexString, e);
+        return null;
+    }
+}
+
 /**
  * Generates a PK proposition (R7 register format) from a wallet address.
  * @param wallet_pk The base58 encoded wallet address.

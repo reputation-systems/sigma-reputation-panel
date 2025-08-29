@@ -43,7 +43,7 @@
 * - Purpose: A tuple that stores the lock status and the total token supply
 * of the collection.
 *
-* R7: Coll[Byte]              -> propositionBytes of the owner, must be spent one box with this script to confirm ownership
+* R7: Coll[Byte]              -> blake2b256 of the propositionBytes of the owner (must be spent one box with this script to confirm ownership)
 *
 * R8: Boolean                  -> customFlag
 * - Purpose: A boolean flag for custom application logic.
@@ -63,13 +63,9 @@
   */
   // --- Path 1: Admin Transaction (signed by the owner) ---
   val ownerSignedPath = {
-    val isOwner = INPUTS.exists { (b: Box) => b.propositionBytes == SELF.R7[Coll[Byte]].get }
+    val isOwner = INPUTS.exists { (b: Box) => blake2b256(b.propositionBytes) == SELF.R7[Coll[Byte]].get }
     if (isOwner) {
 
-      val typeNftBoxes = CONTEXT.dataInputs.filter { (b: Box) =>
-        blake2b256(b.propositionBytes) == DIGITAL_PUBLIC_GOOD
-      }
-      
       // Extract data from this box's (SELF) register structure.
       val r6Tuple = SELF.R6[(Boolean, Long)].get
       val isLocked = r6Tuple._1
@@ -124,11 +120,12 @@
               val typeTokenIdToCheck: Coll[Byte] = SELF.R4[Coll[Byte]].get
 
               // Extract the token IDs from the collection of type NFT boxes
-              val availableTypeTokenIds: Coll[Coll[Byte]] = typeNftBoxes.map { (b: Box) => 
-                b.tokens(0)._1 
+              val availableTypeTokenIds: Coll[Coll[Byte]] = CONTEXT.dataInputs.filter { (b: Box) =>
+                blake2b256(b.propositionBytes) == DIGITAL_PUBLIC_GOOD
+              }.map { (b: Box) => 
+                b.tokens(0)._1
               }
 
-              // Check if any ID in the collection equals the one we're looking for
               availableTypeTokenIds.exists { (id: Coll[Byte]) => 
                 id == typeTokenIdToCheck
               }

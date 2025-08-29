@@ -14,6 +14,7 @@ import { blake2b256, sha256 } from "@fleet-sdk/crypto";
 import * as fs from "fs";
 import * as path from "path";
 import { stringToBytes } from "@scure/base";
+import { hexToBytes } from "$lib/utils";
 
 // --- Funciones Auxiliares de Serialización (similares a utils.ts) ---
 
@@ -40,7 +41,7 @@ const contractsDir = path.resolve(__dirname, "../contracts"); // Asegúrate de q
 // Contrato para el "Type NFT"
 const DIGITAL_PUBLIC_GOOD_SOURCE = fs.readFileSync(path.join(contractsDir, "digital_public_good.es"), "utf-8");
 const digitalPublicGoodErgoTree = compile(DIGITAL_PUBLIC_GOOD_SOURCE, { version: 1 });
-const digitalPublicGoodScriptHash = uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.template));
+const digitalPublicGoodScriptHash = uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.bytes));
 
 // Contrato principal para la Prueba de Reputación
 const REPUTATION_PROOF_SOURCE_TEMPLATE = fs.readFileSync(path.join(contractsDir, "reputation_proof.es"), "utf-8");
@@ -146,16 +147,18 @@ describe("Reputation Proof Contract Tests", () => {
     const creatorPkBytes = creator.address.getPublicKeys()[0];
     const initialProofTokenId = "a".repeat(64); // ID de token predecible
 
+    const r7 = SColl(SByte, blake2b256(new Uint8Array([...( new Uint8Array([0x00, 0x08, 0xcd])), ...creatorPkBytes]))).toHex();
+
     reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
       ergoTree: reputationProofErgoTree.toHex(),
       value: SAFE_MIN_BOX_VALUE,
       assets: [{ tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) }],
       additionalRegisters: {
-        R4: SString(typeNftId),
+        R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(initialObjectPointer),
         R6: tupleToSerialized(false, initialTotalSupply),
-        R7: SColl(SByte, creatorPkBytes).toHex(),
+        R7: r7,
         R8: booleanToSerializer(true),
         R9: SString(JSON.stringify({ comment: "Original comment" }))
       }
@@ -165,7 +168,7 @@ describe("Reputation Proof Contract Tests", () => {
     // --- Parámetros para la actualización ---
     const updatedAmount = 200;
     const changeAmount = initialTotalSupply - updatedAmount; // 800
-    const updatedObjectPointer = "https://cruxfinance.io";
+    const updatedObjectPointer = "https://google.io";
     const updatedPolarization = false; // Cambiar a negativo
 
     // --- Definición de los Outputs ---
@@ -173,10 +176,10 @@ describe("Reputation Proof Contract Tests", () => {
     const updatedProofOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, reputationProofContract.address)
       .addTokens([{ tokenId: initialProofTokenId, amount: updatedAmount.toString() }])
       .setAdditionalRegisters({
-        R4: SString(typeNftId),
+        R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(updatedObjectPointer),
         R6: tupleToSerialized(false, initialTotalSupply),
-        R7: SColl(SByte, creatorPkBytes),
+        R7: r7,
         R8: booleanToSerializer(updatedPolarization),
         R9: SString(JSON.stringify({ message: "This is an updated proof." }))
       });
