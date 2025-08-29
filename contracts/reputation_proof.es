@@ -58,7 +58,6 @@
 
   /*
     TODO:
-    - Validate all typeNFTs are valid. (currently commented)
     - Allow strict typeNFT schema validation (eg: sigmaverse quality standard - 1.Trust; 2. Access;).   Use R9 for schema.
   */
   // --- Path 1: Admin Transaction (signed by the owner) ---
@@ -182,7 +181,7 @@
         successor.R4[Coll[Byte]] == SELF.R4[Coll[Byte]] &&
         successor.R5[Coll[Byte]] == SELF.R5[Coll[Byte]] &&
         successor.R6[(Boolean, Long)] == SELF.R6[(Boolean, Long)] &&
-        successor.R7[SigmaProp] == SELF.R7[SigmaProp] &&
+        successor.R7[Coll[Byte]] == SELF.R7[Coll[Byte]] &&
         successor.R8[Boolean] == SELF.R8[Boolean] &&
         successor.R9[Coll[Byte]] == SELF.R9[Coll[Byte]]
       )
