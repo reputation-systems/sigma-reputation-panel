@@ -18,16 +18,15 @@ import { stringToBytes } from "@scure/base";
 // --- Funciones Auxiliares de Serialización (similares a utils.ts) ---
 
 function SString(value: string): string {
-    return SConstant(SColl(SByte, stringToBytes('utf8', value)));
+    return SColl(SByte, stringToBytes('utf8', value)).toHex();
 }
 
 function booleanToSerializer(value: boolean): string {
-    return SConstant(SBool(value));
+    return SBool(value).toHex();
 }
 
 function tupleToSerialized(isLocked: boolean, totalSupply: number): string {
-    const tuple = SPair(SBool(isLocked), SLong(BigInt(totalSupply)));
-    return SConstant(tuple);
+    return SPair(SBool(isLocked), SLong(BigInt(totalSupply))).toHex();
 }
 
 function uint8ArrayToHex(bytes: Uint8Array): string {
@@ -36,12 +35,12 @@ function uint8ArrayToHex(bytes: Uint8Array): string {
 
 // --- Carga y Compilación de Contratos ---
 
-const contractsDir = path.resolve(__dirname, "contracts"); // Asegúrate de que la ruta a tus contratos es correcta
+const contractsDir = path.resolve(__dirname, "../contracts"); // Asegúrate de que la ruta a tus contratos es correcta
 
 // Contrato para el "Type NFT"
 const DIGITAL_PUBLIC_GOOD_SOURCE = fs.readFileSync(path.join(contractsDir, "digital_public_good.es"), "utf-8");
 const digitalPublicGoodErgoTree = compile(DIGITAL_PUBLIC_GOOD_SOURCE, { version: 1 });
-const digitalPublicGoodScriptHash = uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.template.toBytes()));
+const digitalPublicGoodScriptHash = uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.template));
 
 // Contrato principal para la Prueba de Reputación
 const REPUTATION_PROOF_SOURCE_TEMPLATE = fs.readFileSync(path.join(contractsDir, "reputation_proof.es"), "utf-8");
@@ -127,7 +126,7 @@ describe("Reputation Proof Contract Tests", () => {
     
     // --- Ejecución y Verificación ---
     const executionResult = mockChain.execute(tx, { signers: [creator] });
-    expect(executionResult.success).to.be.true;
+    expect(executionResult).to.be.true;
     
     expect(reputationProofContract.utxos.length).to.equal(1);
     const createdBox = reputationProofContract.utxos.toArray()[0];
@@ -148,6 +147,7 @@ describe("Reputation Proof Contract Tests", () => {
     const initialProofTokenId = "a".repeat(64); // ID de token predecible
 
     reputationProofContract.addUTxOs({
+      creationHeight: mockChain.height,
       ergoTree: reputationProofErgoTree.toHex(),
       value: SAFE_MIN_BOX_VALUE,
       assets: [{ tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) }],
@@ -155,7 +155,7 @@ describe("Reputation Proof Contract Tests", () => {
         R4: SString(typeNftId),
         R5: SString(initialObjectPointer),
         R6: tupleToSerialized(false, initialTotalSupply),
-        R7: SColl(SByte, creatorPkBytes),
+        R7: SColl(SByte, creatorPkBytes).toHex(),
         R8: booleanToSerializer(true),
         R9: SString(JSON.stringify({ comment: "Original comment" }))
       }
@@ -197,7 +197,7 @@ describe("Reputation Proof Contract Tests", () => {
 
     // --- Ejecución y Verificación ---
     const executionResult = mockChain.execute(tx, { signers: [creator] });
-    expect(executionResult.success).to.be.true;
+    expect(executionResult).to.be.true;
 
     expect(reputationProofContract.utxos.length).to.equal(2);
 
