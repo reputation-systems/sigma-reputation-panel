@@ -96,14 +96,16 @@ export async function updateReputationProofList(
     let userR7SerializedHex: string | null = null;
 
     const change_address = get(connected) && ergo ? await ergo.get_change_address() : null;
-    if (change_address && !all) {
+    if (change_address) {
         const creatorP2PKAddress = ErgoAddress.fromBase58(change_address);
         const creatorPkBytes = creatorP2PKAddress.getPublicKeys()[0];
         if (creatorPkBytes) {
             const sigmaPropBytes = new Uint8Array([0x00, 0x08, 0xcd, ...creatorPkBytes]);
             const hashedPk = blake2b256(sigmaPropBytes);
             userR7SerializedHex = SColl(SByte, hashedPk).toHex();
-            r7_filter = { "R7": userR7SerializedHex };
+            if (!all) {
+                r7_filter = { "R7": userR7SerializedHex };
+            }
         }
     }
 
