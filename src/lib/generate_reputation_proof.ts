@@ -134,47 +134,6 @@ export async function generate_reputation_proof(
 
     outputs.push(new_proof_output);
 
-const formatBox = (box) => {
-    if (!box) {
-        return "Box is undefined";
-    }
-    const tokens = box.assets ? box.assets.map(t => `${t.amount} of ${t.tokenId.slice(0, 8)}...`).join(', ') : 'None';
-    return {
-        boxId: box.boxId,
-        value: box.value,
-        tokens: tokens,
-        'R4-R9': {
-            R4: box.additionalRegisters.R4 ? box.additionalRegisters.R4.renderedValue.slice(0, 8) + '...' : 'N/A',
-            R5: box.additionalRegisters.R5 ? box.additionalRegisters.R5.renderedValue.slice(0, 8) + '...' : 'N/A',
-            R6: box.additionalRegisters.R6 ? box.additionalRegisters.R6.renderedValue : 'N/A',
-            R7: box.additionalRegisters.R7 ? box.additionalRegisters.R7.renderedValue.slice(0, 8) + '...' : 'N/A',
-            R8: box.additionalRegisters.R8 ? box.additionalRegisters.R8.renderedValue : 'N/A',
-        }
-    };
-};
-
-console.log("=========================================");
-console.log("🔍 TX Resume");
-console.log("=========================================");
-
-console.log("📥 INPUTS:");
-inputs.forEach((input, index) => {
-    console.log(`  - Input ${index}:`, formatBox(input));
-});
-
-console.log("\n📤 OUTPUTS:");
-outputs.forEach((output, index) => {
-    console.log(`  - Output ${index}:`, formatBox(output));
-});
-
-console.log("\n📄 DATA INPUTS:");
-dataInputs.forEach((dataInput, index) => {
-    console.log(`  - Data Input ${index}:`, formatBox(dataInput));
-});
-
-console.log(`\n📦 Data Inputs: ${dataInputs.length}`);
-console.log("=========================================");
-
     // --- Build and submit the transaction ---
     try {
         const unsignedTransaction = await new TransactionBuilder(await ergo.get_current_height())
