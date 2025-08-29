@@ -54,7 +54,7 @@
 */
 {
 
-  DIGITAL_PUBLIC_GOOD = fromBase16("`+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH+`")
+  val DIGITAL_PUBLIC_GOOD = fromBase16("`+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH+`")
 
   /*
     TODO:
@@ -120,13 +120,18 @@
       val outputsValid = repBoxesOnOutputs.forall { (x: Box) =>
         {
             val typeExists: Boolean = {
+              // Get the token ID to check from the box's register R4
+              val typeTokenIdToCheck: Coll[Byte] = SELF.R4[Coll[Byte]].get
 
-              val typeTokenIdToCheck: Coll[Byte] = x.R4[Coll[Byte]].get
-
-              val availableTypeTokenIds: Seq[Coll[Byte]] = typeNftBoxes.map { (b: Box) => 
+              // Extract the token IDs from the collection of type NFT boxes
+              val availableTypeTokenIds: Coll[Coll[Byte]] = typeNftBoxes.map { (b: Box) => 
                 b.tokens(0)._1 
               }
-              availableTypeTokenIds.contains(typeTokenIdToCheck)
+
+              // Check if any ID in the collection equals the one we're looking for
+              availableTypeTokenIds.exists { (id: Coll[Byte]) => 
+                id == typeTokenIdToCheck
+              }
             }
 
             // There is no data input pointing to the same object (R4, R5) as this output box.

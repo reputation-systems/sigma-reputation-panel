@@ -1,6 +1,12 @@
 import { compile } from "@fleet-sdk/compiler";
 import { ErgoAddress, Network } from "@fleet-sdk/core";
-import { sha256, hex } from "@fleet-sdk/crypto";
+import { sha256, hex, blake2b256 } from "@fleet-sdk/crypto";
+
+function uint8ArrayToHex(array: Uint8Array): string { 
+    return [...new Uint8Array(array)]
+        .map(x => x.toString(16).padStart(2, '0'))
+        .join('');
+}
 
 // --- Explorer Configuration ---
 export const explorer_uri = "https://api.ergoplatform.com";
@@ -25,7 +31,7 @@ import REPUTATION_PROOF_SCRIPT from '../../contracts/reputation_proof.es?raw';
 
 // Compile the Reputation Proof contract
 const reputationProofErgoTree = compile(
-    REPUTATION_PROOF_SCRIPT.replace(/`\+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH\+`/g, digital_public_good_contract_hash), 
+    REPUTATION_PROOF_SCRIPT.replace(/`\+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH\+`/g, uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.template.toBytes()))), 
     { version: 1 }
 );
 
