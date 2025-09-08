@@ -2,7 +2,7 @@ import { Network, type RPBox, type ReputationProof, type TypeNFT } from "$lib/Re
 import { hexToBytes, hexToUtf8, serializedToRendered, SString } from "$lib/utils";
 import { get } from "svelte/store";
 import { connected, proofs, types } from "./store";
-import { digital_public_good_contract_hash, ergo_tree_hash, explorer_uri } from "./envs";
+import { digital_public_good_contract_hash, ergo_tree, ergo_tree_hash, explorer_uri } from "./envs";
 import { ErgoAddress, SByte, SColl } from "@fleet-sdk/core";
 import { blake2b256 } from "@fleet-sdk/crypto";
 
@@ -135,6 +135,7 @@ export async function updateReputationProofList(
                 if (json_data.items.length === 0) { moreDataAvailable = false; continue; }
 
                 for (const box of json_data.items as ApiBox[]) {
+                    if (box.ergoTree != ergo_tree) continue
                     if (!box.assets?.length || !box.additionalRegisters.R4 || !box.additionalRegisters.R6 || !box.additionalRegisters.R7) continue;
 
                     const rep_token_id = box.assets[0].tokenId;

@@ -30,10 +30,7 @@ export const digital_public_good_contract_hash = digitalPublicGoodHash;
 import REPUTATION_PROOF_SCRIPT from '../../contracts/reputation_proof.es?raw';
 
 // Compile the Reputation Proof contract
-const reputationProofErgoTree = compile(
-    REPUTATION_PROOF_SCRIPT.replace(/`\+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH\+`/g, uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.template))), 
-    { version: 1 }
-);
+const reputationProofErgoTree = compile(REPUTATION_PROOF_SCRIPT.replace(/`\+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH\+`/g, uint8ArrayToHex(blake2b256(digitalPublicGoodErgoTree.bytes))), { version: 1 });
 
 // Derive the P2S address and the template hash
 const reputationProofAddress = ErgoAddress.fromErgoTree(reputationProofErgoTree.toHex(), Network.Mainnet).toString();
@@ -42,3 +39,4 @@ const reputationProofHash = hex.encode(sha256(reputationProofErgoTree.template))
 // Export constants for the Reputation Proof contract
 export const ergo_tree_address = reputationProofAddress;
 export const ergo_tree_hash = reputationProofHash;
+export const ergo_tree = reputationProofErgoTree.toHex();
