@@ -56,10 +56,6 @@
 
   val DIGITAL_PUBLIC_GOOD = fromBase16("`+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH+`")
 
-  /*
-    TODO:
-    - Allow strict typeNFT schema validation (eg: sigmaverse quality standard - 1.Trust; 2. Access;).   Use R9 for schema.
-  */
   // --- Path 1: Admin Transaction (signed by the owner) ---
   val ownerSignedPath = {
     val isOwner = INPUTS.exists { (b: Box) => blake2b256(b.propositionBytes) == SELF.R7[Coll[Byte]].get }
