@@ -4,120 +4,154 @@
 
 ## 1. Summary
 
-This document describes a decentralized reputation system built on the Ergo blockchain. The system is designed to create, manage, and verify reputation claims in an atomic, secure, and transparent way. Its architecture is based on two interdependent ErgoScript contracts:
+This document describes a decentralized reputation system built on the Ergo blockchain.
+The system enables the creation, management, and verification of reputation proofs in an atomic, secure, and transparent way.
+Its architecture is based on two interdependent ErgoScript contracts:
 
-1. **"Digital Public Good" Contract (Type NFT)**: Defines immutable standards for the types of reputation that can exist in the ecosystem.
-2. **"Reputation Token" Contract**: Governs the boxes (UTXOs) that contain the reputation proofs, ensuring state consistency, data uniqueness, and owner control.
+1. **"Digital Public Good" Contract (Type NFT)**: Defines immutable standards for reputation types.
+2. **"Reputation Token" Contract**: Governs the boxes (UTXOs) that contain actual reputation proofs, ensuring uniqueness, state consistency, and owner control.
 
-The design leverages Ergo's eUTXO model to enable complex validations and ensure that reputation collections are updated atomically, preventing inconsistent states.
+The design leverages Ergo’s **eUTXO model**, enabling complex validation and atomic updates of reputation collections, preventing inconsistent or fragmented states.
 
 ---
 
 ## 2. System Architecture
 
-The system is composed of two types of boxes (UTXOs), each governed by a specific contract that defines its purpose and state transition rules.
+The system is composed of two types of boxes (UTXOs), each governed by a specific contract.
+
+---
 
 ### 2.1. "Digital Public Good" Contract (Type NFT)
 
-This contract protects a box that contains a unique NFT, which serves as a public and immutable standard for a specific type of reputation.
+This contract protects a box containing a **unique NFT** and metadata defining a reputation type.
+It provides the **public and immutable standard** that other reputation boxes must reference.
 
 #### **Purpose**
 
-* **Standardization**: Defines a reputation type (e.g., “Verified URL”, “Smart Contract Review”) and its associated data structure.
-* **Immutability**: Ensures that the type definition cannot be altered, providing a stable foundation for the entire ecosystem.
-* **Digital Public Good**: The box is designed to be community-maintained, allowing ERG top-ups to cover storage rent without altering its contents.
+* **Standardization**: Defines the structure and semantics of a reputation type (e.g., "Smart Contract Audit").
+* **Immutability**: Guarantees that once defined, the type cannot be altered.
+* **Digital Public Good**: Anyone can top up the box with ERG to pay for storage rent, without altering the type definition.
 
 #### **Register Structure**
 
-| Register  | Type         | Description                                                                              |
-| :-------- | :----------- | :--------------------------------------------------------------------------------------- |
-| **R4**    | `Coll[Byte]` | `typeName`: Human-readable name of the type (e.g., “Web URL”).                           |
-| **R5**    | `Coll[Byte]` | `description`: Purpose and use of the type.                                              |
-| **R6**    | `Coll[Byte]` | `schemaURI`: URI to a schema (e.g., JSON Schema, IPFS) that defines the proof structure. |
-| **R7**    | `Boolean`    | `isReputationProof`: `true` if used for reputation proofs, `false` otherwise.            |
-| **R8-R9** | `(Empty)`    | Reserved for future extensions.                                                          |
+| Register | Type         | Description                                                             |
+| :------- | :----------- | :---------------------------------------------------------------------- |
+| **R4**   | `Coll[Byte]` | `typeName`: Human-readable name of the type (e.g., "Web URL").          |
+| **R5**   | `Coll[Byte]` | `description`: Purpose and usage notes.                                 |
+| **R6**   | `Coll[Byte]` | `schemaURI`: Link to a schema (JSON Schema, IPFS, etc.) for proof data. |
+| **R7**   | `Boolean`    | `isReputationProof`: `true` if this type is used for reputation proofs. |
+| **R8**   | (Empty)      | Reserved for future use.                                                |
+| **R9**   | (Empty)      | Reserved for future use.                                                |
 
 #### **Spending Logic**
 
-The contract enforces a single spending rule:
+1. **Anyone can spend the box** (no signature required).
+2. The transaction is valid **only if exactly one successor box** is created:
 
-1. **Anyone can spend the box.**
-2. The transaction is valid **only if it creates a single output box** that is an exact replica of the input in all aspects (script, NFT token, and registers R4-R9).
-3. The only exception is the ERG value, which **must be greater than or equal to** (`successor.value >= SELF.value`), allowing for top-ups to pay for storage rent.
+   * Must preserve the same **script, registers (R4–R9), and NFT token**.
+   * Only the ERG value may change, and it must be **greater than or equal to** the input.
 
-This logic prevents the destruction or duplication of the standard, ensuring its permanence and reliability.
+This guarantees that **standards cannot be destroyed, duplicated, or modified**, but can always be kept alive by community-funded ERG top-ups.
 
-> If R7 is active, then in the Reputation contract, R5 will be interpreted as referring to a token contained in boxes using a reputation script. If not active, R5 in the Reputation contract may contain any other definition as per the type standard.
+---
 
 ### 2.2. "Reputation Token" Contract (Reputation Box)
 
-This contract governs a box that represents an individual piece of reputation. These boxes form part of distributed collections that must maintain internal consistency.
+This contract governs a **reputation proof box**, representing part of a distributed collection that must remain coherent.
 
 #### **Purpose**
 
-* **Governance**: Defines rules for creating, modifying, and transferring a reputation proof.
-* **Atomic Consistency**: Ensures that an entire reputation collection (“sibling” boxes) is validated together.
-* **Uniqueness**: Ensures that each reputation proof about an object is unique within its collection.
-* **Owner Control**: Grants the owner exclusive authority over substantial modifications.
+* **Governance**: Defines creation, modification, and transfer rules for reputation proofs.
+* **Atomic Consistency**: Ensures all reputation boxes in a collection are validated together.
+* **Uniqueness**: Guarantees that for a given reputation type and object, only one proof exists.
+* **Owner Control**: Only the designated owner can authorize structural changes.
 
 #### **Register and Token Structure**
 
-| Element      | Type                 | Description                                                                                        |
-| :----------- | :------------------- | :------------------------------------------------------------------------------------------------- |
-| **Token(0)** | `(Coll[Byte], Long)` | `(repTokenId, amount)`: The reputation token protected by this box.                                |
-| **R4**       | `Coll[Byte]`         | `typeNftTokenId`: Token ID of the associated Type NFT.                                             |
-| **R5**       | `Coll[Byte]`         | `uniqueObjectData`: Data that, along with R4, uniquely identifies the object.                      |
-| **R6**       | `(Boolean, Long)`    | `(isLocked, totalSupply)`: Tuple defining the lock state and total token supply of the collection. |
-| **R7**       | `SigmaProp`          | `ownerPublicKey`: Public key of the owner that must authorize transactions.                        |
-| **R8**       | `Boolean`            | `customFlag`: Boolean flag for custom application logic.                                           |
-| **R9**       | `Coll[Byte]`         | Reserved for future extensions.                                                                    |
+| Element      | Type                 | Description                                                                 |
+| :----------- | :------------------- | :-------------------------------------------------------------------------- |
+| **Token(0)** | `(Coll[Byte], Long)` | `(repTokenId, amount)`: The reputation token held by this box.              |
+| **R4**       | `Coll[Byte]`         | `typeNftTokenId`: The Type NFT this reputation box adheres to.              |
+| **R5**       | `Coll[Byte]`         | `uniqueObjectData`: Data uniquely identifying the rated object.             |
+| **R6**       | `(Boolean, Long)`    | `(isLocked, totalSupply)`: Lock state + total supply of the reputation set. |
+| **R7**       | `Coll[Byte]`         | `blake2b256(propositionBytes)` of the **owner script**.                     |
+| **R8**       | `Boolean`            | `customFlag`: Optional application-specific flag.                           |
+| **R9**       | `Coll[Byte]`         | Reserved for future extensions.                                             |
+
+---
 
 #### **Spending Logic (Two Paths)**
 
-The contract allows the box to be spent via two distinct paths:
+The contract can be spent via two distinct paths:
 
-**2.2.1. Management Path (Signature Required)**
+---
 
-This path allows the owner to make significant changes to the reputation collection. It strictly requires:
+**2.2.1. Admin Path (Signature Required)**
 
-1. **Authorization**: The transaction must be signed by the owner (`SELF.R7[SigmaProp]`).
-2. **Link to Standard**: The corresponding **Type NFT** box must be included as `dataInputs(0)`. The `typeNftTokenId` (in R4) of the reputation box must match the NFT token ID.
-3. **Proof of Completeness**: All “sibling” boxes sharing the same `repTokenId` must be included as `dataInputs`. The contract sums the `amount` of the tokens across all boxes (SELF + dataInputs) and checks that the total matches the `totalSupply` stored in R6. This ensures the transaction has a complete view of the distributed state.
-4. **Output Rules**:
+Used for managing collections (e.g., issuing, updating, freezing reputation).
 
-   * **Uniqueness**: The `(R4, R5)` combination of every output reputation box must be unique across all inputs and outputs.
-   * **Preservation**: `totalSupply` and `ownerPublicKey` must remain unchanged in all outputs.
-   * **Locking Logic (`isLocked`)**:
+* **Authorization**:
+  At least one input must include the **owner’s script**, verified by comparing its `blake2b256(propositionBytes)` against R7.
 
-     * If `isLocked == true`, the box is immutable. The output must be an exact replica of the input (except for ERG value).
-     * If `isLocked == false`, modifications are allowed, as long as the fundamental structure (script, defined registers) is preserved.
+* **Binding to a Standard**:
+  The corresponding **Type NFT** box must be present in `dataInputs`, and its token ID must match R4.
 
-**2.2.2. ERG Top-Up Path (Public)**
+* **Proof of Completeness**:
+  All sibling reputation boxes (same `repTokenId`) must be included in `dataInputs`.
+  The contract verifies that:
 
-This path does **not require a signature**, allowing anyone to top up the box with ERG to pay for storage rent. Conditions are identical to the Type NFT contract:
+  * The sum of token amounts across all inputs + dataInputs = `totalSupply`.
+  * Input and output token balances match (no minting/burning).
 
-* The transaction must create a single output box.
-* The output must be an **exact replica** of the input (script, tokens, and all registers).
-* The ERG value of the output must be **greater than or equal to** the input.
+* **Output Rules**:
+
+  * **Uniqueness**: Each `(R4, R5)` pair (type + object) must be unique across all outputs and inputs.
+  * **Preservation**: `totalSupply` and `owner` must remain unchanged.
+  * **Locking (`isLocked`)**:
+
+    * If `true`, the box becomes immutable (except ERG).
+    * Once locked, it can never be unlocked.
+
+---
+
+**2.2.2. ERG Top-Up Path (Public, Signature-Free)**
+
+Used for preventing boxes from being destroyed by storage rent.
+
+* Anyone can spend the box.
+* Must produce **exactly one successor** that is an **identical copy** (script, registers, tokens).
+* The ERG value must be **greater than or equal to** the input.
+
+This ensures longevity of the reputation system, without requiring owner involvement.
 
 ---
 
 ## 3. System Interaction Flow
 
-1. **Creating a Standard**: An entity creates a **Type NFT** to define a new reputation type (e.g., “Service Rating”). This NFT becomes an immutable digital public good.
-2. **Issuing Reputation**: A user (the `owner`) creates one or more **Reputation Boxes**. R4 specifies the corresponding `Type NFT` ID. R5 contains unique data about the rated object. R7 stores the user's public key.
-3. **Atomic Management**: To modify any part of their reputation collection (e.g., update a rating or add a new one), the owner must execute a transaction through the **Management Path**. All reputation boxes must be included in `dataInputs` so the contract can validate `totalSupply` and data uniqueness.
-4. **Maintenance**: Any user may, at any time, top up a Reputation Box or a Type NFT with ERG via the **Top-Up Path**, ensuring system longevity without requiring owner intervention.
+1. **Creating a Standard**:
+   A participant creates a **Type NFT** box (Digital Public Good). This NFT defines the schema for a new reputation type.
+
+2. **Issuing Reputation**:
+   An owner issues one or more **Reputation Boxes**, linking them to the Type NFT via R4, and anchoring object-specific data in R5.
+
+3. **Managing Collections**:
+   To update or reorganize reputation, the owner uses the **Admin Path**, including all sibling boxes and the Type NFT.
+   The contract enforces **atomic validation** of the full collection.
+
+4. **Sustaining the System**:
+   Anyone can **top up ERG** in either the Type NFT or Reputation Boxes to cover storage rent, ensuring persistence.
 
 ---
 
 ## 4. Conclusion
 
-This reputation system offers a robust and formally verifiable model for managing trust assertions in a decentralized environment. Key features of the design include:
+This system introduces a **formally verifiable framework** for decentralized reputation management on Ergo.
 
-* **Immutability of Standards**: Type NFTs provide a permanently anchored foundation of trust.
-* **User Ownership and Control**: Signature keys ensure only the owner can make substantial changes.
-* **Atomic State Consistency**: Prevents state fragmentation and ensures collections are validated as coherent wholes.
-* **Long-Term Sustainability**: Public top-up paths ensure that boxes are not lost due to Ergo’s storage rent.
+Key properties include:
 
-The system transforms reputation management into a transparent, secure, and mathematically rigorous process, fully aligned with the principles of Ergo's eUTXO model.
+* **Immutable Standards**: Type NFTs serve as unchangeable foundations.
+* **Owner Authority**: Only the rightful owner can modify collections.
+* **Atomic Consistency**: Prevents fragmentation by enforcing full-state validation.
+* **Sustainability**: Public top-ups guarantee long-term operability.
+
+By leveraging Ergo’s **eUTXO model**, this reputation protocol achieves transparency, robustness, and mathematical security — transforming trust assertions into **immutable, community-verifiable digital assets**.
