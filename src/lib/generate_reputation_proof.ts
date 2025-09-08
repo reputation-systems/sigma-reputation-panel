@@ -128,7 +128,7 @@ export async function generate_reputation_proof(
         R4: SColl(SByte, hexToBytes(type_nft_id) ?? "").toHex(),
         R5: SString(object_pointer),
         R6: tupleToSerialized(is_locked, total_supply),
-        R7: SColl(SByte, hashedProposition).toHex(), // <-- Valor R7 Corregido
+        R7: SColl(SByte, hashedProposition).toHex(),
         R8: booleanToSerializer(polarization),
         R9: SString(typeof(content) === "object" ? JSON.stringify(content): content ?? "")
     });
