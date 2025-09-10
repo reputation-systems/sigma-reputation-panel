@@ -70,7 +70,7 @@
       // PROOF OF COMPLETENESS
       val repBoxesOnDataInputs = CONTEXT.dataInputs.filter { (b: Box) =>
         blake2b256(b.propositionBytes) == blake2b256(SELF.propositionBytes) &&
-        b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
+        b.tokens.size > 0 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
         b.R4[Coll[Byte]].isDefined &&
@@ -80,7 +80,7 @@
 
       val repBoxesOnInputs = INPUTS.filter { (b: Box) =>
         blake2b256(b.propositionBytes) == blake2b256(SELF.propositionBytes) &&
-        b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
+        b.tokens.size > 0 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
         b.R4[Coll[Byte]].isDefined &&
@@ -90,7 +90,7 @@
 
       val repBoxesOnOutputs = OUTPUTS.filter { (b: Box) =>
         blake2b256(b.propositionBytes) == blake2b256(SELF.propositionBytes) &&
-        b.tokens.size == 1 && b.tokens(0)._1 == repTokenId &&
+        b.tokens.size > 0 && b.tokens(0)._1 == repTokenId &&
         b.R6[(Boolean, Long)].get._2 == totalSupply &&
         b.R7[Coll[Byte]].get == SELF.R7[Coll[Byte]].get &&
         b.R4[Coll[Byte]].isDefined &&
@@ -102,9 +102,41 @@
         val dataInputsAmount = repBoxesOnDataInputs.fold(0L, { (sum: Long, b: Box) => sum + b.tokens(0)._2 })
         val inputsAmount = repBoxesOnInputs.fold(0L, { (sum: Long, b: Box) => sum + b.tokens(0)._2 })
         val outputsAmount = repBoxesOnOutputs.fold(0L, { (sum: Long, b: Box) => sum + b.tokens(0)._2 })
-        
+
+        val valuePreserved = {
+
+          val tokensArePreserved = {
+            val secondaryInputTokens = repBoxesOnInputs.flatMap({ (b: Box) =>
+              if (b.tokens.size > 1) { b.tokens.slice(1, b.tokens.size) } else { Coll[(Coll[Byte], Long)]() }
+            })
+            val secondaryOutputTokens = repBoxesOnOutputs.flatMap({ (b: Box) =>
+              if (b.tokens.size > 1) { b.tokens.slice(1, b.tokens.size) } else { Coll[(Coll[Byte], Long)]() }
+            })
+            val uniqueTokenIds = secondaryInputTokens.map({ (t: (Coll[Byte], Long)) => t._1 }).distinct
+            
+            uniqueTokenIds.forall({ (tokenId: Coll[Byte]) =>
+              val totalIn = secondaryInputTokens
+                .filter({ (t: (Coll[Byte], Long)) => t._1 == tokenId })
+                .fold(0L, { (sum: Long, t: (Coll[Byte], Long)) => sum + t._2 })
+              val totalOut = secondaryOutputTokens
+                .filter({ (t: (Coll[Byte], Long)) => t._1 == tokenId })
+                .fold(0L, { (sum: Long, t: (Coll[Byte], Long)) => sum + t._2 })
+              totalOut >= totalIn
+            })
+          }
+
+          val nativeErgIsPreserved = {
+            val totalNativeIn = repBoxesOnInputs.fold(0L, { (sum: Long, b: Box) => sum + b.value })
+            val totalNativeOut = repBoxesOnOutputs.fold(0L, { (sum: Long, b: Box) => sum + b.value })
+            totalNativeOut >= totalNativeIn
+          }
+
+          tokensArePreserved && nativeErgIsPreserved
+        }
+
         (inputsAmount + dataInputsAmount) == totalSupply && // All boxes are present.
-        inputsAmount == outputsAmount                    // All tokens are preserved.
+        inputsAmount == outputsAmount &&                   // All tokens are preserved.
+        valuePreserved
       }
       
       // OUTPUTS VALIDATION
