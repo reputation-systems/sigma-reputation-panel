@@ -112,7 +112,10 @@
             val secondaryOutputTokens = repBoxesOnOutputs.flatMap({ (b: Box) =>
               if (b.tokens.size > 1) { b.tokens.slice(1, b.tokens.size) } else { Coll[(Coll[Byte], Long)]() }
             })
-            val uniqueTokenIds = secondaryInputTokens.map({ (t: (Coll[Byte], Long)) => t._1 }).distinct
+            
+            val uniqueTokenIds = secondaryInputTokens.fold(Coll[Coll[Byte]](), { (acc: Coll[Coll[Byte]], t: (Coll[Byte], Long)) =>
+              if (acc.exists({ (x: Coll[Byte]) => x == t._1 })) acc else acc.append(Coll(t._1))
+            })
             
             uniqueTokenIds.forall({ (tokenId: Coll[Byte]) =>
               val totalIn = secondaryInputTokens
