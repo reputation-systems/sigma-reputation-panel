@@ -47,7 +47,6 @@ const REPUTATION_PROOF_SOURCE_TEMPLATE = fs.readFileSync(path.join(contractsDir,
 const REPUTATION_PROOF_SOURCE = REPUTATION_PROOF_SOURCE_TEMPLATE.replace("`+DIGITAL_PUBLIC_GOOD_SCRIPT_HASH+`", digitalPublicGoodScriptHash);
 const reputationProofErgoTree = compile(REPUTATION_PROOF_SOURCE, { version: 1 });
 
-
 describe("Reputation Proof Contract Tests", () => {
   let mockChain: MockChain;
   let creator: Party;
@@ -57,6 +56,12 @@ describe("Reputation Proof Contract Tests", () => {
 
   let typeNftBox: Box<Amount>;
   const typeNftId = "01c236e723a189c99e9c9380dc48a6058e888c88e9a107df1c0519d0a5bf838e";
+
+  // Generate unique 64-char hex token IDs to avoid encoding issues
+  function generateTokenId(seed: string): string {
+    const hash = blake2b256(stringToBytes('utf8', seed));
+    return uint8ArrayToHex(hash);
+  }
 
   function getCorrectR7(party: Party): string {
     const ergoTreeBytes = hexToBytes(party.address.ergoTree);
@@ -140,7 +145,7 @@ describe("Reputation Proof Contract Tests", () => {
   it("should update an existing reputation proof by splitting it", () => {
     const initialTotalSupply = 1000;
     const initialObjectPointer = "https://github.com/ergoplatform";
-    const initialProofTokenId = "a".repeat(64);
+    const initialProofTokenId = generateTokenId("proof-a");
 
     const r7 = getCorrectR7(creator);
 
@@ -202,11 +207,11 @@ describe("Reputation Proof Contract Tests", () => {
     expect(changeBox).to.not.be.undefined;
     expect(changeBox?.additionalRegisters.R5).to.equal(SString(initialObjectPointer));
     expect(changeBox?.additionalRegisters).to.deep.equal(proofToSpend.additionalRegisters);
-  })
+  });
 
   it("should fail to update if the transaction is not signed by the owner", () => {
     const initialTotalSupply = 1000;
-    const initialProofTokenId = "b".repeat(64);
+    const initialProofTokenId = generateTokenId("proof-b");
     
     const r7 = getCorrectR7(creator);
 
@@ -250,7 +255,7 @@ describe("Reputation Proof Contract Tests", () => {
 
   it("should allow anyone to add ERGs to a proof box (top-up for demurrage)", () => {
     const initialTotalSupply = 1000;
-    const initialProofTokenId = "c".repeat(64);
+    const initialProofTokenId = generateTokenId("proof-c");
 
     const r7 = getCorrectR7(creator); 
 
@@ -297,7 +302,7 @@ describe("Reputation Proof Contract Tests", () => {
 
   it("should update multiple proof boxes of the same token in one transaction", () => {
     const initialTotalSupply = 1000;
-    const proofTokenId = "d".repeat(64);
+    const proofTokenId = generateTokenId("proof-d");
     
     const r7 = getCorrectR7(creator); 
     
@@ -353,6 +358,113 @@ describe("Reputation Proof Contract Tests", () => {
     expect(consolidatedBox.assets[0].amount).to.equal(BigInt(initialTotalSupply));
     expect(consolidatedBox.additionalRegisters.R5).to.equal(SString(newPointer));
     expect(consolidatedBox.additionalRegisters.R8).to.equal(booleanToSerializer(newPolarization));
+  });
+
+  it("should fail if creator tries to withdraw secondary tokens to their own address", () => {
+    const initialTotalSupply = 1000;
+    const initialProofTokenId = generateTokenId("proof-e");
+    const secondaryTokenId = generateTokenId("secondary-e");
+    const secondaryTokenAmount = 500n;
+    
+    const r7 = getCorrectR7(creator);
+
+    reputationProofContract.addUTxOs({
+      creationHeight: mockChain.height,
+      ergoTree: reputationProofErgoTree.toHex(),
+      value: SAFE_MIN_BOX_VALUE,
+      assets: [
+        { tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) },
+        { tokenId: secondaryTokenId, amount: secondaryTokenAmount }
+      ],
+      additionalRegisters: {
+        R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
+        R5: SString("some-pointer"),
+        R6: tupleToSerialized(false, initialTotalSupply),
+        R7: r7,
+        R8: booleanToSerializer(true),
+        R9: SString("{}")
+      }
+    });
+    const proofToSpend = reputationProofContract.utxos.toArray()[0];
+
+    const withdrawOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, creator.address)
+      .addTokens([
+        { tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) },
+        { tokenId: secondaryTokenId, amount: secondaryTokenAmount }
+      ])
+      .setAdditionalRegisters(proofToSpend.additionalRegisters);
+
+    const tx = new TransactionBuilder(mockChain.height)
+      .from([proofToSpend, ...creator.utxos.toArray()])
+      .to(withdrawOutput)
+      .withDataFrom([typeNftBox])
+      .sendChangeTo(creator.address)
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .build();
+
+    const executionResult = mockChain.execute(tx, { signers: [creator], throw: false });
+    expect(executionResult).to.be.false;
+    
+    expect(reputationProofContract.utxos.length).to.equal(1);
+    expect(reputationProofContract.utxos.toArray()[0].assets).to.deep.equal([
+      { tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) },
+      { tokenId: secondaryTokenId, amount: secondaryTokenAmount }
+    ]);
+    expect(reputationProofContract.utxos.toArray()[0].additionalRegisters.R5).to.equal(SString("some-pointer"));
+  });
+
+  it("should fail if creator tries to reduce the number of secondary tokens", () => {
+    const initialTotalSupply = 1000;
+    const initialProofTokenId = generateTokenId("proof-f");
+    const secondaryTokenId = generateTokenId("secondary-f");
+    const secondaryTokenAmount = 500n;
+    
+    const r7 = getCorrectR7(creator);
+
+    reputationProofContract.addUTxOs({
+      creationHeight: mockChain.height,
+      ergoTree: reputationProofErgoTree.toHex(),
+      value: SAFE_MIN_BOX_VALUE,
+      assets: [
+        { tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) },
+        { tokenId: secondaryTokenId, amount: secondaryTokenAmount }
+      ],
+      additionalRegisters: {
+        R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
+        R5: SString("some-pointer"),
+        R6: tupleToSerialized(false, initialTotalSupply),
+        R7: r7,
+        R8: booleanToSerializer(true),
+        R9: SString("{}")
+      }
+    });
+    const proofToSpend = reputationProofContract.utxos.toArray()[0];
+
+    const reducedSecondaryAmount = 300n;
+    const reducedOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, reputationProofContract.address)
+      .addTokens([
+        { tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) },
+        { tokenId: secondaryTokenId, amount: reducedSecondaryAmount }
+      ])
+      .setAdditionalRegisters(proofToSpend.additionalRegisters);
+
+    const tx = new TransactionBuilder(mockChain.height)
+      .from([proofToSpend, ...creator.utxos.toArray()])
+      .to(reducedOutput)
+      .withDataFrom([typeNftBox])
+      .sendChangeTo(creator.address)
+      .payFee(RECOMMENDED_MIN_FEE_VALUE)
+      .build();
+
+    const executionResult = mockChain.execute(tx, { signers: [creator], throw: false });
+    expect(executionResult).to.be.false;
+    
+    expect(reputationProofContract.utxos.length).to.equal(1);
+    expect(reputationProofContract.utxos.toArray()[0].assets).to.deep.equal([
+      { tokenId: initialProofTokenId, amount: BigInt(initialTotalSupply) },
+      { tokenId: secondaryTokenId, amount: secondaryTokenAmount }
+    ]);
+    expect(reputationProofContract.utxos.toArray()[0].additionalRegisters.R5).to.equal(SString("some-pointer"));
   });
 
 });
