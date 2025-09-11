@@ -474,7 +474,6 @@ describe("Reputation Proof Contract Tests", () => {
 
     const r7 = getCorrectR7(creator);
 
-    // 1. Crear la caja inicial con alto valor en nanoERGs y todos los tokens
     reputationProofContract.addUTxOs({
       creationHeight: mockChain.height,
       ergoTree: reputationProofErgoTree.toHex(),
@@ -493,29 +492,23 @@ describe("Reputation Proof Contract Tests", () => {
     expect(proofToSpend.value).to.equal(initialValue);
     expect(reputationProofContract.utxos.length).to.equal(1);
 
-    // 2. Preparar la división
     const amountToMove = 1n;
     const amountRemaining = initialTotalSupply - amountToMove;
 
-    // Caja de salida para el token movido (con valor mínimo)
     const newBoxOutput = new OutputBuilder(SAFE_MIN_BOX_VALUE, reputationProofContract.address)
       .addTokens([{ tokenId: proofTokenId, amount: amountToMove.toString() }])
-      // Modificamos R5 para que sea único
       .setAdditionalRegisters({
         ...proofToSpend.additionalRegisters,
         R5: SString("high-value-box-split-1")
       });
 
-    // Caja de salida que conserva el valor original y los tokens restantes
     const recreatedBoxOutput = new OutputBuilder(initialValue, reputationProofContract.address)
       .addTokens([{ tokenId: proofTokenId, amount: amountRemaining.toString() }])
-      // Mantenemos el R5 original o le damos otro valor único
       .setAdditionalRegisters({
         ...proofToSpend.additionalRegisters,
         R5: SString("high-value-box-recreated")
       });
       
-    // 3. Construir y ejecutar la transacción
     const tx = new TransactionBuilder(mockChain.height)
       .from([proofToSpend, ...creator.utxos.toArray()])
       .to([newBoxOutput, recreatedBoxOutput])
@@ -527,18 +520,15 @@ describe("Reputation Proof Contract Tests", () => {
     const executionResult = mockChain.execute(tx, { signers: [creator] });
     expect(executionResult).to.be.true;
 
-    // 4. Verificar el estado final
     expect(reputationProofContract.utxos.length).to.equal(2);
 
     const newSmallBox = reputationProofContract.utxos.toArray().find(box => box.assets[0].amount === amountToMove);
     const recreatedHighValueBox = reputationProofContract.utxos.toArray().find(box => box.assets[0].amount === amountRemaining);
 
-    // Verificar la nueva caja pequeña
     expect(newSmallBox).to.not.be.undefined;
     expect(newSmallBox?.value).to.equal(SAFE_MIN_BOX_VALUE);
     expect(newSmallBox?.assets[0].amount).to.equal(amountToMove);
 
-    // Verificar la caja recreada con alto valor
     expect(recreatedHighValueBox).to.not.be.undefined;
     expect(recreatedHighValueBox?.value).to.equal(initialValue);
     expect(recreatedHighValueBox?.assets[0].amount).to.equal(amountRemaining);
