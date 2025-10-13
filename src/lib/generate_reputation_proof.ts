@@ -115,13 +115,12 @@ export async function generate_reputation_proof(
     if (!propositionBytes) {
         throw new Error(`Could not get proposition bytes from address ${creatorAddressString}.`);
     }
-    const hashedProposition = blake2b256(propositionBytes);
 
     new_proof_output.setAdditionalRegisters({
         R4: SColl(SByte, hexToBytes(type_nft_id) ?? "").toHex(),
         R5: SString(object_pointer),
         R6: booleanToSerializer(is_locked),
-        R7: SColl(SByte, hashedProposition).toHex(),
+        R7: SColl(SByte, propositionBytes).toHex(),
         R8: booleanToSerializer(polarization),
         R9: SString(typeof(content) === "object" ? JSON.stringify(content): content ?? "")
     });

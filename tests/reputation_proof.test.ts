@@ -66,8 +66,7 @@ describe("Reputation Proof Contract Tests", () => {
   function getCorrectR7(party: Party): string {
     const ergoTreeBytes = hexToBytes(party.address.ergoTree);
     if (!ergoTreeBytes) throw new Error("Could not get ergoTree bytes");
-    const hashedProposition = blake2b256(ergoTreeBytes);
-    return SColl(SByte, hashedProposition).toHex();
+    return SColl(SByte, ergoTreeBytes).toHex();
   }
 
   afterEach(() => {

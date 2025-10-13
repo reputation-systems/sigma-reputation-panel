@@ -19,7 +19,7 @@ export interface ReputationProof {
     type: TypeNFT;  // SELF identification of the proof type (by Type NFT)
     total_amount: number;
     owner_address: string;
-    owner_hash_serialized: string;
+    owner_serialized: string;
     can_be_spend: boolean;
     current_boxes: RPBox[];
     number_of_boxes: number;

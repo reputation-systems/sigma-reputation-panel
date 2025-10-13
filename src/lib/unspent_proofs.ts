@@ -91,8 +91,7 @@ export async function updateReputationProofList(
         const propositionBytes = hexToBytes(userAddress.ergoTree);
 
         if (propositionBytes) {
-            const hashedProposition = blake2b256(propositionBytes);
-            userR7SerializedHex = SColl(SByte, hashedProposition).toHex();
+            userR7SerializedHex = SColl(SByte, propositionBytes).toHex();
             if (!all) {
                 r7_filter = { "R7": userR7SerializedHex };
             }
@@ -129,14 +128,14 @@ export async function updateReputationProofList(
                     if (!box.assets?.length || !box.additionalRegisters.R4 || !box.additionalRegisters.R6 || !box.additionalRegisters.R7) continue;
 
                     const rep_token_id = box.assets[0].tokenId;
-                    const owner_hash_serialized = box.additionalRegisters.R7.serializedValue;
+                    const owner_serialized = box.additionalRegisters.R7.serializedValue;
 
                     let proof = proofs.get(rep_token_id);
 
-                    if (proof && proof.owner_hash_serialized !== owner_hash_serialized) {
+                    if (proof && proof.owner_serialized !== owner_serialized) {
                         console.warn(`Reputation Proof with token ID ${rep_token_id} has conflicting owner hashes. Skipping this proof.`, {
-                            expectedOwnerHash: proof.owner_hash_serialized,
-                            foundOwnerHash: owner_hash_serialized,
+                            expectedOwnerHash: proof.owner_serialized,
+                            foundOwnerHash: owner_serialized,
                             conflictingBox: box.boxId
                         });
                         proofs.delete(rep_token_id);
@@ -156,9 +155,9 @@ export async function updateReputationProofList(
                             token_id: rep_token_id,
                             type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
                             total_amount: emissionAmount,
-                            owner_address: serializedToRendered(owner_hash_serialized),
-                            owner_hash_serialized: owner_hash_serialized,
-                            can_be_spend: userR7SerializedHex ? owner_hash_serialized === userR7SerializedHex : false,
+                            owner_address: serializedToRendered(owner_serialized),
+                            owner_serialized: owner_serialized,
+                            can_be_spend: userR7SerializedHex ? owner_serialized === userR7SerializedHex : false,
                             current_boxes: [],
                             number_of_boxes: 0,
                             network: Network.ErgoMainnet,
