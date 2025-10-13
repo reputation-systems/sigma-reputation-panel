@@ -15,16 +15,6 @@ type ApiBox = {
     index: number; transactionId: string;
 };
 
-function parseR6(r6RenderedValue: string): { isLocked: boolean; totalSupply: number } {
-    try {
-        const [lockedStr, supplyStr] = r6RenderedValue.replace(/[()\[\]]/g, '').split(',');
-        return { isLocked: lockedStr.trim() === 'true', totalSupply: Number(supplyStr.trim()) };
-    } catch (e) {
-        console.warn("Could not parse R6 tuple, returning defaults:", r6RenderedValue, e);
-        return { isLocked: true, totalSupply: 0 };
-    }
-}
-
 export async function fetchTypeNfts() {
     try {
         const fetchedTypesArray: TypeNFT[] = [];
@@ -154,11 +144,11 @@ export async function updateReputationProofList(
                     }
 
                     if (!proof) {
-                        const r6_parsed = parseR6(box.additionalRegisters.R6.renderedValue);
+                        const emissionAmount = 100;  // TODO get total supply from  /api/v1/tokens/{rep_token_id}
                         proof = {
                             token_id: rep_token_id,
                             type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
-                            total_amount: r6_parsed.totalSupply,
+                            total_amount: emissionAmount,
                             owner_address: serializedToRendered(owner_hash_serialized),
                             owner_hash_serialized: owner_hash_serialized,
                             can_be_spend: userR7SerializedHex ? owner_hash_serialized === userR7SerializedHex : false,
@@ -204,7 +194,7 @@ export async function updateReputationProofList(
                         token_id: rep_token_id,
                         token_amount: Number(box.assets[0].amount),
                         object_pointer: object_pointer_for_box,
-                        is_locked: parseR6(box.additionalRegisters.R6.renderedValue).isLocked,
+                        is_locked: box.additionalRegisters.R6.renderedValue === 'true',
                         polarization: box.additionalRegisters.R8?.renderedValue === 'true',
                         content: box_content,
                     };

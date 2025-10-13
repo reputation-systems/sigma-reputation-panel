@@ -109,13 +109,6 @@ export async function generate_reputation_proof(
         }
 
         if (!object_pointer) object_pointer = input_proof.token_id
-
-        const parentProof = getReputationProofFromRPBox(input_proof);
-        if (parentProof) {
-            let all_boxes = getAllRPBoxesFromProof(parentProof);
-            all_boxes = all_boxes.filter(b => b.box_id !== input_proof.box_id); // Exclude the spent box
-            dataInputs = dataInputs.concat(all_boxes);
-        }
     }
     
     const propositionBytes = hexToBytes(creatorP2PKAddress.ergoTree);
@@ -127,7 +120,7 @@ export async function generate_reputation_proof(
     new_proof_output.setAdditionalRegisters({
         R4: SColl(SByte, hexToBytes(type_nft_id) ?? "").toHex(),
         R5: SString(object_pointer),
-        R6: tupleToSerialized(is_locked, total_supply),
+        R6: booleanToSerializer(is_locked),
         R7: SColl(SByte, hashedProposition).toHex(),
         R8: booleanToSerializer(polarization),
         R9: SString(typeof(content) === "object" ? JSON.stringify(content): content ?? "")
