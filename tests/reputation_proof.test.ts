@@ -114,7 +114,7 @@ describe("Reputation Proof Contract Tests", () => {
     .setAdditionalRegisters({
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(objectPointer),
-        R6: tupleToSerialized(false, totalSupply),
+        R6: booleanToSerializer(false),
         R7: getCorrectR7(creator),
         R8: booleanToSerializer(true),
         R9: SString(JSON.stringify({ message: "Initial creation" }))
@@ -157,7 +157,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(initialObjectPointer),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(true),
         R9: SString(JSON.stringify({ comment: "Original comment" }))
@@ -175,7 +175,7 @@ describe("Reputation Proof Contract Tests", () => {
       .setAdditionalRegisters({
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString(updatedObjectPointer),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(updatedPolarization),
         R9: SString(JSON.stringify({ message: "This is an updated proof." }))
@@ -223,7 +223,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString("some-pointer"),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(true),
         R9: SString("{}")
@@ -267,7 +267,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString("demurrage-test"),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(true),
         R9: SString("{}")
@@ -308,7 +308,7 @@ describe("Reputation Proof Contract Tests", () => {
     
     const commonRegisters = {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R9: SString("{}")
     };
@@ -379,7 +379,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString("some-pointer"),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(true),
         R9: SString("{}")
@@ -432,7 +432,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString("some-pointer"),
-        R6: tupleToSerialized(false, initialTotalSupply),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(true),
         R9: SString("{}")
@@ -482,7 +482,7 @@ describe("Reputation Proof Contract Tests", () => {
       additionalRegisters: {
         R4: SColl(SByte, hexToBytes(typeNftId) ?? "").toHex(),
         R5: SString("high-value-box"),
-        R6: tupleToSerialized(false, Number(initialTotalSupply)),
+        R6: booleanToSerializer(false),
         R7: r7,
         R8: booleanToSerializer(true),
         R9: SString(JSON.stringify({ note: "Initial high value box" }))
