@@ -144,7 +144,14 @@ export async function updateReputationProofList(
                     }
 
                     if (!proof) {
-                        const emissionAmount = 100;  // TODO get total supply from  /api/v1/tokens/{rep_token_id}
+                        const tokenResponse = await fetch(`${explorer_uri}/api/v1/tokens/${rep_token_id}`);
+                        if (!tokenResponse.ok) {
+                            console.error(`Error al obtener la cantidad emitida del token ${rep_token_id}`);
+                            continue;
+                        }
+                        const tokenData = await tokenResponse.json();
+                        const emissionAmount = Number(tokenData.emissionAmount || 0);
+
                         proof = {
                             token_id: rep_token_id,
                             type: { tokenId: "", boxId: '', typeName: "N/A", description: "...", schemaURI: "", isRepProof: false },
