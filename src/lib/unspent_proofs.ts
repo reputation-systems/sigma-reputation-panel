@@ -187,7 +187,7 @@ export async function updateReputationProofList(
                         box_content = {};
                     }
                     
-                    const object_pointer_for_box = hexToUtf8(box.additionalRegisters.R5?.renderedValue ?? "") ?? "";
+                    const object_pointer_for_box = hexToBytes(box.additionalRegisters.R5?.renderedValue ?? "") ?? "";
 
                     const current_box: RPBox = {
                         box: {
